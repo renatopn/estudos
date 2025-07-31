@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cool Clothes - Jogo do JR</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            background-color: #f0f8ff;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #ff6347;
+            margin-bottom: 10px;
+        }
+
+        .score {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4682b4;
+            margin-bottom: 20px;
+        }
+
+        .game-area {
+            background-color: #e6f7ff;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #b0e0e6;
+        }
+
+        #emoji-display {
+            font-size: 6em;
+            margin-bottom: 20px;
+        }
+
+        #question {
+            font-size: 1.5em;
+            color: #555;
+            min-height: 40px;
+        }
+
+        #answer-input {
+            width: 80%;
+            padding: 10px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            border: 2px solid #99d9ea;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        #answer-input:focus {
+            outline: none;
+            border-color: #4682b4;
+            box-shadow: 0 0 5px #4682b4;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 5px;
+        }
+
+        #check-button {
+            background-color: #32cd32;
+        }
+
+        #check-button:hover {
+            background-color: #228b22;
+        }
+
+        #next-button {
+            background-color: #4682b4;
+        }
+
+        #next-button:hover {
+            background-color: #386699;
+        }
+
+        #settings-button {
+            background-color: #ffa500;
+        }
+
+        #settings-button:hover {
+            background-color: #ff8c00;
+        }
+
+        #feedback {
+            font-size: 1.3em;
+            font-weight: bold;
+            min-height: 30px;
+            margin-top: 10px;
+        }
+
+        /* Estilos do Popup */
+        .popup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+            /* Inicia escondido */
+        }
+
+        .popup-content {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: left;
+        }
+
+        #json-editor {
+            width: 100%;
+            height: 250px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 1em;
+            margin-bottom: 15px;
+            resize: vertical;
+        }
+
+        .popup-buttons {
+            text-align: right;
+        }
+
+        #save-button,
+        #cancel-button {
+            padding: 8px 15px;
+            font-size: 1em;
+            margin-left: 10px;
+        }
+
+        #save-button {
+            background-color: #32cd32;
+        }
+
+        #save-button:hover {
+            background-color: #228b22;
+        }
+
+        #cancel-button {
+            background-color: #ff4500;
+        }
+
+        #cancel-button:hover {
+            background-color: #cc3700;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Cool Clothes - Jogo do JR</h1>
+        <div class="score">Acertos: <span id="score-value">0</span></div>
+        <div class="game-area">
+            <div id="emoji-display"></div>
+            <p id="question"></p>
+            <input type="text" id="answer-input" placeholder="Digite sua resposta aqui...">
+            <button id="check-button">Verificar</button>
+            <p id="feedback"></p>
+        </div>
+        <div class="buttons-bottom">
+            <button id="next-button" style="display: none;">Próxima Pergunta</button>
+            <button id="settings-button">Ajustes</button>
+        </div>
+    </div>
+
+    <div id="settings-popup" class="popup-container">
+        <div class="popup-content">
+            <h2>Ajustes do Jogo</h2>
+            <textarea id="json-editor"></textarea>
+            <div class="popup-buttons">
+                <button id="save-button">Salvar</button>
+                <button id="cancel-button">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let clothesData = [
+                { emoji: '👟', question: 'What are those?', answer: 'those are shoes' },
+                { emoji: '👕', question: 'What is that?', answer: 'that is a t-shirt' },
+                { emoji: '👖', question: 'What are those?', answer: 'those are pants' },
+                { emoji: '🧥', question: 'What is that?', answer: 'that is a jacket' },
+                { emoji: '👗', question: 'What is that?', answer: 'that is a dress' },
+                { emoji: '🧦', question: 'What are those?', answer: 'those are socks' },
+                { emoji: '🧤', question: 'What are those?', answer: 'those are gloves' },
+                { emoji: '🧣', question: 'What is that?', answer: 'that is a scarf' },
+                { emoji: '🧢', question: 'What is that?', answer: 'that is a cap' },
+                { emoji: '🎩', question: 'What is that?', answer: 'that is a hat' },
+                { emoji: '🩳', question: 'What are those?', answer: 'those are shorts' },
+                { emoji: '👚', question: 'What is that?', answer: 'that is a blouse' },
+                { emoji: '👜', question: 'What is that?', answer: 'that is a handbag' },
+                { emoji: '👙', question: 'What is that?', answer: 'that is a bikini' }
+            ];
+
+            const congratsMessages = [
+                'Parabéns! Você acertou!',
+                'Isso mesmo, excelente!',
+                'Uhu! Acertou de novo!',
+                'Muito bem, você é um craque!',
+                'Resposta certa, arrasou!'
+            ];
+
+            const encouragementMessages = [
+                'Quase lá! Tente de novo!',
+                'Não desanime, você consegue!',
+                'Vamos tentar mais uma vez!',
+                'Você está perto, pense um pouco mais!',
+                'Continue tentando, você vai acertar!'
+            ];
+
+            const emojiDisplay = document.getElementById('emoji-display');
+            const questionEl = document.getElementById('question');
+            const answerInput = document.getElementById('answer-input');
+            const checkButton = document.getElementById('check-button');
+            const feedbackEl = document.getElementById('feedback');
+            const nextButton = document.getElementById('next-button');
+            const scoreValueEl = document.getElementById('score-value');
+            const settingsButton = document.getElementById('settings-button');
+            const settingsPopup = document.getElementById('settings-popup');
+            const jsonEditor = document.getElementById('json-editor');
+            const saveButton = document.getElementById('save-button');
+            const cancelButton = document.getElementById('cancel-button');
+
+            let currentItem = {};
+            let score = 0;
+
+            function getRandomItem() {
+                const randomIndex = Math.floor(Math.random() * clothesData.length);
+                return clothesData[randomIndex];
+            }
+
+            function startGame() {
+                score = 0;
+                updateScore();
+                nextQuestion();
+            }
+
+             function nextQuestion() {
+                currentItem = getRandomItem();
+
+                // Alteração: Exibir o emoji duas vezes se a pergunta for 'What are those?'
+                if (currentItem.question.includes('those')) {
+                    emojiDisplay.textContent = `${currentItem.emoji} ${currentItem.emoji}`;
+                } else {
+                    emojiDisplay.textContent = currentItem.emoji;
+                }
+                
+                questionEl.textContent = currentItem.question;
+                answerInput.value = '';
+                answerInput.disabled = false;
+                checkButton.style.display = 'block';
+                nextButton.style.display = 'none';
+                feedbackEl.innerHTML = '';
+                answerInput.focus();
+            }
+            
+             function checkAnswer() {
+                // Normaliza as strings para ignorar pontuação, espaços extras e case
+                const userAnswerNormalized = answerInput.value.trim().toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").replace(/\s{2,}/g," ");
+                const correctAnswerNormalized = currentItem.answer.trim().toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").replace(/\s{2,}/g," ");
+
+                if (userAnswerNormalized === correctAnswerNormalized) {
+                    feedbackEl.textContent = getRandomCongratsMessage();
+                    feedbackEl.style.color = 'green';
+                    score++;
+                    updateScore();
+                    answerInput.disabled = true;
+                    checkButton.style.display = 'none';
+                    nextButton.style.display = 'block';
+                } else {
+                    // Se a resposta estiver errada, exibe a mensagem de erro com a resposta correta
+                    const encouragementMsg = getRandomEncouragementMessage();
+                    feedbackEl.innerHTML = `${encouragementMsg} <br> A resposta correta é:<br> <strong>"${currentItem.answer}"</strong>`;
+                    feedbackEl.style.color = 'red';
+                }
+            }
+
+            function updateScore() {
+                scoreValueEl.textContent = score;
+            }
+
+            function getRandomCongratsMessage() {
+                const randomIndex = Math.floor(Math.random() * congratsMessages.length);
+                return congratsMessages[randomIndex];
+            }
+
+            function getRandomEncouragementMessage() {
+                const randomIndex = Math.floor(Math.random() * encouragementMessages.length);
+                return encouragementMessages[randomIndex];
+            }
+
+            function openSettings() {
+                jsonEditor.value = JSON.stringify(clothesData, null, 2);
+                settingsPopup.style.display = 'flex';
+            }
+
+            function closeSettings() {
+                settingsPopup.style.display = 'none';
+            }
+
+            function saveSettings() {
+                try {
+                    const newClothesData = JSON.parse(jsonEditor.value);
+                    clothesData = newClothesData;
+                    alert('Ajustes salvos com sucesso!');
+                    closeSettings();
+                    startGame(); // Reinicia o jogo com os novos dados
+                } catch (error) {
+                    alert('Erro ao salvar os ajustes. Verifique a formatação do JSON.');
+                    console.error('Erro de parsing JSON:', error);
+                }
+            }
+
+            // Event Listeners
+            checkButton.addEventListener('click', checkAnswer);
+            nextButton.addEventListener('click', nextQuestion);
+            settingsButton.addEventListener('click', openSettings);
+            saveButton.addEventListener('click', saveSettings);
+            cancelButton.addEventListener('click', closeSettings);
+
+            answerInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && answerInput.disabled === false) {
+                    checkAnswer();
+                } else if (e.key === 'Enter' && nextButton.style.display === 'block') {
+                    nextQuestion();
+                }
+            });
+
+            // Inicia o jogo
+            startGame();
+        });
+
+    </script>
+</body>
+
+</html>
