@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Português - Estudo</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+        
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .settings-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .settings-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .game-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        .question-display {
+            font-size: 36px;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            background-color: #9b59b6;
+        }
+        
+        .emoji-display {
+            font-size: 60px;
+            margin: 20px 0;
+        }
+        
+        .question-text {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #34495e;
+        }
+        
+        .answer-input {
+            width: 80%;
+            padding: 15px;
+            font-size: 20px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .option-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+        
+        .option-btn:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        .check-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+        
+        .check-btn:hover {
+            background-color: #27ae60;
+            transform: scale(1.05);
+        }
+        
+        .next-btn {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+            display: none;
+        }
+        
+        .next-btn:hover {
+            background-color: #d35400;
+            transform: scale(1.05);
+        }
+        
+        .message {
+            font-size: 22px;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d5f5e3;
+            color: #27ae60;
+        }
+        
+        .error {
+            background-color: #fadbd8;
+            color: #e74c3c;
+        }
+        
+        .correct-answer {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .json-textarea {
+            width: 100%;
+            height: 300px;
+            font-family: monospace;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            border: none;
+        }
+        
+        .save-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .game-over {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .final-score {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        
+        .final-message {
+            font-size: 24px;
+            color: #7f8c8d;
+        }
+        
+        .topic-selector {
+            margin-bottom: 20px;
+        }
+        
+        .topic-btn {
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        
+        .topic-btn.active {
+            background-color: #8e44ad;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 600px) {
+            .question-display {
+                font-size: 28px;
+            }
+            
+            .question-text {
+                font-size: 20px;
+            }
+            
+            .emoji-display {
+                font-size: 48px;
+            }
+            
+            .answer-input {
+                width: 90%;
+                font-size: 18px;
+            }
+            
+            .option-btn {
+                padding: 10px 15px;
+                font-size: 16px;
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="settings-btn">⚙️ Configurações</button>
+        <div class="score">Pontuação: 0/0</div>
+    </div>
+    
+    <div class="topic-selector">
+        <button class="topic-btn active" data-topic="r">Letra R</button>
+        <button class="topic-btn" data-topic="diminutivo">Diminutivo</button>
+        <button class="topic-btn" data-topic="nasal">Sons Nasais</button>
+        <button class="topic-btn" data-topic="silabas">Separação Silábica</button>
+    </div>
+    
+    <div class="game-container">
+        <div id="question-display" class="question-display">Carregando...</div>
+        <div id="emoji-display" class="emoji-display" style="display: none;"></div>
+        <div id="question-text" class="question-text">Aguarde enquanto preparamos o jogo</div>
+        
+        <div id="options-container" class="options-container" style="display: none;"></div>
+        
+        <input type="text" id="answer-input" class="answer-input" placeholder="Digite sua resposta..." style="display: none;">
+        
+        <button id="check-btn" class="check-btn" style="display: none;">Verificar</button>
+        <button id="next-btn" class="next-btn">Próxima</button>
+        
+        <div id="message" class="message"></div>
+    </div>
+    
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Configurações do Jogo</div>
+            <textarea id="json-textarea" class="json-textarea"></textarea>
+            <div class="modal-buttons">
+                <button id="cancel-btn" class="modal-btn cancel-btn">Cancelar</button>
+                <button id="save-btn" class="modal-btn save-btn">Salvar</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Dados iniciais do jogo por tópico
+        let gameData = {
+            r: [
+                {
+                    type: "single",
+                    question: "Quantos R tem no nome deste emoji?",
+                    emoji: "🚗",
+                    answer: "2",
+                    options: ["1", "2"],
+                    explanation: "O emoji 🚗 é 'carro', que tem RR na palavra."
+                },
+                {
+                    type: "single",
+                    question: "Quantos R tem no nome deste emoji?",
+                    emoji: "🐶",
+                    answer: "1",
+                    options: ["1", "2"],
+                    explanation: "O emoji 🐶 é 'cachorro', que tem apenas 1 R."
+                },
+                {
+                    type: "single",
+                    question: "Quantos R tem no nome deste emoji?",
+                    emoji: "🍎",
+                    answer: "1",
+                    options: ["1", "2"],
+                    explanation: "O emoji 🍎 é 'maçã', que tem apenas 1 R."
+                },
+                {
+                    type: "single",
+                    question: "Quantos R tem no nome deste emoji?",
+                    emoji: "🚪",
+                    answer: "1",
+                    options: ["1", "2"],
+                    explanation: "O emoji 🚪 é 'porta', que tem apenas 1 R."
+                },
+                {
+                    type: "single",
+                    question: "Quantos R tem no nome deste emoji?",
+                    emoji: "🌹",
+                    answer: "1",
+                    options: ["1", "2"],
+                    explanation: "O emoji 🌹 é 'rosa', que tem apenas 1 R."
+                },
+                {
+                    type: "single",
+                    question: "Quantos R tem no nome deste emoji?",
+                    emoji: "🚂",
+                    answer: "2",
+                    options: ["1", "2"],
+                    explanation: "O emoji 🚂 é 'trem', que tem RR na palavra."
+                },
+                {
+                    type: "single",
+                    question: "Quantos R tem no nome deste emoji?",
+                    emoji: "🎻",
+                    answer: "2",
+                    options: ["1", "2"],
+                    explanation: "O emoji 🎻 é 'violino', que tem RR na palavra."
+                },
+                {
+                    type: "single",
+                    question: "Quantos R tem no nome deste emoji?",
+                    emoji: "🍒",
+                    answer: "2",
+                    options: ["1", "2"],
+                    explanation: "O emoji 🍒 é 'cereja', que tem RR na palavra."
+                },
+                {
+                    type: "single",
+                    question: "Quantos R tem no nome deste emoji?",
+                    emoji: "🦁",
+                    answer: "1",
+                    options: ["1", "2"],
+                    explanation: "O emoji 🦁 é 'leão', que tem apenas 1 R."
+                },
+                {
+                    type: "single",
+                    question: "Quantos R tem no nome deste emoji?",
+                    emoji: "🍞",
+                    answer: "1",
+                    options: ["1", "2"],
+                    explanation: "O emoji 🍞 é 'pão', que tem apenas 1 R."
+                }
+            ],
+            diminutivo: [
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "casa",
+                    answer: "casinha",
+                    explanation: "O diminutivo de 'casa' é 'casinha'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "cão",
+                    answer: "cãozinho",
+                    explanation: "O diminutivo de 'cão' é 'cãozinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "flor",
+                    answer: "florzinha",
+                    explanation: "O diminutivo de 'flor' é 'florzinha'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "livro",
+                    answer: "livrinho",
+                    explanation: "O diminutivo de 'livro' é 'livrinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "pé",
+                    answer: "pezinho",
+                    explanation: "O diminutivo de 'pé' é 'pezinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "mão",
+                    answer: "mãozinha",
+                    explanation: "O diminutivo de 'mão' é 'mãozinha'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "sol",
+                    answer: "sozinho",
+                    explanation: "O diminutivo de 'sol' é 'sozinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "pai",
+                    answer: "paizinho",
+                    explanation: "O diminutivo de 'pai' é 'paizinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "irmão",
+                    answer: "irmãozinho",
+                    explanation: "O diminutivo de 'irmão' é 'irmãozinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "avó",
+                    answer: "avozinha",
+                    explanation: "O diminutivo de 'avó' é 'avozinha'."
+                }
+            ],
+            nasal: [
+                {
+                    type: "multiple",
+                    question: "Qual palavra tem som nasal?",
+                    options: ["cama", "banana", "pente", "tampa"],
+                    answer: "pente",
+                    explanation: "'Pente' tem som nasal por causa do 'n' seguido de consoante."
+                },
+                {
+                    type: "multiple",
+                    question: "Qual palavra tem som nasal?",
+                    options: ["bala", "mala", "tampa", "pato"],
+                    answer: "tampa",
+                    explanation: "'Tampa' tem som nasal por causa do 'm' seguido de consoante."
+                },
+                {
+                    type: "multiple",
+                    question: "Qual palavra tem som nasal?",
+                    options: ["casa", "vaso", "pomba", "sapo"],
+                    answer: "pomba",
+                    explanation: "'Pomba' tem som nasal por causa do 'm' seguido de consoante."
+                },
+                {
+                    type: "multiple",
+                    question: "Qual palavra tem som nasal?",
+                    options: ["faca", "boca", "penca", "pipa"],
+                    answer: "penca",
+                    explanation: "'Penca' tem som nasal por causa do 'n' seguido de consoante."
+                },
+                {
+                    type: "multiple",
+                    question: "Qual palavra tem som nasal?",
+                    options: ["lupa", "rupa", "tumba", "cuba"],
+                    answer: "tumba",
+                    explanation: "'Tumba' tem som nasal por causa do 'm' seguido de consoante."
+                }
+            ],
+            silabas: [
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "casa",
+                    answer: "ca-sa (dissílaba)",
+                    explanation: "'Casa' separa-se em 'ca-sa' e é uma palavra dissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "árvore",
+                    answer: "ár-vo-re (trissílaba)",
+                    explanation: "'Árvore' separa-se em 'ár-vo-re' e é uma palavra trissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "sol",
+                    answer: "sol (monossílaba)",
+                    explanation: "'Sol' é uma palavra monossílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "computador",
+                    answer: "com-pu-ta-dor (polissílaba)",
+                    explanation: "'Computador' separa-se em 'com-pu-ta-dor' e é uma palavra polissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "carro",
+                    answer: "car-ro (dissílaba)",
+                    explanation: "'Carro' separa-se em 'car-ro' (com RR) e é uma palavra dissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "passo",
+                    answer: "pas-so (dissílaba)",
+                    explanation: "'Passo' separa-se em 'pas-so' (com SS) e é uma palavra dissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "tempo",
+                    answer: "tem-po (dissílaba)",
+                    explanation: "'Tempo' separa-se em 'tem-po' (com M antes de P) e é uma palavra dissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "cantar",
+                    answer: "can-tar (dissílaba)",
+                    explanation: "'Cantar' separa-se em 'can-tar' (com N antes de T) e é uma palavra dissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "asfalto",
+                    answer: "as-fal-to (trissílaba)",
+                    explanation: "'Asfalto' separa-se em 'as-fal-to' (com S antes de F) e é uma palavra trissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "construir",
+                    answer: "cons-tru-ir (trissílaba)",
+                    explanation: "'Construir' separa-se em 'cons-tru-ir' (com N antes de S e S antes de T) e é uma palavra trissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "prato",
+                    answer: "pra-to (dissílaba)",
+                    explanation: "'Prato' separa-se em 'pra-to' e é uma palavra dissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "flor",
+                    answer: "flor (monossílaba)",
+                    explanation: "'Flor' é uma palavra monossílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "elefante",
+                    answer: "e-le-fan-te (polissílaba)",
+                    explanation: "'Elefante' separa-se em 'e-le-fan-te' e é uma palavra polissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "pássaro",
+                    answer: "pás-sa-ro (trissílaba)",
+                    explanation: "'Pássaro' separa-se em 'pás-sa-ro' (com SS) e é uma palavra trissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "homem",
+                    answer: "ho-mem (dissílaba)",
+                    explanation: "'Homem' separa-se em 'ho-mem' e é uma palavra dissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "mãe",
+                    answer: "mãe (monossílaba)",
+                    explanation: "'Mãe' é uma palavra monossílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "universidade",
+                    answer: "u-ni-ver-si-da-de (polissílaba)",
+                    explanation: "'Universidade' separa-se em 'u-ni-ver-si-da-de' e é uma palavra polissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "triste",
+                    answer: "tris-te (dissílaba)",
+                    explanation: "'Triste' separa-se em 'tris-te' (com S antes de T) e é uma palavra dissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "criança",
+                    answer: "cri-an-ça (trissílaba)",
+                    explanation: "'Criança' separa-se em 'cri-an-ça' e é uma palavra trissílaba."
+                },
+                {
+                    type: "text",
+                    question: "Separe as sílabas e classifique:",
+                    word: "pão",
+                    answer: "pão (monossílaba)",
+                    explanation: "'Pão' é uma palavra monossílaba."
+                }
+            ]
+        };
+
+        // Variáveis do jogo
+        let currentTopic = "r";
+        let currentQuestion = null;
+        let usedQuestions = { r: [], diminutivo: [], nasal: [], silabas: [] };
+        let score = 0;
+        let totalQuestions = 0;
+        let gameActive = false;
+        
+        // Elementos do DOM
+        const questionDisplay = document.getElementById('question-display');
+        const emojiDisplay = document.getElementById('emoji-display');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const answerInput = document.getElementById('answer-input');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const messageDisplay = document.getElementById('message');
+        const scoreDisplay = document.querySelector('.score');
+        const settingsBtn = document.querySelector('.settings-btn');
+        const settingsModal = document.getElementById('settings-modal');
+        const jsonTextarea = document.getElementById('json-textarea');
+        const saveBtn = document.getElementById('save-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const topicBtns = document.querySelectorAll('.topic-btn');
+        
+        // Frases de feedback
+        const successPhrases = [
+            "Parabéns! Você acertou!",
+            "Muito bem! Você está aprendendo muito!",
+            "Correto! Você é um expert em português!",
+            "Ótimo trabalho! Continue assim!",
+            "Isso aí! Você é muito inteligente!"
+        ];
+        
+        const errorPhrases = [
+            "Ops! Não foi dessa vez, mas continue tentando!",
+            "Quase lá! Pratique mais um pouco!",
+            "Não desanime! Você vai conseguir na próxima!",
+            "Errou, mas isso faz parte do aprendizado!",
+            "Tente novamente! Você consegue!"
+        ];
+        
+        const finalMessages = [
+            {min: 0, max: 30, message: "Você pode melhorar! Pratique mais!"},
+            {min: 31, max: 70, message: "Bom trabalho! Continue praticando!"},
+            {min: 71, max: 90, message: "Excelente! Você está quase dominando tudo!"},
+            {min: 91, max: 100, message: "Incrível! Você é um mestre do português!"}
+        ];
+        
+        // Inicializar o jogo
+        function initGame() {
+            usedQuestions = { r: [], diminutivo: [], nasal: [], silabas: [] };
+            score = 0;
+            totalQuestions = 0;
+            gameActive = true;
+            updateScore();
+            nextQuestion();
+        }
+        
+        // Mudar tópico
+        function changeTopic(topic) {
+            currentTopic = topic;
+            
+            // Atualizar botões ativos
+            topicBtns.forEach(btn => {
+                if (btn.dataset.topic === topic) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Reiniciar o jogo com o novo tópico
+            initGame();
+        }
+        
+        // Selecionar próxima pergunta
+        function nextQuestion() {
+            // Verificar se ainda há perguntas disponíveis
+            const availableQuestions = gameData[currentTopic].filter(
+                q => !usedQuestions[currentTopic].includes(gameData[currentTopic].indexOf(q))
+            );
+            
+            if (availableQuestions.length === 0) {
+                endGame();
+                return;
+            }
+            
+            // Selecionar pergunta aleatória
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+            currentQuestion = availableQuestions[randomIndex];
+            
+            // Adicionar à lista de perguntas usadas
+            usedQuestions[currentTopic].push(gameData[currentTopic].indexOf(currentQuestion));
+            
+            // Atualizar exibição
+            questionDisplay.textContent = currentTopic === "r" ? currentQuestion.question : 
+                                        currentTopic === "diminutivo" ? `${currentQuestion.question} ${currentQuestion.word}?` :
+                                        currentTopic === "silabas" ? `${currentQuestion.question} '${currentQuestion.word}'` :
+                                        currentQuestion.question;
+            
+            // Mostrar emoji se for o caso
+            if (currentQuestion.emoji) {
+                emojiDisplay.textContent = currentQuestion.emoji;
+                emojiDisplay.style.display = 'block';
+            } else {
+                emojiDisplay.style.display = 'none';
+            }
+            
+            // Configurar opções ou campo de texto
+            if (currentQuestion.type === "multiple") {
+                optionsContainer.style.display = 'flex';
+                answerInput.style.display = 'none';
+                
+                // Limpar opções anteriores
+                optionsContainer.innerHTML = '';
+                
+                // Adicionar novas opções
+                currentQuestion.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = option;
+                    btn.addEventListener('click', () => selectOption(option));
+                    optionsContainer.appendChild(btn);
+                });
+            } else {
+                optionsContainer.style.display = 'none';
+                answerInput.style.display = 'block';
+                answerInput.placeholder = currentTopic === "silabas" ? "Ex: ca-sa (dissílaba)" : "Digite sua resposta...";
+            }
+            
+            // Configurar botões
+            checkBtn.style.display = currentQuestion.type === "text" ? 'block' : 'none';
+            nextBtn.style.display = 'none';
+            
+            // Limpar mensagens e campo de resposta
+            answerInput.value = '';
+            messageDisplay.style.display = 'none';
+            messageDisplay.className = 'message';
+            
+            if (currentQuestion.type === "text") {
+                answerInput.focus();
+            }
+        }
+        
+        // Selecionar opção (para questões de múltipla escolha)
+        function selectOption(option) {
+            totalQuestions++;
+            
+            // Verificar resposta
+            if (option === currentQuestion.answer) {
+                // Resposta correta
+                score++;
+                showFeedback(true);
+            } else {
+                // Resposta incorreta
+                showFeedback(false, currentQuestion.answer);
+            }
+            
+            updateScore();
+            
+            // Desativar botões de opção
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === currentQuestion.answer) {
+                    btn.style.backgroundColor = '#2ecc71';
+                } else if (btn.textContent === option && option !== currentQuestion.answer) {
+                    btn.style.backgroundColor = '#e74c3c';
+                }
+            });
+            
+            // Mostrar botão de próxima pergunta
+            nextBtn.style.display = 'block';
+        }
+        
+        // Verificar resposta (para questões de texto)
+        function checkAnswer() {
+            if (!currentQuestion || !gameActive) return;
+            
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = currentQuestion.answer.toLowerCase();
+            
+            totalQuestions++;
+            
+            // Verificar se a resposta está correta
+            if (userAnswer === correctAnswer) {
+                // Resposta correta
+                score++;
+                showFeedback(true);
+            } else {
+                // Resposta incorreta
+                showFeedback(false, currentQuestion.answer);
+            }
+            
+            updateScore();
+            
+            // Mostrar botão de próxima pergunta
+            nextBtn.style.display = 'block';
+            checkBtn.style.display = 'none';
+        }
+        
+        // Mostrar feedback
+        function showFeedback(isCorrect, correctAnswer = null) {
+            messageDisplay.style.display = 'block';
+            
+            if (isCorrect) {
+                // Feedback positivo
+                const randomPhrase = successPhrases[Math.floor(Math.random() * successPhrases.length)];
+                messageDisplay.textContent = `${randomPhrase} ${currentQuestion.explanation ? `(${currentQuestion.explanation})` : ''}`;
+                messageDisplay.className = 'message success';
+            } else {
+                // Feedback negativo
+                const randomPhrase = errorPhrases[Math.floor(Math.random() * errorPhrases.length)];
+                messageDisplay.innerHTML = `${randomPhrase}<div class="correct-answer">Resposta correta: ${correctAnswer}</div>${currentQuestion.explanation ? `<div>${currentQuestion.explanation}</div>` : ''}`;
+                messageDisplay.className = 'message error';
+            }
+        }
+        
+        // Atualizar pontuação
+        function updateScore() {
+            scoreDisplay.textContent = `Pontuação: ${score}/${totalQuestions}`;
+        }
+        
+        // Finalizar jogo
+        function endGame() {
+            gameActive = false;
+            answerInput.disabled = true;
+            checkBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+            optionsContainer.style.display = 'none';
+            answerInput.style.display = 'none';
+            
+            // Calcular porcentagem de acertos
+            const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
+            
+            // Selecionar mensagem final
+            let finalMessage = "";
+            for (const msg of finalMessages) {
+                if (percentage >= msg.min && percentage <= msg.max) {
+                    finalMessage = msg.message;
+                    break;
+                }
+            }
+            
+            // Exibir tela de fim de jogo
+            questionDisplay.textContent = "Fim do Jogo!";
+            emojiDisplay.style.display = 'none';
+            questionText.innerHTML = `
+                <div class="game-over">Jogo Concluído!</div>
+                <div class="final-score">Sua pontuação: ${score}/${totalQuestions} (${percentage}%)</div>
+                <div class="final-message">${finalMessage}</div>
+            `;
+            
+            // Limpar mensagens
+            messageDisplay.style.display = 'none';
+        }
+        
+        // Configurações - Abrir modal
+        function openSettings() {
+            jsonTextarea.value = JSON.stringify(gameData, null, 2);
+            settingsModal.style.display = 'flex';
+        }
+        
+        // Configurações - Fechar modal
+        function closeSettings() {
+            settingsModal.style.display = 'none';
+        }
+        
+        // Configurações - Salvar
+        function saveSettings() {
+            try {
+                const newData = JSON.parse(jsonTextarea.value);
+                
+                // Validar dados
+                if (typeof newData !== 'object' || newData === null) {
+                    throw new Error("Os dados devem ser um objeto");
+                }
+                
+                if (!newData.r || !newData.diminutivo || !newData.nasal || !newData.silabas) {
+                    throw new Error("Os dados devem conter os tópicos 'r', 'diminutivo', 'nasal' e 'silabas'");
+                }
+                
+                for (const topic in newData) {
+                    if (!Array.isArray(newData[topic])) {
+                        throw new Error(`O tópico ${topic} deve ser um array`);
+                    }
+                    
+                    for (const item of newData[topic]) {
+                        if (!item.type || !item.question || !item.answer) {
+                            throw new Error("Cada item deve ter 'type', 'question' e 'answer'");
+                        }
+                    }
+                }
+                
+                // Salvar novos dados e reiniciar jogo
+                gameData = newData;
+                closeSettings();
+                initGame();
+            } catch (error) {
+                alert(`Erro ao salvar configurações: ${error.message}`);
+            }
+        }
+        
+        // Event Listeners
+        checkBtn.addEventListener('click', checkAnswer);
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        
+        nextBtn.addEventListener('click', nextQuestion);
+        
+        settingsBtn.addEventListener('click', openSettings);
+        saveBtn.addEventListener('click', saveSettings);
+        cancelBtn.addEventListener('click', closeSettings);
+        
+        topicBtns.forEach(btn => {
+            btn.addEventListener('click', () => changeTopic(btn.dataset.topic));
+        });
+        
+        // Iniciar o jogo quando a página carregar
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
