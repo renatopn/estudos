@@ -273,6 +273,7 @@
         }
         
         .topic-selector {
+            visibility: hidden;
             margin-bottom: 20px;
         }
         
@@ -325,14 +326,14 @@
 </head>
 <body>
     <div class="header">
-        <button class="settings-btn">⚙️ Configurações</button>
-        <div class="score">Pontuação: 0/0</div>
+        <button class="settings-btn">⚙️</button>
+        <div class="score">0/0</div>
     </div>
     
     <div class="game-container">
         <div id="question-display" class="question-display">Carregando...</div>
         <div id="emoji-display" class="emoji-display" style="display: none;"></div>
-        <div id="question-text" class="question-text">...</div>
+        
         
         <div id="options-container" class="options-container" style="display: none;"></div>
         
@@ -418,9 +419,9 @@
                 {
                     type: "text",
                     question: "Qual é o nome deste emoji?",
-                    emoji: "🦁",
+                    emoji: "🐯",
                     answer: "tigre",
-                    explanation: "O emoji 🦁 é 'tigre', que tem apenas 1 R."
+                    explanation: "O emoji 🐯 é 'tigre', que tem apenas 1 R."
                 },
                 {
                     type: "text",
@@ -433,7 +434,7 @@
                     type: "text",
                     question: "Qual é o nome deste emoji?",
                     emoji: "🦍",
-                    answer: "pão",
+                    answer: "gorila",
                     explanation: "O emoji 🦍 é um 'gorila', que tem apenas 1 R."
                 },
                 {
@@ -816,11 +817,11 @@
                 q => !usedQuestions[currentTopic].includes(gameData[currentTopic].indexOf(q))
             );
             
-            if (availableQuestions.length === 0) {
+           /* if (availableQuestions.length === 0) {
                 endGame();
                 return;
-            }
-            
+            }*/
+
             // Selecionar pergunta aleatória
             const randomIndex = Math.floor(Math.random() * availableQuestions.length);
             currentQuestion = availableQuestions[randomIndex];
@@ -988,8 +989,11 @@
             if (isCorrect) {
                 // Feedback positivo
                 const randomPhrase = successPhrases[Math.floor(Math.random() * successPhrases.length)];
-                messageDisplay.textContent = `${randomPhrase} ${currentQuestion.explanation ? `(${currentQuestion.explanation})` : ''}`;
+                messageDisplay.textContent = `${randomPhrase}`;
                 messageDisplay.className = 'message success';
+                setTimeout(() => {
+                     nextBtn.click();
+                }, 1500); // Esperar 2 segundos antes de limpar a mensagem
             } else {
                 // Feedback negativo
                 const randomPhrase = errorPhrases[Math.floor(Math.random() * errorPhrases.length)];
@@ -1000,7 +1004,7 @@
         
         // Atualizar pontuação
         function updateScore() {
-            scoreDisplay.textContent = `Pontuação: ${score}/${totalQuestions}`;
+            scoreDisplay.textContent = `${score}/${totalQuestions}`;
         }
         
         // Finalizar jogo
