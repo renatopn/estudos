@@ -3,391 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo de Matemática - 2º Ano</title>
+    <title>Jogo de Português - Estudo</title>
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-        }
-        
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0f8ff;
             margin: 0;
             padding: 20px;
-            color: #333;
-            min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
         
-        .container {
-            max-width: 900px;
-            width: 100%;
-            margin: 20px auto;
-            background-color: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        header {
+        .header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            width: 100%;
+            max-width: 800px;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px dashed #ffcc00;
-        }
-        
-        h1 {
-            color: #4a6fa5;
-            text-align: center;
-            margin: 0;
-            font-size: 28px;
-            text-shadow: 2px 2px 0px #f0f0f0;
         }
         
         .score {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
-            color: #ff6b6b;
-            background-color: #fff9e6;
-            padding: 10px 15px;
-            border-radius: 50%;
-            border: 3px solid #ffcc00;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: #e74c3c;
+            background-color: #fdeaea;
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 2px solid #e74c3c;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
         
-        .config-btn {
-            background: linear-gradient(to bottom, #4a6fa5, #3a5a80);
+        .settings-btn {
+            background-color: #3498db;
             color: white;
             border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 24px;
+            padding: 8px 15px;
+            border-radius: 5px;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s;
+            font-size: 16px;
         }
         
-        .config-btn:hover {
-            transform: scale(1.1);
+        .settings-btn:hover {
+            background-color: #2980b9;
         }
         
-        .game-section {
-            padding: 10px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            background-color: #f8faff;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .section-title {
-            color: #4a6fa5;
-            text-align: center;
-            margin-top: 0;
-            font-size: 24px;
-            border-bottom: 2px solid #ffcc00;
-            padding-bottom: 10px;
-        }
-        
-        .category-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 15px;
-            margin-left: 10px;
-            font-size: 14px;
-            background-color: #4a6fa5;
-            color: white;
-        }
-        
-        .question-container {
+        .game-container {
             background-color: white;
-            padding: 20px;
             border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        .question-display {
+            font-size: 36px;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            background-color: #9b59b6;
+        }
+        
+        .emoji-display {
+            font-size: 60px;
+            margin: 20px 0;
         }
         
         .question-text {
-            font-size: 28px;
-            margin-bottom: 15px;
-            text-align: center;
-            line-height: 1.5;
+            font-size: 24px;
+            margin: 20px 0;
+            color: #34495e;
+        }
+        
+        .answer-input {
+            width: 80%;
+            padding: 15px;
+            font-size: 20px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
         
         .options-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
             margin-bottom: 20px;
         }
         
-        .option {
-            background: linear-gradient(to bottom, #e6f7ff, #bae7ff);
-            border: 2px solid #91d5ff;
-            border-radius: 15px;
-            padding: 15px 20px;
+        .option-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 18px;
             transition: all 0.3s;
-            min-width: 150px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 120px;
         }
         
-        .option:hover {
-            background: linear-gradient(to bottom, #bae7ff, #91d5ff);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        }
-        
-        .option.selected {
-            background: linear-gradient(to bottom, #ffd666, #ffc53d);
-            border-color: #ffa940;
-            color: #333;
+        .option-btn:hover {
+            background-color: #2980b9;
             transform: scale(1.05);
-            box-shadow: 0 6px 12px rgba(255, 165, 0, 0.3);
-            animation: pulse 1s infinite;
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1.05); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1.05); }
+        .syllable-type-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         
-        .operation-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .operation-table td {
-            text-align: center;
-            padding: 12px;
-            border: 2px solid #ddd;
-        }
-
-        /* Alinhamento das colunas na tabela de operações */
-        .operation-table td:nth-child(2) {
-            text-align: right !important;
-        }
-
-        .operation-table td:nth-child(3) {
-            text-align: left !important;
-        }
-
-      
-
-        /* Manter a centralização apenas na célula do resultado */
-        .operation-table tr:last-child td {
-            text-align: center !important;
-        }
-
-        .operation-table tr:last-child input {
-            text-align: center;
-        }
-        
-        .operation-table tr:first-child {
-            background-color: #4a6fa5;
+        .syllable-type-btn {
+            background-color: #add1f3;
             color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .syllable-type-btn.selected {
+            background-color: #f37a0a;
             font-weight: bold;
         }
         
-        .operation-input {
-            width: 60px;
-            height: 50px;
-            text-align: center;
-            font-size: 24px;
-            border: 2px solid #4a6fa5;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-        
-        .operation-input:focus {
-            border-color: #ffc53d;
-            box-shadow: 0 0 0 3px rgba(255, 197, 61, 0.3);
-            outline: none;
-        }
-        
-        .operator-container {
-            position: relative;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .operator-btn {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            font-size: 24px;
-            border: 3px solid #4a6fa5;
-            border-radius: 50%;
-            background-color: #f0f9ff;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1;
-        }
-        
-        .plus-btn {
-            left: 0;
-        }
-        
-        .minus-btn {
-            right: 0;
-        }
-        
-        .operator-btn.active {
-            background-color: #4a6fa5;
-            color: white;
-            transform: scale(1.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            z-index: 2;
-        }
-        
-        .operator-btn.inactive {
-            opacity: 0.4;
-            transform: scale(0.8);
-        }
-        
-        .operator-btn.active.plus-btn {
-            left: 0px;
-        }
-        
-        .operator-btn.active.minus-btn {
-            right: 0px;
-        }
-        
-        .operator-btn:hover {
-            transform: scale(1.1);
-        }
-        
-        .operator-btn.active:hover {
-            transform: scale(1.3);
-        }
-        
         .check-btn {
-            display: block;
-            margin: 25px auto;
-            padding: 15px 35px;
-            background: linear-gradient(to bottom, #52c41a, #389e0d);
+            background-color: #2ecc71;
             color: white;
             border: none;
-            border-radius: 50px;
-            font-size: 20px;
+            padding: 12px 25px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 20px;
             transition: all 0.3s;
-            box-shadow: 0 4px 8px rgba(82, 196, 26, 0.3);
         }
         
         .check-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(82, 196, 26, 0.4);
+            background-color: #27ae60;
+            transform: scale(1.05);
         }
         
-        .check-btn:active {
-            transform: translateY(1px);
-        }
-        
-        .feedback {
-            text-align: center;
-            font-size: 22px;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
+        .next-btn {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
             display: none;
-            animation: popIn 0.5s ease-out;
         }
         
-        @keyframes popIn {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+        .next-btn:hover {
+            background-color: #d35400;
+            transform: scale(1.05);
+        }
+        
+        .message {
+            font-size: 22px;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
         }
         
         .success {
-            background: linear-gradient(to bottom, #f6ffed, #d9f7be);
-            border: 2px solid #b7eb8f;
-            color: #52c41a;
+            background-color: #d5f5e3;
+            color: #27ae60;
         }
         
         .error {
-            background: linear-gradient(to bottom, #fff2f0, #ffccc7);
-            border: 2px solid #ffa39e;
-            color: #f5222d;
+            background-color: #fadbd8;
+            color: #e74c3c;
         }
         
-        .progress-bar {
-            height: 10px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-        
-        .progress {
-            height: 100%;
-            background: linear-gradient(to right, #4a6fa5, #6a11cb);
-            border-radius: 5px;
-            width: 0%;
-            transition: width 0.5s;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .control-btn {
-            padding: 10px 20px;
-            background: linear-gradient(to bottom, #4a6fa5, #3a5a80);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .control-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        .emoji-large {
-            font-size: 42px;
-            margin: 0 10px;
-            vertical-align: middle;
-        }
-        .emoji-small {
-            font-size: 32px;
-            margin: 0 10px;
-            vertical-align: middle;
+        .correct-answer {
+            font-weight: bold;
+            margin-top: 10px;
         }
         
         .modal {
@@ -397,936 +200,918 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0,0,0,0.5);
             z-index: 100;
             justify-content: center;
             align-items: center;
-            animation: fadeIn 0.3s;
         }
         
         .modal-content {
             background-color: white;
             padding: 30px;
-            border-radius: 20px;
+            border-radius: 10px;
             width: 80%;
             max-width: 600px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-height: 80vh;
+            overflow-y: auto;
         }
         
         .modal-title {
-            margin-top: 0;
-            color: #4a6fa5;
-            text-align: center;
-            border-bottom: 2px solid #ffcc00;
-            padding-bottom: 10px;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #2c3e50;
         }
         
-        .json-input {
+        .json-textarea {
             width: 100%;
             height: 300px;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
             font-family: monospace;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
             margin-bottom: 20px;
-            resize: vertical;
         }
         
         .modal-buttons {
             display: flex;
             justify-content: flex-end;
-            gap: 15px;
+            gap: 10px;
         }
         
         .modal-btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
+            padding: 8px 15px;
+            border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            font-weight: bold;
-            transition: all 0.2s;
+            border: none;
         }
         
         .save-btn {
-            background: linear-gradient(to bottom, #52c41a, #389e0d);
+            background-color: #2ecc71;
             color: white;
         }
         
         .cancel-btn {
-            background: linear-gradient(to bottom, #ff4d4f, #f5222d);
+            background-color: #e74c3c;
             color: white;
         }
         
-        .modal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        .game-over {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .final-score {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        
+        .final-message {
+            font-size: 24px;
+            color: #7f8c8d;
+        }
+        
+        .topic-selector {
+            visibility: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .topic-btn {
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        
+        .topic-btn.active {
+            background-color: #8e44ad;
+            font-weight: bold;
         }
         
         @media (max-width: 600px) {
-            .options-container {
-                flex-direction: column;
+            .question-display {
+                font-size: 28px;
             }
             
-            .operation-table {
-                font-size: 14px;
+            .question-text {
+                font-size: 20px;
             }
             
-            .operation-input {
-                width: 40px;
-                height: 40px;
+            .emoji-display {
+                font-size: 48px;
+            }
+            
+            .answer-input {
+                width: 90%;
                 font-size: 18px;
             }
             
+            .option-btn {
+                padding: 10px 15px;
+                font-size: 16px;
+                min-width: 100px;
+            }
             
+            .syllable-type-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <button class="config-btn" onclick="openConfig()">⚙️</button>
-            <h1>Jogo de Matemática - 2º Ano</h1>
-            <div class="score" id="score">0/0</div>
-        </header>
+    <div class="header">
+        <button class="settings-btn">⚙️</button>
+        <div class="score">0/0</div>
+    </div>
+    
+    <div class="game-container">
+        <div id="question-display" class="question-display">Carregando...</div>
+        <div id="emoji-display" class="emoji-display" style="display: none;"></div>
         
-        <div class="progress-bar">
-            <div class="progress" id="progress"></div>
+        
+        <div id="options-container" class="options-container" style="display: none;"></div>
+        
+        <div id="syllable-type-container" class="syllable-type-container" style="display: none;">
+            <button class="syllable-type-btn" data-type="monossílaba">Monossílaba</button>
+            <button class="syllable-type-btn" data-type="dissílaba">Dissílaba</button>
+            <button class="syllable-type-btn" data-type="trissílaba">Trissílaba</button>
+            <button class="syllable-type-btn" data-type="polissílaba">Polissílaba</button>
         </div>
-        <div class="controls">
-            <button class="control-btn" onclick="skipQuestion()">Pular Questão</button>
-            <button class="control-btn" onclick="showAnswer()">Mostrar Resposta</button>
-        </div>
-        <div class="feedback" id="feedback"></div>
-        <div id="game-section" class="game-section">
-            <!--h2 class="section-title" id="section-title">Questão de Matemática</h2 -->
-            <div class="question-container">
-                <div class="question-text" id="question-text"></div>
-                <div id="question-content"></div>
-                <button class="check-btn" id="check-btn" style="display:none;">Verificar ✅</button>
-                
+        
+        <input type="text" id="answer-input" class="answer-input" placeholder="Digite sua resposta..." style="display: none;">
+        
+        <button id="check-btn" class="check-btn" style="display: none;">Verificar</button>
+        <button id="next-btn" class="next-btn">Próxima</button>
+        
+        <div id="message" class="message"></div>
+
+        <div class="topic-selector">
+        <button class="topic-btn active" data-topic="r">Letra R</button>
+        <button class="topic-btn" data-topic="diminutivo">Diminutivo</button>
+        <button class="topic-btn" data-topic="nasal">Sons Nasais</button>
+        <button class="topic-btn" data-topic="silabas">Separação Silábica</button>
+    </div>
+    </div>
+    
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Configurações do Jogo</div>
+            <textarea id="json-textarea" class="json-textarea"></textarea>
+            <div class="modal-buttons">
+                <button id="cancel-btn" class="modal-btn cancel-btn">Cancelar</button>
+                <button id="save-btn" class="modal-btn save-btn">Salvar</button>
             </div>
         </div>
     </div>
     
-    <div class="modal" id="config-modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Configurações</h2>
-            <textarea class="json-input" id="config-json"></textarea>
-            <div class="modal-buttons">
-                <button class="modal-btn cancel-btn" onclick="closeConfig()">Cancelar</button>
-                <button class="modal-btn save-btn" onclick="saveConfig()">Salvar</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Variáveis globais
-        let currentMode = '';
-        let score = { correct: 0, total: 0 };
-        let measuresQuestions = [];
-        let operationsQuestions = [];
-        let allQuestions = [];
-        let usedQuestions = new Set();
+        // Dados iniciais do jogo por tópico
+        let gameData = {
+            r: [
+                {
+                    type: "text",
+                    question: "Qual é o nome deste emoji?",
+                    emoji: "🚗",
+                    answer: "carro",
+                    explanation: "O emoji 🚗 é 'carro', que tem RR na palavra."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o nome deste emoji?",
+                    emoji: "🐶",
+                    answer: "cachorro",
+                    explanation: "O emoji 🐶 é 'cachorro', que tem RR."
+                },              
+                {
+                    type: "text",
+                    question: "Qual é o nome deste emoji?",
+                    emoji: "🚪",
+                    answer: "porta",
+                    explanation: "O emoji 🚪 é 'porta', que tem apenas 1 R."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o nome deste emoji?",
+                    emoji: "🌹",
+                    answer: "rosa",
+                    explanation: "O emoji 🌹 é 'rosa', que tem apenas 1 R."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o nome deste emoji?",
+                    emoji: "🚂",
+                    answer: "trem",
+                    explanation: "O emoji 🚂 é um 'trem'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o nome deste emoji?",
+                    emoji: "🍒",
+                    answer: "cereja",
+                    explanation: "O emoji 🍒 é 'cereja', que tem apenas 1 R."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o nome deste emoji?",
+                    emoji: "🐯",
+                    answer: "tigre",
+                    explanation: "O emoji 🐯 é 'tigre', que tem apenas 1 R."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o nome deste emoji?",
+                    emoji: "🐭",
+                    answer: "rato",
+                    explanation: "O emoji 🐭 é um 'rato', que tem apenas 1 R."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o nome deste emoji?",
+                    emoji: "🦍",
+                    answer: "gorila",
+                    explanation: "O emoji 🦍 é um 'gorila', que tem apenas 1 R."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o nome deste emoji?",
+                    emoji: "🐊",
+                    answer: "jacaré",
+                    explanation: "O emoji 🐊 é 'jacaré', que tem apenas 1 R."
+                }
+            ],
+            diminutivo: [
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "casa",
+                    answer: "casinha",
+                    explanation: "O diminutivo de 'casa' é 'casinha'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "cão",
+                    answer: "cãozinho",
+                    explanation: "O diminutivo de 'cão' é 'cãozinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "flor",
+                    answer: "florzinha",
+                    explanation: "O diminutivo de 'flor' é 'florzinha'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "livro",
+                    answer: "livrinho",
+                    explanation: "O diminutivo de 'livro' é 'livrinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "pé",
+                    answer: "pezinho",
+                    explanation: "O diminutivo de 'pé' é 'pezinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "mão",
+                    answer: "mãozinha",
+                    explanation: "O diminutivo de 'mão' é 'mãozinha'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "sol",
+                    answer: "solzinho",
+                    explanation: "O diminutivo de 'sol' é 'sozinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "pai",
+                    answer: "paizinho",
+                    explanation: "O diminutivo de 'pai' é 'paizinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "irmão",
+                    answer: "irmãozinho",
+                    explanation: "O diminutivo de 'irmão' é 'irmãozinho'."
+                },
+                {
+                    type: "text",
+                    question: "Qual é o diminutivo de:",
+                    word: "avó",
+                    answer: "avozinha",
+                    explanation: "O diminutivo de 'avó' é 'avozinha'."
+                }
+            ],
+            nasal: [
+                {
+                    type: "multiple",
+                    question: "Qual palavra tem som nasal?",
+                    options: ["cama", "banana", "pente", "barco"],
+                    answer: "pente",
+                    explanation: "'Pente' tem som nasal por causa do 'n' seguido de consoante."
+                },
+                {
+                    type: "multiple",
+                    question: "Qual palavra tem som nasal?",
+                    options: ["bala", "mala", "tampa", "pato"],
+                    answer: "tampa",
+                    explanation: "'Tampa' tem som nasal por causa do 'm' seguido de consoante."
+                },
+                {
+                    type: "multiple",
+                    question: "Qual palavra tem som nasal?",
+                    options: ["casa", "vaso", "pomba", "sapo"],
+                    answer: "pomba",
+                    explanation: "'Pomba' tem som nasal por causa do 'm' seguido de consoante."
+                },
+                {
+                    type: "multiple",
+                    question: "Qual palavra tem som nasal?",
+                    options: ["faca", "boca", "penca", "pipa"],
+                    answer: "penca",
+                    explanation: "'Penca' tem som nasal por causa do 'n' seguido de consoante."
+                },
+                {
+                    type: "multiple",
+                    question: "Qual palavra tem som nasal?",
+                    options: ["lupa", "rupa", "tumba", "cuba"],
+                    answer: "tumba",
+                    explanation: "'Tumba' tem som nasal por causa do 'm' seguido de consoante."
+                }
+            ],
+            silabas: [
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "casa",
+                    syllables: "ca-sa",
+                    syllableType: "dissílaba",
+                    explanation: "'Casa' separa-se em 'ca-sa' e é uma palavra dissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "árvore",
+                    syllables: "ár-vo-re",
+                    syllableType: "trissílaba",
+                    explanation: "'Árvore' separa-se em 'ár-vo-re' e é uma palavra trissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "sol",
+                    syllables: "sol",
+                    syllableType: "monossílaba",
+                    explanation: "'Sol' é uma palavra monossílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "computador",
+                    syllables: "com-pu-ta-dor",
+                    syllableType: "polissílaba",
+                    explanation: "'Computador' separa-se em 'com-pu-ta-dor' e é uma palavra polissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "carro",
+                    syllables: "car-ro",
+                    syllableType: "dissílaba",
+                    explanation: "'Carro' separa-se em 'car-ro' (com RR) e é uma palavra dissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "passo",
+                    syllables: "pas-so",
+                    syllableType: "dissílaba",
+                    explanation: "'Passo' separa-se em 'pas-so' (com SS) e é uma palavra dissílaba."
+                },{
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "carroça",
+                    syllables: "car-ro-ça",
+                    syllableType: "trissílaba",
+                    explanation: "'Tempo' separa-se em 'car-ro-ça' e é uma palavra trissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "tempo",
+                    syllables: "tem-po",
+                    syllableType: "dissílaba",
+                    explanation: "'Tempo' separa-se em 'tem-po' (com M antes de P) e é uma palavra dissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "cantar",
+                    syllables: "can-tar",
+                    syllableType: "dissílaba",
+                    explanation: "'Cantar' separa-se em 'can-tar' (com N antes de T) e é uma palavra dissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "asfalto",
+                    syllables: "as-fal-to",
+                    syllableType: "trissílaba",
+                    explanation: "'Asfalto' separa-se em 'as-fal-to' (com S antes de F) e é uma palavra trissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "construir",
+                    syllables: "cons-tru-ir",
+                    syllableType: "trissílaba",
+                    explanation: "'Construir' separa-se em 'cons-tru-ir' (com N antes de S e S antes de T) e é uma palavra trissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "prato",
+                    syllables: "pra-to",
+                    syllableType: "dissílaba",
+                    explanation: "'Prato' separa-se em 'pra-to' e é uma palavra dissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "flor",
+                    syllables: "flor",
+                    syllableType: "monossílaba",
+                    explanation: "'Flor' é uma palavra monossílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "elefante",
+                    syllables: "e-le-fan-te",
+                    syllableType: "polissílaba",
+                    explanation: "'Elefante' separa-se em 'e-le-fan-te' e é uma palavra polissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "pássaro",
+                    syllables: "pás-sa-ro",
+                    syllableType: "trissílaba",
+                    explanation: "'Pássaro' separa-se em 'pás-sa-ro' (com SS) e é uma palavra trissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "homem",
+                    syllables: "ho-mem",
+                    syllableType: "dissílaba",
+                    explanation: "'Homem' separa-se em 'ho-mem' e é uma palavra dissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "mãe",
+                    syllables: "mãe",
+                    syllableType: "monossílaba",
+                    explanation: "'Mãe' é uma palavra monossílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "universidade",
+                    syllables: "u-ni-ver-si-da-de",
+                    syllableType: "polissílaba",
+                    explanation: "'Universidade' separa-se em 'u-ni-ver-si-da-de' e é uma palavra polissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "triste",
+                    syllables: "tris-te",
+                    syllableType: "dissílaba",
+                    explanation: "'Triste' separa-se em 'tris-te' (com S antes de T) e é uma palavra dissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "criança",
+                    syllables: "cri-an-ça",
+                    syllableType: "trissílaba",
+                    explanation: "'Criança' separa-se em 'cri-an-ça' e é uma palavra trissílaba."
+                },
+                {
+                    type: "syllables",
+                    question: "Classifique e separe as sílabas de:",
+                    word: "pão",
+                    syllables: "pão",
+                    syllableType: "monossílaba",
+                    explanation: "'Pão' é uma palavra monossílaba."
+                }
+            ]
+        };
+
+        // Variáveis do jogo
+        let currentTopic = "r";
         let currentQuestion = null;
-        let selectedOperator = "+";
+        let usedQuestions = { r: [], diminutivo: [], nasal: [], silabas: [] };
+        let score = 0;
+        let totalQuestions = 0;
+        let gameActive = false;
+        let selectedSyllableType = null;
         
-        // Questões padrão para medidas
-        const defaultMeasuresQuestions = [
-              {
-                type: "comparison",
-                question: "Qual é maior: 1 metro ou 90 centímetros?",
-                options: ["1 metro", "90 centímetros", "São iguais"],
-                answer: 0,
-                emojis: ["📏", "📐"]
-                },
-                {
-                type: "comparison",
-                question: "A Wyana prparou a comida com 500g de arroz e 1kg de feijão. Quantos gramas de comida deu no total?",
-                options: ["1,5g de comida", "1500g de comida", "501g de comida"],
-                answer: 1,
-                emojis: ["🍚", "🫘"]
-                },
-                {
-                type: "problem",
-                question: "Maria tinha 3 litros de suco. Ela serviu 500ml para cada amigo. Quantos ml de suco sobraram se ela tem 4 amigos?",
-                options: ["1000ml", "500ml", "1500ml"],
-                answer: 0,
-                emojis: ["🧃", "👧"]
-                },
-                {
-                type: "instrument",
-                question: "Qual instrumento usamos para medir peso?",
-                options: ["Régua", "Balança", "Termômetro"],
-                answer: 1,
-                emojis: ["⚖️", "📏"]
-                },
-                {
-                type: "comparison",
-                question: "Qual capacidade é maior: 2 litros ou 2500 mililitros?",
-                options: ["2 litros", "2500 mililitros", "São iguais"],
-                answer: 1,
-                emojis: ["🥛", "🧃"]
-                },
-                {
-                type: "problem",
-                question: "Um pacote de biscoito pesa 200g. Se João comprou 5 pacotes, quantos quilos ele comprou?",
-                options: ["1kg", "500g", "2kg"],
-                answer: 0,
-                emojis: ["🍪", "👦"]
-                },
-                {
-                type: "comparison",
-                question: "Qual é mais comprido: 150cm ou 1,5m?",
-                options: ["150cm", "1,5m", "São iguais"],
-                answer: 2,
-                emojis: ["📏", "📐"]
-                },
-                {
-                type: "instrument",
-                question: "Qual instrumento usamos para medir líquidos?",
-                options: ["Balança", "Copo medidor", "Régua"],
-                answer: 1,
-                emojis: ["🥤", "📏"]
-                },
-                {
-                type: "problem",
-                question: "Uma caixa tem 60cm de comprimento. Outra caixa tem 0,5m. Qual a diferença em cm entre elas?",
-                options: ["10cm", "5cm", "15cm"],
-                answer: 0,
-                emojis: ["📦", "📦"]
-                },
-                {
-                type: "comparison",
-                question: "Qual pesa menos: 1kg de algodão ou 800g de ferro?",
-                options: ["1kg de algodão", "800g de ferro", "Pesam o mesmo"],
-                answer: 1,
-                emojis: ["🍥", "🔩"]
-                },
-                {
-                type: "problem",
-                question: "Uma garrafa de água tem capacidade para 500ml. Se eu comprei 6 garrafas, quantos litros de água comprei ao todo?",
-                options: ["3L", "2L", "1L"],
-                answer: 0,
-                emojis: ["🧴", "<span style='font-size:32px'>🧴</span>"]
-                },
-                {
-                type: "instrument",
-                question: "Qual instrumento usamos para medir comprimentos pequenos?",
-                options: ["Trena", "Régua", "Termômetro"],
-                answer: 1,
-                emojis: ["📏", "📐"]
-                },
-                {
-                type: "comparison",
-                question: "Qual é menor: 1000ml ou 1 litro?",
-                options: ["1000ml", "1 litro", "São iguais"],
-                answer: 2,
-                emojis: ["🥛", "🧃"]
-                },
-                {
-                type: "problem",
-                question: "Uma barra de chocolate pesa 250g. Se Maria comeu 100g, quantos gramas sobraram?",
-                options: ["100g", "150g", "200g"],
-                answer: 1,
-                emojis: ["🍫", "👧"]
-                },
-                {
-                type: "comparison",
-                question: "Qual é mais longo: 2 metros ou 180 centímetros?",
-                options: ["2 metros", "180 centímetros", "São iguais"],
-                answer: 0,
-                emojis: ["📏", "📐"]
-                },
-                {
-                type: "instrument",
-                question: "Qual instrumento mede a temperatura?",
-                options: ["Balança", "Termômetro", "Copo medidor"],
-                answer: 1,
-                emojis: ["🌡️", "🤒"]
-                },
-                {
-                type: "problem",
-                question: "Um rolo de fita tem 5m. Se Ana usou 2,5m, quantos cm de fita sobraram?",
-                options: ["200cm", "250cm", "300cm"],
-                answer: 1,
-                emojis: ["🎀", "👧"]
-                },
-                {
-                type: "comparison",
-                question: "Qual capacidade é menor: 300ml ou 0,3 litros?",
-                options: ["300ml", "0,3 litros", "São iguais"],
-                answer: 2,
-                emojis: ["🥛", "🧃"]
-                },
-                {
-                type: "problem",
-                question: "Um saco de arroz pesa 5kg. Se uma família consome 500g por dia, em quantos dias acabará o saco?",
-                options: ["5 dias", "10 dias", "15 dias"],
-                answer: 1,
-                emojis: ["🍚", "👨‍👩‍👧‍👦"]
-                },
-                {
-                type: "instrument",
-                question: "Qual instrumento é melhor para medir uma sala de aula?",
-                options: ["Régua", "Trena", "Termômetro"],
-                answer: 1,
-                emojis: ["📏", "🏫"]
-                },
-            {
-                type: "comparison",
-                question: "Qual é maior: 1 metro ou 100 centímetros?",
-                options: ["1 metro", "100 centímetros", "São iguais"],
-                answer: 2,
-                emojis: ["📏", "📐"]
-            },
-            {
-                type: "comparison",
-                question: "Qual pesa mais: 1kg de algodão ou 1000g de ferro?",
-                options: ["1kg de algodão", "1000g de ferro", "Pesam o mesmo"],
-                answer: 2,
-                emojis: ["🍥", "🔩"]
-            },
-            {
-                type: "problem",
-                question: "João tinha 2 litros de água. Ele bebeu 300ml. Quantos ml de água sobraram?",
-                options: ["1700ml", "500ml", "700ml"],
-                answer: 0,
-                emojis: ["💧", "🥤"]
-            },
-            {
-                type: "instrument",
-                question: "Qual instrumento usamos para medir comprimento?",
-                options: ["Balança", "Fita métrica", "Copo medidor"],
-                answer: 1,
-                emojis: ["📏", "⚖️"]
-            },
-            {
-                type: "comparison",
-                question: "Qual capacidade é maior: 1 litro ou 1500 mililitros?",
-                options: ["1 litro", "1500 mililitros", "São iguais"],
-                answer: 1,
-                emojis: ["🥛", "🧃"]
-            }
-        ];
-        
-        // Questões padrão para operações
-        const defaultOperationsQuestions = [
-             {
-                question: "João tinha 15 bolinhas de gude. Ganhou 12 do seu amigo. Com quantas bolinhas ele ficou?",
-                num1: 15,
-                num2: 12,
-                operator: "+",
-                answer: 27
-                },
-                {
-                question: "Maria tinha 30 reais. Gastou 18 reais na livraria. Quanto dinheiro sobrou?",
-                num1: 30,
-                num2: 18,
-                operator: "-",
-                answer: 12
-                },
-                {
-                question: "Na escola há 25 meninos e 23 meninas. Quantos alunos há no total?",
-                num1: 25,
-                num2: 23,
-                operator: "+",
-                answer: 48
-                },
-                {
-                question: "Carlos tinha 47 figurinhas. Deu 19 para seu irmão. Com quantas figurinhas ficou?",
-                num1: 47,
-                num2: 19,
-                operator: "-",
-                answer: 28
-                },
-                {
-                question: "Uma caixa tem 36 lápis. Outra caixa tem 25 lápis. Quantos lápis têm as duas caixas juntas?",
-                num1: 36,
-                num2: 25,
-                operator: "+",
-                answer: 61
-                },
-                {
-                question: "Pedro fez 58 pontos em um jogo. Ana fez 39 pontos. Quantos pontos Pedro fez a mais que Ana?",
-                num1: 58,
-                num2: 39,
-                operator: "-",
-                answer: 19
-                },
-                {
-                question: "Num ônibus havia 42 passageiros. Desceram 15. Quantos passageiros ficaram no ônibus?",
-                num1: 42,
-                num2: 15,
-                operator: "-",
-                answer: 27
-                },
-                {
-                question: "Num aquário há 28 peixes vermelhos e 35 peixes amarelos. Quantos peixes há no total?",
-                num1: 28,
-                num2: 35,
-                operator: "+",
-                answer: 63
-                },
-                {
-                question: "Laura leu 45 páginas de um livro na segunda-feira e 37 na terça-feira. Quantas páginas ela leu no total?",
-                num1: 45,
-                num2: 37,
-                operator: "+",
-                answer: 82
-                },
-                {
-                question: "Uma loja tinha 91 brinquedos. Vendeu 68. Quantos brinquedos ainda restam?",
-                num1: 91,
-                num2: 68,
-                operator: "-",
-                answer: 23
-                },
-                {
-                question: "Num pomar há 57 laranjeiras e 38 macieiras. Quantas árvores há no total?",
-                num1: 57,
-                num2: 38,
-                operator: "+",
-                answer: 95
-                },
-                {
-                question: "Paulo tinha 86 reais. Comprou um jogo que custou 49 reais. Quanto dinheiro sobrou?",
-                num1: 86,
-                num2: 49,
-                operator: "-",
-                answer: 37
-                },
-                {
-                question: "Num estádio havia 75 torcedores do time A e 46 do time B. Quantos torcedores havia no total?",
-                num1: 75,
-                num2: 46,
-                operator: "+",
-                answer: 121
-                },
-                {
-                question: "Carla fez 92 biscoitos. Vendeu 57. Quantos biscoitos ainda tem para vender?",
-                num1: 92,
-                num2: 57,
-                operator: "-",
-                answer: 35
-                },
-                {
-                question: "Uma escola tem 68 alunos no período da manhã e 57 à tarde. Quantos alunos estudam na escola?",
-                num1: 68,
-                num2: 57,
-                operator: "+",
-                answer: 125
-                },
-                {
-                question: "Ricardo tinha 80 figurinhas. Perdeu 33 no recreio. Com quantas figurinhas ficou?",
-                num1: 80,
-                num2: 33,
-                operator: "-",
-                answer: 47
-                },
-                {
-                question: "Num jardim há 49 rosas vermelhas e 38 rosas amarelas. Quantas rosas há no total?",
-                num1: 49,
-                num2: 38,
-                operator: "+",
-                answer: 87
-                },
-                {
-                question: "Uma família tinha 95 reais. Gastou 67 reais no supermercado. Quanto dinheiro sobrou?",
-                num1: 95,
-                num2: 67,
-                operator: "-",
-                answer: 28
-                },
-                {
-                question: "Num campo de futebol há 56 pessoas no lado esquerdo e 47 no lado direito. Quantas pessoas há no total?",
-                num1: 56,
-                num2: 47,
-                operator: "+",
-                answer: 103
-                },
-                {
-                question: "Márcia tinha 70 balas. Deu 45 para suas amigas. Com quantas balas ficou?",
-                num1: 70,
-                num2: 45,
-                operator: "-",
-                answer: 25
-                },
-    {
-                question: "Maria tinha 25 doces, comeu 12. Com quantos doces ela ficou?",
-                num1: 25,
-                num2: 12,
-                operator: "-",
-                answer: 13
-            },
-            {
-                question: "João tinha 15 figurinhas e ganhou 23. Quantas figurinhas ele tem agora?",
-                num1: 15,
-                num2: 23,
-                operator: "+",
-                answer: 38
-            },
-            {
-                question: "Uma classe tem 32 alunos. Chegaram 17 novos alunos. Quantos alunos ficaram?",
-                num1: 32,
-                num2: 17,
-                operator: "+",
-                answer: 49
-            },
-            {
-                question: "Pedro tinha 47 reais. Gastou 28 reais. Quanto sobrou?",
-                num1: 47,
-                num2: 28,
-                operator: "-",
-                answer: 19
-            },
-            {
-                question: "Quanto é 56 menos 34?",
-                num1: 56,
-                num2: 34,
-                operator: "-",
-                answer: 22
-            },
-
-            /////
-
-            ////
-        ];
+        // Elementos do DOM
+        const questionDisplay = document.getElementById('question-display');
+        const emojiDisplay = document.getElementById('emoji-display');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const syllableTypeContainer = document.getElementById('syllable-type-container');
+        const syllableTypeBtns = document.querySelectorAll('.syllable-type-btn');
+        const answerInput = document.getElementById('answer-input');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const messageDisplay = document.getElementById('message');
+        const scoreDisplay = document.querySelector('.score');
+        const settingsBtn = document.querySelector('.settings-btn');
+        const settingsModal = document.getElementById('settings-modal');
+        const jsonTextarea = document.getElementById('json-textarea');
+        const saveBtn = document.getElementById('save-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const topicBtns = document.querySelectorAll('.topic-btn');
         
         // Frases de feedback
         const successPhrases = [
-            "Parabéns! Você acertou! 🎉",
-            "Muito bem! Você é demais! 👏",
-            "João Rafael é nota 10! 👍",
-            "Isso aí! Continue assim! 🌟",
-            "Resposta correta! Você é um gênio! 🧠",
-            "Acertou em cheio! 🎯"
+            "Parabéns! Você acertou!",
+            "Muito bem! Você está aprendendo muito!",
+            "Correto! Você é um expert em português!",
+            "Ótimo trabalho! Continue assim!",
+            "Isso aí! Você é muito inteligente!"
         ];
         
         const errorPhrases = [
-            "Ops! Tente novamente. 💪",
-            "Não foi dessa vez, mas continue tentando! 😉",
-            "Quase lá! Vamos tentar a próxima? 🚀",
-            "Errou, mas não desista! 📚",
-            "Você vai conseguir na próxima! 👍"
+            "Ops! Não foi dessa vez, mas continue tentando!",
+            "Quase lá! Pratique mais um pouco!",
+            "Não desanime! Você vai conseguir na próxima!",
+            "Errou, mas isso faz parte do aprendizado!",
+            "Tente novamente! Você consegue!"
         ];
         
-        // Inicialização do jogo
+        const finalMessages = [
+            {min: 0, max: 30, message: "Você pode melhorar! Pratique mais!"},
+            {min: 31, max: 70, message: "Bom trabalho! Continue praticando!"},
+            {min: 71, max: 90, message: "Excelente! Você está quase dominando tudo!"},
+            {min: 91, max: 100, message: "Incrível! Você é um mestre do português!"}
+        ];
+        
+        // Inicializar o jogo
         function initGame() {
-            // Carrega as questões padrão
-            measuresQuestions = [...defaultMeasuresQuestions];
-            operationsQuestions = [...defaultOperationsQuestions];
-            
-            // Combina todas as questões
-            allQuestions = combineAllQuestions();
-            
-            // Inicializa os botões de operador
-            initOperatorButtons();
-            
-            // Carrega a primeira questão
-            loadQuestion();
+            usedQuestions = { r: [], diminutivo: [], nasal: [], silabas: [] };
+            score = 0;
+            totalQuestions = 0;
+            gameActive = true;
             updateScore();
+            nextQuestion();
         }
         
-        // Combinar todas as questões em um único array
-        function combineAllQuestions() {
-            const combined = [];
+        // Mudar tópico
+        function changeTopic(topic) {
+            currentTopic = topic;
             
-            // Adicionar questões de medidas
-            measuresQuestions.forEach(q => {
-                combined.push({
-                    ...q,
-                    type: 'measures',
-                    id: `m-${measuresQuestions.indexOf(q)}`
-                });
+            // Atualizar botões ativos
+            topicBtns.forEach(btn => {
+                if (btn.dataset.topic === topic) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
             });
             
-            // Adicionar questões de operações
-            operationsQuestions.forEach(q => {
-                combined.push({
-                    ...q,
-                    type: 'operations',
-                    id: `o-${operationsQuestions.indexOf(q)}`
-                });
-            });
-            
-            return combined;
+            // Reiniciar o jogo com o novo tópico
+           // initGame();
         }
         
-        // Selecionar uma questão aleatória não utilizada
-        function getRandomQuestion() {
-            // Se todas as questões foram usadas, reinicia o conjunto
-            if (usedQuestions.size >= allQuestions.length) {
-                usedQuestions.clear();
+        // Selecionar próxima pergunta
+        function nextQuestion() {
+
+            // Selecionar pergunta aleatória
+            const randomTopic = Math.floor(Math.random() * Object.keys(gameData).length);   
+            currentTopic = Object.keys(gameData)[randomTopic];
+            changeTopic(currentTopic);
+
+            // Verificar se ainda há perguntas disponíveis
+            const availableQuestions = gameData[currentTopic].filter(
+                q => !usedQuestions[currentTopic].includes(gameData[currentTopic].indexOf(q))
+            );
+            
+           /* if (availableQuestions.length === 0) {
+                endGame();
+                return;
+            }*/
+
+            // Selecionar pergunta aleatória
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+            currentQuestion = availableQuestions[randomIndex];
+            
+            // Adicionar à lista de perguntas usadas
+            usedQuestions[currentTopic].push(gameData[currentTopic].indexOf(currentQuestion));
+            
+            // Atualizar exibição
+            questionDisplay.textContent = currentTopic === "r" ? currentQuestion.question : 
+                                        currentTopic === "diminutivo" ? `${currentQuestion.question} ${currentQuestion.word}?` :
+                                        currentTopic === "silabas" ? `${currentQuestion.question} '${currentQuestion.word}'` :
+                                        currentQuestion.question;
+            
+            // Mostrar emoji se for o caso
+            if (currentQuestion.emoji) {
+                emojiDisplay.textContent = currentQuestion.emoji;
+                emojiDisplay.style.display = 'block';
+            } else {
+                emojiDisplay.style.display = 'none';
             }
             
-            // Filtra questões não utilizadas
-            const availableQuestions = allQuestions.filter(q => !usedQuestions.has(q.id));
-            
-            // Seleciona uma questão aleatória
-            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
-            const question = availableQuestions[randomIndex];
-            
-            // Marca a questão como utilizada
-            usedQuestions.add(question.id);
-            
-            return question;
-        }
-        
-        // Inicializar botões de operador
-        function initOperatorButtons() {
-            const operatorBtns = document.querySelectorAll('.operator-btn');
-            operatorBtns.forEach(b => {
-                b.classList.remove('active');
-                b.classList.add('inactive');
-            });
-            
-            operatorBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    // Remove a classe active de todos os botões
-                    operatorBtns.forEach(b => {
-                        b.classList.remove('active');
-                        b.classList.add('inactive');
-                    });
-                    
-                    // Adiciona a classe active ao botão clicado
-                    this.classList.add('active');
-                    this.classList.remove('inactive');
-                    
-                    // Atualiza o operador selecionado
-                    //selectedOperator = this.getAttribute('data-operator');
-                    
-                    // Mostra o botão de verificar
-                    document.getElementById('check-btn').style.display = 'block';
-                });
-            });
-        }
-        
-        // Carregar uma questão
-        function loadQuestion() {
-            currentQuestion = getRandomQuestion();
-            const questionTextElement = document.getElementById('question-text');
-            const questionContentElement = document.getElementById('question-content');
-            const checkBtn = document.getElementById('check-btn');
-           // const sectionTitle = document.getElementById('section-title');
-            const feedbackElement = document.getElementById('feedback');
-            
-            // Esconder feedback
-            feedbackElement.style.display = 'none';
-            
-                      
-            // Configurar a pergunta
-            questionTextElement.textContent = currentQuestion.question;
-            
-            // Limpar conteúdo anterior
-            questionContentElement.innerHTML = '';
+            // Configurar elementos de resposta
+            optionsContainer.style.display = 'none';
+            answerInput.style.display = 'none';
+            syllableTypeContainer.style.display = 'none';
             checkBtn.style.display = 'none';
             
-            // Configurar conteúdo baseado no tipo
-            if (currentQuestion.type === 'measures') {
-                // Adicionar emojis se existirem
-                if (currentQuestion.emojis && currentQuestion.emojis.length > 0) {
-                    const emojiSpan = document.createElement('div');
-                    emojiSpan.style.textAlign = 'center';
-                    emojiSpan.style.margin = '10px 0';
-                    emojiSpan.innerHTML = currentQuestion.emojis.map(e => `<span class="emoji-large">${e}</span>`).join('');
-                    questionContentElement.appendChild(emojiSpan);
-                }
+            // Resetar seleção de tipo silábico
+            selectedSyllableType = null;
+            syllableTypeBtns.forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Configurar tipo de pergunta
+            if (currentQuestion.type === "multiple") {
+                optionsContainer.style.display = 'flex';
                 
-                // Criar opções de resposta
-                const optionsContainer = document.createElement('div');
-                optionsContainer.className = 'options-container';
+                // Limpar opções anteriores
+                optionsContainer.innerHTML = '';
                 
-                currentQuestion.options.forEach((option, index) => {
-                    const optionElement = document.createElement('div');
-                    optionElement.className = 'option';
-                    optionElement.textContent = option;
-                    optionElement.setAttribute('data-index', index);
-                    optionElement.onclick = function() {
-                        document.querySelectorAll('.option.selected').forEach(el => {
-                            el.classList.remove('selected');
-                        });
-                        this.classList.add('selected');
-                        checkBtn.style.display = 'block';
-                        checkMeasuresAnswer();
-                    };
-                    optionsContainer.appendChild(optionElement);
+                // Adicionar novas opções
+                currentQuestion.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = option;
+                    btn.addEventListener('click', () => selectOption(option));
+                    optionsContainer.appendChild(btn);
                 });
-                
-                questionContentElement.appendChild(optionsContainer);
-                checkBtn.onclick = checkMeasuresAnswer;
-                
-            } else {
-                // Configurar questão de operações
-                const table = document.createElement('table');
-                table.className = 'operation-table';
-                table.innerHTML = `
-                    <tr>
-                        <td></td>
-                        <td>D</td>
-                        <td>U</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><input type="text" class="operation-input" id="aux-tens" maxlength="2"></td>
-                        <td><input type="text" class="operation-input" id="aux-ones" maxlength="2"></td>
-                    </tr>
-                    <tr>
-                        <td style="position: relative;"> <div class="operator-container">
-                                <button class="inactive operator-btn plus-btn" data-operator="+">+</button>
-                            </div></td>
-                        <td id="num1-tens">${Math.floor(currentQuestion.num1 / 10)}</td>
-                        <td id="num1-ones">${currentQuestion.num1 % 10}</td>
-                    </tr>
-                    <tr>
-                        <td style="position: relative;">
-                            <div class="operator-container">
-                                <button class="inactive operator-btn minus-btn" data-operator="-">-</button>
-                            </div>
-                        </td>
-                        <td id="num2-tens">${Math.floor(currentQuestion.num2 / 10)}</td>
-                        <td id="num2-ones">${currentQuestion.num2 % 10}</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td colspan="2">
-                            <input type="number" class="operation-input" id="result" style="width: 100px;">
-                        </td>
-                    </tr>
-                `;
-                questionContentElement.appendChild(table);
-                
-                // Inicializar botões de operador
-                initOperatorButtons();
-                
-                // Configurar evento para mostrar botão de verificar quando o resultado for preenchido
-                const resultInput = document.getElementById('result');
-                resultInput.addEventListener('input', function() {
-                    if (this.value.trim() !== '') {
-                        checkBtn.style.display = 'block';
-                    } else {
-                        checkBtn.style.display = 'none';
-                    }
-                });
-                
-                checkBtn.onclick = checkOperationsAnswer;
+            } 
+            else if (currentQuestion.type === "syllables") {
+                answerInput.style.display = 'block';
+                syllableTypeContainer.style.display = 'flex';
+                checkBtn.style.display = 'block';
+                answerInput.placeholder = "Ex: ca-sa (use - ou espaço)";
+            }
+            else {
+                answerInput.style.display = 'block';
+                checkBtn.style.display = 'block';
+                answerInput.placeholder = "Digite sua resposta...";
             }
             
-          
+            // Configurar botões
+            nextBtn.style.display = 'none';
             
-            // Atualizar barra de progresso
-            updateProgressBar();
-        }
-        
-        // Adicionar controles para próxima questão
-        function addControlButtons(container) {
-            const controlsDiv = document.createElement('div');
-            controlsDiv.className = 'controls';
-            controlsDiv.innerHTML = `
-                <button class="control-btn" onclick="skipQuestion()">Pular Questão</button>
-                <button class="control-btn" onclick="showAnswer()">Mostrar Resposta</button>
-            `;
-            container.appendChild(controlsDiv);
-        }
-        
-        // Verificar resposta para questões de medidas
-        function checkMeasuresAnswer() {
-            const selectedOption = document.querySelector('.option.selected');
+            // Limpar mensagens e campo de resposta
+            answerInput.value = '';
+            messageDisplay.style.display = 'none';
+            messageDisplay.className = 'message';
             
-            if (!selectedOption) {
-                alert('Por favor, selecione uma resposta!');
-                return;
+            if (currentQuestion.type === "text" || currentQuestion.type === "syllables") {
+                answerInput.focus();
             }
+        }
+        
+        // Selecionar opção (para questões de múltipla escolha)
+        function selectOption(option) {
+            totalQuestions++;
             
-            const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
-            const feedbackElement = document.getElementById('feedback');
-            
-            score.total++;
-            
-            if (selectedIndex === currentQuestion.answer) {
+            // Verificar resposta
+            if (option === currentQuestion.answer) {
                 // Resposta correta
-                score.correct++;
-                feedbackElement.className = 'feedback success';
-                feedbackElement.innerHTML = getRandomSuccessPhrase();
-                
-                // Destacar a resposta correta
-                selectedOption.style.animation = "pulse 1s 2";
+                score++;
+                showFeedback(true);
             } else {
                 // Resposta incorreta
-                feedbackElement.className = 'feedback error';
-                feedbackElement.innerHTML = getRandomErrorPhrase() + 
-                    '<br>Resposta correta: ' + currentQuestion.options[currentQuestion.answer];
-                
-                // Destacar a resposta errada e mostrar a correta
-                selectedOption.style.background = "linear-gradient(to bottom, #ffccc7, #ffa39e)";
-                selectedOption.style.borderColor = "#ff4d4f";
-                
-                // Destacar a resposta correta
-                const correctOption = document.querySelector(`.option[data-index="${currentQuestion.answer}"]`);
-                correctOption.style.background = "linear-gradient(to bottom, #d9f7be, #b7eb8f)";
-                correctOption.style.borderColor = "#52c41a";
-                correctOption.style.animation = "pulse 1s 2";
+                showFeedback(false, currentQuestion.answer);
             }
             
-            feedbackElement.style.display = 'block';
             updateScore();
-            updateProgressBar();
             
-            // Avança para a próxima questão após 2 segundos
-            setTimeout(() => {
-                loadQuestion();
-            }, 2000);
+            // Desativar botões de opção
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === currentQuestion.answer) {
+                    btn.style.backgroundColor = '#2ecc71';
+                } else if (btn.textContent === option && option !== currentQuestion.answer) {
+                    btn.style.backgroundColor = '#e74c3c';
+                }
+            });
+            
+            // Mostrar botão de próxima pergunta
+            nextBtn.style.display = 'block';
         }
         
-        // Verificar resposta para questões de operações
-        function checkOperationsAnswer() {
-            const resultInput = document.getElementById('result');
-            const result = parseInt(resultInput.value);
+        // Selecionar tipo silábico
+        function selectSyllableType(type) {
+            selectedSyllableType = type;
+            syllableTypeBtns.forEach(btn => {
+                if (btn.dataset.type === type) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+        
+        // Verificar resposta (para questões de texto e sílabas)
+        function checkAnswer() {
+            if (!currentQuestion || !gameActive) return;
             
-            if (isNaN(result)) {
-                alert('Por favor, digite um número como resposta!');
-                return;
+            let isCorrect = false;
+            let userAnswer = "";
+            
+            if (currentQuestion.type === "syllables") {
+                userAnswer = answerInput.value.trim().toLowerCase();
+                // Normalizar a resposta (aceitar tanto - quanto espaço como separador)
+                const normalizedUserAnswer = userAnswer.replace(/ /g, '-');
+                const normalizedCorrectAnswer = currentQuestion.syllables.toLowerCase();
+                
+                // Verificar separação silábica e tipo
+                isCorrect = normalizedUserAnswer === normalizedCorrectAnswer && 
+                           selectedSyllableType === currentQuestion.syllableType;
+            } else {
+                userAnswer = answerInput.value.trim().toLowerCase();
+                const correctAnswer = currentQuestion.answer.toLowerCase();
+                isCorrect = userAnswer === correctAnswer;
             }
             
-            const feedbackElement = document.getElementById('feedback');
+            totalQuestions++;
             
-            // Verifica se o operador selecionado está correto
-            const operatorCorrect = true;//selectedOperator === currentQuestion.operator;
-            
-            score.total++;
-            
-            if ((result == currentQuestion.answer) && operatorCorrect ) {
+            if (isCorrect) {
                 // Resposta correta
-                score.correct++;
-                feedbackElement.className = 'feedback success';
-                feedbackElement.innerHTML = getRandomSuccessPhrase();
-                
-                // Destacar o campo de resultado
-                resultInput.style.borderColor = "#52c41a";
-                resultInput.style.boxShadow = "0 0 0 3px rgba(82, 196, 26, 0.3)";
+                score++;
+                showFeedback(true);
             } else {
                 // Resposta incorreta
-                feedbackElement.className = 'feedback error';
-                let errorMessage = getRandomErrorPhrase();
-                
-                if (!operatorCorrect) {
-                    errorMessage += "<br>O operador selecionado está incorreto.";
+                let correctAnswer = currentQuestion.answer;
+                if (currentQuestion.type === "syllables") {
+                    correctAnswer = `${currentQuestion.syllables} (${currentQuestion.syllableType})`;
                 }
-                
-                if (result !== currentQuestion.answer) {
-                    errorMessage += "<br>O resultado está incorreto.";
-                }
-                
-                errorMessage += '<br>Resposta correta: ' + currentQuestion.answer;
-                feedbackElement.innerHTML = errorMessage;
-                
-                // Destacar o campo de resultado
-                resultInput.style.borderColor = "#f5222d";
-                resultInput.style.boxShadow = "0 0 0 3px rgba(245, 34, 45, 0.3)";
+                showFeedback(false, correctAnswer);
             }
             
-            feedbackElement.style.display = 'block';
             updateScore();
-            updateProgressBar();
             
-            // Avança para a próxima questão após 2 segundos
-            setTimeout(() => {
-                loadQuestion();
-            }, 2000);
+            // Mostrar botão de próxima pergunta
+            nextBtn.style.display = 'block';
+            checkBtn.style.display = 'none';
         }
         
-        // Função para pular questão
-        function skipQuestion() {
-            loadQuestion();
-        }
-        
-        // Função para mostrar resposta
-        function showAnswer() {
-            const feedbackElement = document.getElementById('feedback');
+        // Mostrar feedback
+        function showFeedback(isCorrect, correctAnswer = null) {
+            messageDisplay.style.display = 'block';
             
-            if (currentQuestion.type === 'measures') {
-                feedbackElement.className = 'feedback error';
-                feedbackElement.innerHTML = `Resposta correta: ${currentQuestion.options[currentQuestion.answer]}`;
+            if (isCorrect) {
+                // Feedback positivo
+                const randomPhrase = successPhrases[Math.floor(Math.random() * successPhrases.length)];
+                messageDisplay.textContent = `${randomPhrase}`;
+                messageDisplay.className = 'message success';
+                setTimeout(() => {
+                     nextBtn.click();
+                }, 1500); // Esperar 2 segundos antes de limpar a mensagem
             } else {
-                feedbackElement.className = 'feedback error';
-                feedbackElement.innerHTML = `Resposta correta: ${currentQuestion.answer}`;
+                // Feedback negativo
+                const randomPhrase = errorPhrases[Math.floor(Math.random() * errorPhrases.length)];
+                messageDisplay.innerHTML = `${randomPhrase}<div class="correct-answer">Resposta correta: ${correctAnswer}</div>${currentQuestion.explanation ? `<div>${currentQuestion.explanation}</div>` : ''}`;
+                messageDisplay.className = 'message error';
             }
-            
-            feedbackElement.style.display = 'block';
         }
         
-        // Atualiza a pontuação exibida
+        // Atualizar pontuação
         function updateScore() {
-            document.getElementById('score').textContent = `${score.correct}/${score.total}`;
+            scoreDisplay.textContent = `${score}/${totalQuestions}`;
         }
         
-        // Atualiza a barra de progresso
-        function updateProgressBar() {
-            const progressPercent = (usedQuestions.size / allQuestions.length) * 100;
-            document.getElementById('progress').style.width = `${progressPercent}%`;
-        }
-        
-        // Retorna uma frase aleatória de sucesso
-        function getRandomSuccessPhrase() {
-            return successPhrases[Math.floor(Math.random() * successPhrases.length)];
-        }
-        
-        // Retorna uma frase aleatória de erro
-        function getRandomErrorPhrase() {
-            return errorPhrases[Math.floor(Math.random() * errorPhrases.length)];
-        }
-        
-        // Abre o modal de configuração
-        function openConfig() {
-            const modal = document.getElementById('config-modal');
-            const textarea = document.getElementById('config-json');
+        // Finalizar jogo
+        function endGame() {
+            gameActive = false;
+            answerInput.disabled = true;
+            checkBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+            optionsContainer.style.display = 'none';
+            answerInput.style.display = 'none';
+            syllableTypeContainer.style.display = 'none';
             
-            // Preenche o textarea com as configurações atuais
-            const config = {
-                measuresQuestions: measuresQuestions,
-                operationsQuestions: operationsQuestions
-            };
+            // Calcular porcentagem de acertos
+            const percentage = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
             
-            textarea.value = JSON.stringify(config, null, 2);
-            modal.style.display = 'flex';
+            // Selecionar mensagem final
+            let finalMessage = "";
+            for (const msg of finalMessages) {
+                if (percentage >= msg.min && percentage <= msg.max) {
+                    finalMessage = msg.message;
+                    break;
+                }
+            }
+            
+            // Exibir tela de fim de jogo
+            questionDisplay.textContent = "Fim do Jogo!";
+            emojiDisplay.style.display = 'none';
+            questionText.innerHTML = `
+                <div class="game-over">Jogo Concluído!</div>
+                <div class="final-score">Sua pontuação: ${score}/${totalQuestions} (${percentage}%)</div>
+                <div class="final-message">${finalMessage}</div>
+            `;
+            
+            // Limpar mensagens
+            messageDisplay.style.display = 'none';
         }
         
-        // Fecha o modal de configuração
-        function closeConfig() {
-            document.getElementById('config-modal').style.display = 'none';
+        // Configurações - Abrir modal
+        function openSettings() {
+            jsonTextarea.value = JSON.stringify(gameData, null, 2);
+            settingsModal.style.display = 'flex';
         }
         
-        // Salva as configurações do JSON
-        function saveConfig() {
-            const textarea = document.getElementById('config-json');
-            
+        // Configurações - Fechar modal
+        function closeSettings() {
+            settingsModal.style.display = 'none';
+        }
+        
+        // Configurações - Salvar
+        function saveSettings() {
             try {
-                const config = JSON.parse(textarea.value);
+                const newData = JSON.parse(jsonTextarea.value);
                 
-                if (config.measuresQuestions && Array.isArray(config.measuresQuestions)) {
-                    measuresQuestions = config.measuresQuestions;
+                // Validar dados
+                if (typeof newData !== 'object' || newData === null) {
+                    throw new Error("Os dados devem ser um objeto");
                 }
                 
-                if (config.operationsQuestions && Array.isArray(config.operationsQuestions)) {
-                    operationsQuestions = config.operationsQuestions;
+                if (!newData.r || !newData.diminutivo || !newData.nasal || !newData.silabas) {
+                    throw new Error("Os dados devem conter os tópicos 'r', 'diminutivo', 'nasal' e 'silabas'");
                 }
                 
-                // Recria a lista de questões
-                allQuestions = combineAllQuestions();
-                usedQuestions.clear();
+                for (const topic in newData) {
+                    if (!Array.isArray(newData[topic])) {
+                        throw new Error(`O tópico ${topic} deve ser um array`);
+                    }
+                    
+                    for (const item of newData[topic]) {
+                        if (!item.type || !item.question) {
+                            throw new Error("Cada item deve ter 'type' e 'question'");
+                        }
+                    }
+                }
                 
-                // Recarrega a questão atual
-                loadQuestion();
-                
-                closeConfig();
-                alert('Configurações salvas com sucesso!');
+                // Salvar novos dados e reiniciar jogo
+                gameData = newData;
+                closeSettings();
+                initGame();
             } catch (error) {
-                alert('Erro ao analisar o JSON: ' + error.message);
+                alert(`Erro ao salvar configurações: ${error.message}`);
             }
         }
         
-        // Inicia o jogo quando a página carregar
-        window.onload = initGame;
+        // Event Listeners
+        checkBtn.addEventListener('click', checkAnswer);
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        
+        nextBtn.addEventListener('click', nextQuestion);
+        
+        settingsBtn.addEventListener('click', openSettings);
+        saveBtn.addEventListener('click', saveSettings);
+        cancelBtn.addEventListener('click', closeSettings);
+        
+        topicBtns.forEach(btn => {
+            btn.addEventListener('click', () => changeTopic(btn.dataset.topic));
+        });
+        
+        syllableTypeBtns.forEach(btn => {
+            btn.addEventListener('click', () => selectSyllableType(btn.dataset.type));
+        });
+        
+        // Iniciar o jogo quando a página carregar
+        window.addEventListener('load', initGame);
     </script>
 </body>
 </html>
