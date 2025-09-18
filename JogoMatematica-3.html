@@ -80,7 +80,7 @@
         }
         
         .game-section {
-            padding: 20px;
+            padding: 10px;
             border-radius: 15px;
             margin-bottom: 20px;
             background-color: #f8faff;
@@ -121,7 +121,7 @@
         }
         
         .question-text {
-            font-size: 20px;
+            font-size: 28px;
             margin-bottom: 15px;
             text-align: center;
             line-height: 1.5;
@@ -229,7 +229,7 @@
         
         .operator-container {
             position: relative;
-            width: 120px;
+            width: 60px;
             height: 60px;
             display: flex;
             align-items: center;
@@ -273,11 +273,11 @@
         }
         
         .operator-btn.active.plus-btn {
-            left: 60px;
+            left: 0px;
         }
         
         .operator-btn.active.minus-btn {
-            right: 60px;
+            right: 0px;
         }
         
         .operator-btn:hover {
@@ -356,7 +356,10 @@
         
         .controls {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
             gap: 15px;
             margin: 20px 0;
         }
@@ -377,7 +380,12 @@
         }
         
         .emoji-large {
-            font-size: 40px;
+            font-size: 42px;
+            margin: 0 10px;
+            vertical-align: middle;
+        }
+        .emoji-small {
+            font-size: 32px;
             margin: 0 10px;
             vertical-align: middle;
         }
@@ -470,10 +478,7 @@
                 font-size: 18px;
             }
             
-            .controls {
-                flex-direction: column;
-                align-items: center;
-            }
+            
         }
     </style>
 </head>
@@ -488,14 +493,18 @@
         <div class="progress-bar">
             <div class="progress" id="progress"></div>
         </div>
-        
+        <div class="controls">
+            <button class="control-btn" onclick="skipQuestion()">Pular Questão</button>
+            <button class="control-btn" onclick="showAnswer()">Mostrar Resposta</button>
+        </div>
+        <div class="feedback" id="feedback"></div>
         <div id="game-section" class="game-section">
-            <h2 class="section-title" id="section-title">Questão de Matemática</h2>
+            <!--h2 class="section-title" id="section-title">Questão de Matemática</h2 -->
             <div class="question-container">
                 <div class="question-text" id="question-text"></div>
                 <div id="question-content"></div>
                 <button class="check-btn" id="check-btn" style="display:none;">Verificar ✅</button>
-                <div class="feedback" id="feedback"></div>
+                
             </div>
         </div>
     </div>
@@ -533,8 +542,8 @@
                 },
                 {
                 type: "comparison",
-                question: "Qual pesa mais: 500g de arroz ou 1kg de feijão?",
-                options: ["500g de arroz", "1kg de feijão", "Pesam o mesmo"],
+                question: "A Wyana prparou a comida com 500g de arroz e 1kg de feijão. Quantos gramas de comida deu no total?",
+                options: ["1,5g de comida", "1500g de comida", "501g de comida"],
                 answer: 1,
                 emojis: ["🍚", "🫘"]
                 },
@@ -596,10 +605,10 @@
                 },
                 {
                 type: "problem",
-                question: "Uma garrafa tem capacidade para 2 litros. Se eu tenho 5 garrafas, quantos ml tenho ao todo?",
-                options: ["10000ml", "5000ml", "2000ml"],
+                question: "Uma garrafa de água tem capacidade para 500ml. Se eu comprei 6 garrafas, quantos litros de água comprei ao todo?",
+                options: ["3L", "2L", "1L"],
                 answer: 0,
-                emojis: ["🧴", "🧴"]
+                emojis: ["🧴", "<span style='font-size:32px'>🧴</span>"]
                 },
                 {
                 type: "instrument",
@@ -673,8 +682,8 @@
             },
             {
                 type: "comparison",
-                question: "Qual pesa mais: 1kg de algodão ou 1kg de ferro?",
-                options: ["1kg de algodão", "1kg de ferro", "Pesam o mesmo"],
+                question: "Qual pesa mais: 1kg de algodão ou 1000g de ferro?",
+                options: ["1kg de algodão", "1000g de ferro", "Pesam o mesmo"],
                 answer: 2,
                 emojis: ["🍥", "🔩"]
             },
@@ -886,16 +895,18 @@
         
         // Frases de feedback
         const successPhrases = [
-            "Parabéns! Você acertou! 🎉",
-            "Muito bem! Você é demais! 👏",
-            "Isso aí! Continue assim! 🌟",
-            "Resposta correta! Você é um gênio! 🧠",
-            "Acertou em cheio! 🎯"
+            "Parabéns, João Rafael! Você acertou! 🎉",
+            "Muito bem, João Rafael! Você é demais! 👏",
+            "Muito bom, João Rafael. 👍",
+            "Isso aí! Continue assim João Rafael! 🌟",
+            "Resposta correta! João Rafael é um gênio! 🧠",
+            "João Rafael, Acertou em cheio! 🎯",
+            "João Rafael, é um foguete! 🚀"
         ];
         
         const errorPhrases = [
             "Ops! Tente novamente. 💪",
-            "Não foi dessa vez, mas continue tentando! 🌈",
+            "Não foi dessa vez, mas continue tentando! 😉",
             "Quase lá! Vamos tentar a próxima? 🚀",
             "Errou, mas não desista! 📚",
             "Você vai conseguir na próxima! 👍"
@@ -998,19 +1009,13 @@
             const questionTextElement = document.getElementById('question-text');
             const questionContentElement = document.getElementById('question-content');
             const checkBtn = document.getElementById('check-btn');
-            const sectionTitle = document.getElementById('section-title');
+           // const sectionTitle = document.getElementById('section-title');
             const feedbackElement = document.getElementById('feedback');
             
             // Esconder feedback
             feedbackElement.style.display = 'none';
             
-            // Atualizar título da seção com badge de categoria
-            if (currentQuestion.type === 'measures') {
-                sectionTitle.innerHTML = 'Medidas <span class="category-badge">Comprimento, Massa, Capacidade</span>';
-            } else {
-                sectionTitle.innerHTML = 'Operações <span class="category-badge">Adição e Subtração</span>';
-            }
-            
+                      
             // Configurar a pergunta
             questionTextElement.textContent = currentQuestion.question;
             
@@ -1063,19 +1068,20 @@
                         <td>U</td>
                     </tr>
                     <tr>
-                        <td>Auxiliar:</td>
+                        <td></td>
                         <td><input type="text" class="operation-input" id="aux-tens" maxlength="2"></td>
                         <td><input type="text" class="operation-input" id="aux-ones" maxlength="2"></td>
                     </tr>
                     <tr>
-                        <td>Primeiro número:</td>
+                        <td style="position: relative;"> <div class="operator-container">
+                                <button class="inactive operator-btn plus-btn" data-operator="+">+</button>
+                            </div></td>
                         <td id="num1-tens">${Math.floor(currentQuestion.num1 / 10)}</td>
                         <td id="num1-ones">${currentQuestion.num1 % 10}</td>
                     </tr>
                     <tr>
-                        <td style="position: relative; width: 140px;">
+                        <td style="position: relative;">
                             <div class="operator-container">
-                                <button class="inactive operator-btn plus-btn" data-operator="+">+</button>
                                 <button class="inactive operator-btn minus-btn" data-operator="-">-</button>
                             </div>
                         </td>
@@ -1083,7 +1089,7 @@
                         <td id="num2-ones">${currentQuestion.num2 % 10}</td>
                     </tr>
                     <tr>
-                        <td>Resultado:</td>
+                        <td></td>
                         <td colspan="2">
                             <input type="number" class="operation-input" id="result" style="width: 100px;">
                         </td>
@@ -1107,8 +1113,7 @@
                 checkBtn.onclick = checkOperationsAnswer;
             }
             
-            // Adicionar controles
-            addControlButtons(questionContentElement);
+          
             
             // Atualizar barra de progresso
             updateProgressBar();
