@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Infantil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        body {
+            background-color: #f0f9ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: linear-gradient(145deg, #ffccee, #aaddff);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            width: 320px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff6699;
+            margin-bottom: 15px;
+            font-size: 28px;
+            text-shadow: 2px 2px 0px #fff;
+        }
+
+        .display {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 32px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            color: #444;
+            letter-spacing: 2px;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            border: none;
+            border-radius: 15px;
+            padding: 15px 0;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .number {
+            background-color: #fff;
+            color: #444;
+        }
+
+        .number:hover {
+            background-color: #e6f7ff;
+        }
+
+        .operator {
+            background-color: #ffcc66;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .operator:hover {
+            background-color: #ffbb44;
+        }
+
+        .equals {
+            background-color: #77dd77;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .equals:hover {
+            background-color: #66cc66;
+        }
+
+        .clear {
+            background-color: #ff6666;
+            color: white;
+        }
+
+        .clear:hover {
+            background-color: #ff5555;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 22px;
+            min-height: 30px;
+            color: #ff6699;
+            font-weight: bold;
+        }
+
+        .animal {
+            font-size: 30px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Calculadora Infantil</h1>
+        <div class="animal">🐶</div>
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="operator" onclick="appendOperator('+')">+</button>
+            <button class="operator" onclick="appendOperator('-')">-</button>
+            <button class="number" onclick="appendNumber(7)">7</button>
+            <button class="number" onclick="appendNumber(8)">8</button>
+            <button class="number" onclick="appendNumber(9)">9</button>
+            <button class="number" onclick="appendNumber(4)">4</button>
+            <button class="number" onclick="appendNumber(5)">5</button>
+            <button class="number" onclick="appendNumber(6)">6</button>
+            <button class="number" onclick="appendNumber(1)">1</button>
+            <button class="number" onclick="appendNumber(2)">2</button>
+            <button class="number" onclick="appendNumber(3)">3</button>
+            <button class="number" onclick="appendNumber(0)">0</button>
+            <button class="equals" onclick="calculate()">=</button>
+        </div>
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <script>
+        let currentInput = '0';
+        let currentOperator = '';
+        let previousInput = '';
+        let shouldResetDisplay = false;
+        
+        const display = document.getElementById('display');
+        const feedback = document.getElementById('feedback');
+        const animals = ['🐶', '🐱', '🐰', '🐻', '🐼', '🐨', '🦊', '🐯', '🦁', '🐮'];
+        
+        function updateDisplay() {
+            display.textContent = currentInput;
+            
+            // Muda o animal aleatoriamente
+            document.querySelector('.animal').textContent = 
+                animals[Math.floor(Math.random() * animals.length)];
+        }
+        
+        function appendNumber(number) {
+            if (currentInput === '0' || shouldResetDisplay) {
+                currentInput = number.toString();
+                shouldResetDisplay = false;
+            } else {
+                currentInput += number.toString();
+            }
+            updateDisplay();
+            clearFeedback();
+        }
+        
+        function appendOperator(operator) {
+            if (currentOperator !== '') {
+                calculate();
+            }
+            previousInput = currentInput;
+            currentOperator = operator;
+            shouldResetDisplay = true;
+            clearFeedback();
+        }
+        
+        function calculate() {
+            if (currentOperator === '' || shouldResetDisplay) return;
+            
+            let result;
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            
+            if (currentOperator === '+') {
+                result = prev + current;
+            } else if (currentOperator === '-') {
+                result = prev - current;
+            }
+            
+            // Mostrar feedback positivo
+            if (result >= 0) {
+                feedback.textContent = "Muito bem! 👍";
+                feedback.style.color = "#77dd77";
+            } else {
+                feedback.textContent = "Vamos tentar de novo! 😊";
+                feedback.style.color = "#ff9966";
+            }
+            
+            currentInput = result.toString();
+            currentOperator = '';
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+        
+        function clearDisplay() {
+            currentInput = '0';
+            previousInput = '';
+            currentOperator = '';
+            updateDisplay();
+            clearFeedback();
+        }
+        
+        function clearFeedback() {
+            feedback.textContent = '';
+        }
+        
+        // Inicializar a calculadora
+        updateDisplay();
+    </script>
+</body>
+</html>
