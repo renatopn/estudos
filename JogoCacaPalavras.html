@@ -9,7 +9,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Arial', cursive, sans-serif;
+            font-family: Arial, sans-serif;
         }
         
         body {
@@ -20,6 +20,12 @@
             height: 100vh;
             padding: 10px;
             overflow: hidden;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         
         .header {
@@ -64,22 +70,24 @@
         
         .hints-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-bottom: 10px;
-            
+            max-height: 30vh;
+            overflow-y: auto;
         }
         
         .hint {
             background-color: #d1e7ff;
             padding: 8px;
             border-radius: 8px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             text-align: center;
         }
         
         .game-container {
             flex-grow: 1;
+            display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -95,6 +103,7 @@
             max-height: 100%;
             aspect-ratio: 1/1;
             overflow: hidden;
+            touch-action: pan-x pan-y;
         }
         
         .cell {
@@ -108,6 +117,12 @@
             cursor: pointer;
             user-select: none;
             transition: background-color 0.2s, color 0.2s;
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
         
         .cell.selected {
@@ -181,6 +196,7 @@
             margin: 0 5px;
             border: 1px solid #ccc;
             border-radius: 3px;
+            font-family: Arial, sans-serif;
         }
         
         .add-button, .remove-button {
@@ -191,6 +207,7 @@
             padding: 5px 10px;
             margin: 5px;
             cursor: pointer;
+            font-family: Arial, sans-serif;
         }
         
         .remove-button {
@@ -209,6 +226,7 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 1rem;
+            font-family: Arial, sans-serif;
         }
         
         .save-button {
@@ -241,7 +259,10 @@
                 font-size: 1.2rem;
             }
             
-           
+            .hints-container {
+                grid-template-columns: 1fr;
+            }
+            
             .cell {
                 font-size: 1rem;
             }
@@ -308,16 +329,16 @@
             wordGroups: {
                 sinonimos: [
                     {
-                        hints: ["Alegre", "Rápido", "Bonito", "Inteligente", "Resistente", "Fácil"],
-                        answers: ["Feliz", "Veloz", "Lindo", "Esperto", "Forte", "Simples"]
+                        hints: ["Alegre", "Rápido", "Bonito", "Inteligente", "Pequeno", "Fácil"],
+                        answers: ["Feliz", "Veloz", "Formoso", "Esperto", "Miúdo", "Simples"]
                     },
                     {
-                        hints: ["Grande", "Chateado", "Lento", "Brincar", "Burro", "Difícil"],
-                        answers: ["Enorme", "Triste", "Devagar", "Jogar", "Ignorante", "Complicado"]
+                        hints: ["Grande", "Triste", "Lento", "Feio", "Burro", "Difícil"],
+                        answers: ["Enorme", "Desolado", "Devagar", "Horrendo", "Ignorante", "Complicado"]
                     },
                     {
-                        hints: ["Corajoso", "Gelado", "Novo", "Quente", "Claro", "Higienizar"],
-                        answers: ["Valente", "Frio", "Jovem", "Aquecido", "Luminoso", "Limpar"]
+                        hints: ["Corajoso", "Rico", "Novo", "Quente", "Claro", "Doce"],
+                        answers: ["Valente", "Abastado", "Jovem", "Aquecido", "Luminoso", "Açucarado"]
                     }
                 ],
                 antonimos: [
@@ -330,36 +351,36 @@
                         answers: ["Lento", "Feio", "Fraco", "Velho", "Vazio", "Barato"]
                     },
                     {
-                        hints: ["Medroso", "Molhado", "Difícil", "Gordo", "Longe", "Aberto"],
-                        answers: ["Corajoso", "Seco", "Fácil", "Magro", "Perto", "Fechado"]
+                        hints: ["Doce", "Molhado", "Quente", "Claro", "Longe", "Aberto"],
+                        answers: ["Amargo", "Seco", "Frio", "Escuro", "Perto", "Fechado"]
                     }
                 ],
                 diminutivo: [
                     {
-                        hints: ["Casa", "Cão", "Gato", "Dedo", "Livro", "Pé"],
-                        answers: ["Casinha", "Cãozinho", "Gatinho", "Dedinho", "Livrinho", "Pezinho"]
+                        hints: ["Casa", "Cão", "Gato", "Flor", "Livro", "Pé"],
+                        answers: ["Casebre", "Cãozinho", "Gatinho", "Florzinha", "Livrinho", "Pezinho"]
                     },
                     {
                         hints: ["Mão", "Rua", "Sol", "Mar", "Rio", "Pão"],
-                        answers: ["Mãozinha", "Ruela", "Solzinho", "Marzinho", "Riacho", "Pãozinho"]
+                        answers: ["Mãozinha", "Ruela", "Solezinho", "Marzinho", "Riacho", "Pãozinho"]
                     },
                     {
                         hints: ["Copo", "Lápis", "Porta", "Janela", "Mesa", "Cadeira"],
-                        answers: ["Copinho", "Lapisinho", "Portinha", "Janelinha", "Mesinha", "Cadeirinha"]
+                        answers: ["Copinho", "Lapiseira", "Portinha", "Janelinha", "Mesinha", "Cadeirinha"]
                     }
                 ],
                 aumentativo: [
                     {
-                        hints: ["Casa", "Barriga", "Mulher", "Árvore", "Pedra", "Cabeça"],
-                        answers: ["Casarão", "Barrigão", "Mulherão", "Arvoredo", "Pedregulho", "Cabeção"]
+                        hints: ["Casa", "Homem", "Mulher", "Árvore", "Pedra", "Vento"],
+                        answers: ["Casão", "Homenzarrão", "Mulherona", "Arvoredo", "Pedregulho", "Ventania"]
                     },
                     {
-                        hints: ["Amigo", "Gato", "Porta", "Janela", "Mão", "Pé"],
-                        answers: ["Amigão", "Gatão", "Portão", "Janelona", "Mãozona", "Pezão"]
+                        hints: ["Cão", "Gato", "Porta", "Janela", "Mão", "Pé"],
+                        answers: ["Cãozarrão", "Gatão", "Portão", "Janelona", "Mãozona", "Peão"]
                     },
                     {
-                        hints: ["Livro", "Copo", "Carro", "Barco", "Muro", "Nariz"],
-                        answers: ["Livrão", "Copão", "Carrão", "Barcão", "Muralha", "Narigão"]
+                        hints: ["Livro", "Copo", "Carro", "Barco", "Prédio", "Sapato"],
+                        answers: ["Livrão", "Copão", "Carrão", "Barcaça", "Prédiozão", "Sapatão"]
                     }
                 ]
             }
@@ -372,8 +393,7 @@
             selectedCells: [],
             foundWords: [],
             isSelecting: false,
-            isMessaging: false,
-            gridSize: 10,
+            gridSize: 10, // Alterado para 10x10
             selectionDirection: null // 'horizontal' ou 'vertical'
         };
 
@@ -489,7 +509,9 @@
             // Insere as palavras na matriz
             const words = gameState.currentGroup.answers;
             const usedPositions = [];
-            let lastDirection = 0;
+            
+            // Alterna entre horizontal e vertical para cada palavra
+            let nextDirection = 0; // 0 = horizontal, 1 = vertical
             
             words.forEach(word => {
                 let placed = false;
@@ -498,9 +520,10 @@
                 while (!placed && attempts < 100) {
                     attempts++;
                     
-                    // Escolhe uma direção aleatória: 0=horizontal, 1=vertical
-                    const direction = (lastDirection+1)%2;
-                    lastDirection = direction;
+                    // Alterna entre horizontal e vertical
+                    const direction = nextDirection;
+                    nextDirection = (nextDirection + 1) % 2; // Alterna para a próxima direção
+                    
                     const wordLength = word.length;
                     
                     // Escolhe uma posição inicial aleatória
@@ -554,6 +577,63 @@
                         placed = true;
                     }
                 }
+                
+                // Se não conseguiu colocar com a direção alternada, tenta a direção oposta
+                if (!placed) {
+                    attempts = 0;
+                    while (!placed && attempts < 50) {
+                        attempts++;
+                        
+                        const direction = (nextDirection + 1) % 2; // Direção oposta
+                        const wordLength = word.length;
+                        
+                        let row, col;
+                        
+                        if (direction === 0) { // Horizontal
+                            row = Math.floor(Math.random() * gameState.gridSize);
+                            col = Math.floor(Math.random() * (gameState.gridSize - wordLength));
+                        } else { // Vertical
+                            row = Math.floor(Math.random() * (gameState.gridSize - wordLength));
+                            col = Math.floor(Math.random() * gameState.gridSize);
+                        }
+                        
+                        let canPlace = true;
+                        const positions = [];
+                        
+                        for (let i = 0; i < wordLength; i++) {
+                            let checkRow = row;
+                            let checkCol = col;
+                            
+                            if (direction === 0) { // Horizontal
+                                checkCol = col + i;
+                            } else { // Vertical
+                                checkRow = row + i;
+                            }
+                            
+                            if (grid[checkRow][checkCol] !== '' && grid[checkRow][checkCol] !== word[i]) {
+                                canPlace = false;
+                                break;
+                            }
+                            
+                            positions.push({ row: checkRow, col: checkCol });
+                        }
+                        
+                        if (canPlace) {
+                            for (let i = 0; i < wordLength; i++) {
+                                const { row: r, col: c } = positions[i];
+                                grid[r][c] = word[i].toUpperCase();
+                            }
+                            
+                            usedPositions.push({
+                                word: word.toUpperCase(),
+                                positions: positions,
+                                direction: direction === 0 ? 'horizontal' : 'vertical'
+                            });
+                            
+                            placed = true;
+                        }
+                    }
+                }
             });
             
             // Preenche as células vazias com letras aleatórias
@@ -580,6 +660,7 @@
                     cell.addEventListener('mousedown', handleCellMouseDown);
                     cell.addEventListener('mouseenter', handleCellMouseEnter);
                     cell.addEventListener('touchstart', handleCellTouchStart);
+                    cell.addEventListener('touchmove', handleCellTouchMove);
                     
                     wordSearch.appendChild(cell);
                 }
@@ -588,6 +669,11 @@
             // Adiciona event listeners para o documento
             document.addEventListener('mouseup', handleMouseUp);
             document.addEventListener('touchend', handleTouchEnd);
+            document.addEventListener('touchmove', function(e) {
+                if (gameState.isSelecting) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
             
             // Armazena as posições das palavras no estado do jogo
             gameState.wordPositions = usedPositions;
@@ -596,14 +682,14 @@
         // Manipula o início da seleção (mouse)
         function handleCellMouseDown(e) {
             e.preventDefault();
-            if (gameState.isMessaging || (gameState.foundWords.length === gameState.currentGroup.answers.length)) return;
+            if (gameState.foundWords.length === gameState.currentGroup.answers.length) return;
             
             const cell = e.target;
             if (!cell.classList.contains('cell')) return;
             
             gameState.isSelecting = true;
             gameState.selectedCells = [cell];
-            gameState.selectionDirection = null; // Reset da direção
+            gameState.selectionDirection = null;
             cell.classList.add('selected');
         }
 
@@ -676,6 +762,7 @@
 
         // Manipula o início da seleção (toque)
         function handleCellTouchStart(e) {
+            e.preventDefault();
             if (gameState.foundWords.length === gameState.currentGroup.answers.length) return;
             
             const cell = e.target;
@@ -685,6 +772,82 @@
             gameState.selectedCells = [cell];
             gameState.selectionDirection = null;
             cell.classList.add('selected');
+        }
+
+        // Manipula o movimento do toque durante a seleção
+        function handleCellTouchMove(e) {
+            if (!gameState.isSelecting) return;
+            
+            e.preventDefault();
+            
+            // Obtém a posição do toque
+            const touch = e.touches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            if (!element || !element.classList.contains('cell')) return;
+            
+            const cell = element;
+            if (gameState.selectedCells.includes(cell)) return;
+            
+            // Reutiliza a mesma lógica de verificação de mouse
+            const lastCell = gameState.selectedCells[gameState.selectedCells.length - 1];
+            const lastRow = parseInt(lastCell.dataset.row);
+            const lastCol = parseInt(lastCell.dataset.col);
+            const currentRow = parseInt(cell.dataset.row);
+            const currentCol = parseInt(cell.dataset.col);
+            
+            // Verifica se é uma célula adjacente (horizontal ou vertical)
+            const rowDiff = Math.abs(currentRow - lastRow);
+            const colDiff = Math.abs(currentCol - lastCol);
+            
+            // Só permite seleção em linha reta (horizontal ou vertical)
+            if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+                // Determina a direção da seleção
+                if (gameState.selectedCells.length === 1) {
+                    // Primeira célula adicional - define a direção
+                    if (rowDiff === 0) {
+                        gameState.selectionDirection = 'horizontal';
+                    } else {
+                        gameState.selectionDirection = 'vertical';
+                    }
+                } else {
+                    // Verifica se a nova célula segue a direção estabelecida
+                    if (gameState.selectionDirection === 'horizontal' && rowDiff !== 0) {
+                        return; // Não segue a direção horizontal
+                    }
+                    if (gameState.selectionDirection === 'vertical' && colDiff !== 0) {
+                        return; // Não segue a direção vertical
+                    }
+                    
+                    // Verifica se é uma extensão linear da seleção atual
+                    const firstCell = gameState.selectedCells[0];
+                    const firstRow = parseInt(firstCell.dataset.row);
+                    const firstCol = parseInt(firstCell.dataset.col);
+                    
+                    if (gameState.selectionDirection === 'horizontal') {
+                        // Todas as células devem estar na mesma linha
+                        if (currentRow !== firstRow) return;
+                        
+                        // Verifica se está na sequência correta
+                        const minCol = Math.min(...gameState.selectedCells.map(c => parseInt(c.dataset.col)));
+                        const maxCol = Math.max(...gameState.selectedCells.map(c => parseInt(c.dataset.col)));
+                        
+                        if (currentCol !== minCol - 1 && currentCol !== maxCol + 1) return;
+                    } else { // vertical
+                        // Todas as células devem estar na mesma coluna
+                        if (currentCol !== firstCol) return;
+                        
+                        // Verifica se está na sequência correta
+                        const minRow = Math.min(...gameState.selectedCells.map(c => parseInt(c.dataset.row)));
+                        const maxRow = Math.max(...gameState.selectedCells.map(c => parseInt(c.dataset.row)));
+                        
+                        if (currentRow !== minRow - 1 && currentRow !== maxRow + 1) return;
+                    }
+                }
+                
+                gameState.selectedCells.push(cell);
+                cell.classList.add('selected');
+            }
         }
 
         // Manipula o fim da seleção (mouse)
@@ -734,7 +897,6 @@
                 gameState.selectedCells.forEach(cell => {
                     cell.classList.remove('selected');
                     cell.classList.add('incorrect');
-                    gameState.isMessaging = true;
                 });
                 
                 // Remove a classe de erro após 3 segundos
@@ -743,8 +905,7 @@
                         cell.classList.remove('incorrect');
                     });
                     gameState.selectedCells = [];
-                    gameState.isMessaging = false;
-                }, 1000);
+                }, 3000);
             }
         }
 
