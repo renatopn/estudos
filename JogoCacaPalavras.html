@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Caça Palavras - Português</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f8ff;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 10px;
+            overflow: hidden;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #4a90e2;
+        }
+        
+        .title {
+            font-size: 1.5rem;
+            color: #4a90e2;
+            text-align: center;
+            flex-grow: 1;
+        }
+        
+        .config-button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .instructions {
+            background-color: #e6f2ff;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .hints-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+            max-height: 30vh;
+            overflow-y: auto;
+        }
+        
+        .hint {
+            background-color: #d1e7ff;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+        }
+        
+        .game-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .word-search {
+            display: grid;
+            gap: 2px;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            aspect-ratio: 1/1;
+            overflow: hidden;
+        }
+        
+        .cell {
+            background-color: #ffffff;
+            border: 1px solid #a0c8ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        
+        .cell.selected {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        .cell.correct {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .cell.incorrect {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .popup-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .popup h2 {
+            margin-bottom: 15px;
+            color: #4a90e2;
+            text-align: center;
+        }
+        
+        .config-section {
+            margin-bottom: 20px;
+        }
+        
+        .config-section h3 {
+            margin-bottom: 10px;
+            color: #4a90e2;
+        }
+        
+        .word-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #a0c8ff;
+            border-radius: 5px;
+        }
+        
+        .word-pair {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .word-pair input {
+            flex: 1;
+            padding: 5px;
+            margin: 0 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        
+        .add-button, .remove-button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        
+        .remove-button {
+            background-color: #f44336;
+        }
+        
+        .popup-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .popup-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .save-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .cancel-button {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            text-align: center;
+            display: none;
+            z-index: 200;
+        }
+        
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.2rem;
+            }
+            
+            .hints-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .cell {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="config-button" id="configButton">⚙️</button>
+        <h1 class="title">Caça Palavras - Português</h1>
+    </div>
+    
+    <div class="instructions" id="instructions">
+        Encontre os Sinônimos das palavras abaixo
+    </div>
+    
+    <div class="hints-container" id="hintsContainer">
+        <!-- As dicas serão inseridas aqui via JavaScript -->
+    </div>
+    
+    <div class="game-container">
+        <div class="word-search" id="wordSearch">
+            <!-- A matriz do caça-palavras será gerada aqui via JavaScript -->
+        </div>
+    </div>
+    
+    <div class="popup" id="configPopup">
+        <div class="popup-content">
+            <h2>Configurações do Jogo</h2>
+            
+            <div class="config-section">
+                <h3>Conteúdo de Estudo</h3>
+                <select id="contentType">
+                    <option value="sinonimos">Sinônimos</option>
+                    <option value="antonimos">Antônimos</option>
+                    <option value="diminutivo">Diminutivo</option>
+                    <option value="aumentativo">Aumentativo</option>
+                </select>
+            </div>
+            
+            <div class="config-section">
+                <h3>Grupos de Palavras</h3>
+                <div id="wordGroups">
+                    <!-- Os grupos de palavras serão inseridos aqui via JavaScript -->
+                </div>
+                <button class="add-button" id="addGroupButton">Adicionar Grupo</button>
+            </div>
+            
+            <div class="popup-buttons">
+                <button class="cancel-button" id="cancelButton">Cancelar</button>
+                <button class="save-button" id="saveButton">Salvar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="message" id="successMessage">
+        Parabéns, você é muito bom em Sinônimos!
+    </div>
+
+    <script>
+        // Configuração padrão do jogo
+        const defaultConfig = {
+            currentContentType: "sinonimos",
+            wordGroups: {
+                sinonimos: [
+                    {
+                        hints: ["Alegre", "Rápido", "Bonito", "Inteligente", "Resistente", "Fácil"],
+                        answers: ["Feliz", "Veloz", "Lindo", "Esperto", "Forte", "Simples"]
+                    },
+                    {
+                        hints: ["Grande", "Chateado", "Lento", "Brincar", "Burro", "Difícil"],
+                        answers: ["Enorme", "Triste", "Devagar", "Jogar", "Ignorante", "Complicado"]
+                    },
+                    {
+                        hints: ["Corajoso", "Gelado", "Novo", "Quente", "Claro", "Higienizar"],
+                        answers: ["Valente", "Frio", "Jovem", "Aquecido", "Luminoso", "Limpar"]
+                    }
+                ],
+                antonimos: [
+                    {
+                        hints: ["Alto", "Quente", "Claro", "Rico", "Feliz", "Grande"],
+                        answers: ["Baixo", "Frio", "Escuro", "Pobre", "Triste", "Pequeno"]
+                    },
+                    {
+                        hints: ["Rápido", "Bonito", "Forte", "Novo", "Cheio", "Caro"],
+                        answers: ["Lento", "Feio", "Fraco", "Velho", "Vazio", "Barato"]
+                    },
+                    {
+                        hints: ["Medroso", "Molhado", "Difícil", "Gordo", "Longe", "Aberto"],
+                        answers: ["Corajoso", "Seco", "Fácil", "Magro", "Perto", "Fechado"]
+                    }
+                ],
+                diminutivo: [
+                    {
+                        hints: ["Casa", "Cão", "Gato", "Dedo", "Livro", "Pé"],
+                        answers: ["Casinha", "Cãozinho", "Gatinho", "Dedinho", "Livrinho", "Pezinho"]
+                    },
+                    {
+                        hints: ["Mão", "Rua", "Sol", "Mar", "Rio", "Pão"],
+                        answers: ["Mãozinha", "Ruela", "Solzinho", "Marzinho", "Riacho", "Pãozinho"]
+                    },
+                    {
+                        hints: ["Copo", "Lápis", "Porta", "Janela", "Mesa", "Cadeira"],
+                        answers: ["Copinho", "Lapisinho", "Portinha", "Janelinha", "Mesinha", "Cadeirinha"]
+                    }
+                ],
+                aumentativo: [
+                    {
+                        hints: ["Casa", "Barriga", "Mulher", "Árvore", "Pedra", "Cabeça"],
+                        answers: ["Casarão", "Barrigão", "Mulherão", "Arvoredo", "Pedregulho", "Cabeção"]
+                    },
+                    {
+                        hints: ["Amigo", "Gato", "Porta", "Janela", "Mão", "Pé"],
+                        answers: ["Amigão", "Gatão", "Portão", "Janelona", "Mãozona", "Pezão"]
+                    },
+                    {
+                        hints: ["Livro", "Copo", "Carro", "Barco", "Muro", "Nariz"],
+                        answers: ["Livrão", "Copão", "Carrão", "Barcão", "Muralha", "Narigão"]
+                    }
+                ]
+            }
+        };
+
+        // Estado do jogo
+        let gameState = {
+            config: JSON.parse(JSON.stringify(defaultConfig)),
+            currentGroup: null,
+            selectedCells: [],
+            foundWords: [],
+            isSelecting: false,
+            isMessaging: false,
+            gridSize: 10,
+            selectionDirection: null // 'horizontal' ou 'vertical'
+        };
+
+        // Lista circular de conteúdos
+        const contentOrder = ['sinonimos', 'antonimos', 'diminutivo', 'aumentativo'];
+        let currentContentIndex = 0;
+
+        // Elementos DOM
+        const configButton = document.getElementById('configButton');
+        const configPopup = document.getElementById('configPopup');
+        const cancelButton = document.getElementById('cancelButton');
+        const saveButton = document.getElementById('saveButton');
+        const instructions = document.getElementById('instructions');
+        const hintsContainer = document.getElementById('hintsContainer');
+        const wordSearch = document.getElementById('wordSearch');
+        const contentTypeSelect = document.getElementById('contentType');
+        const wordGroupsContainer = document.getElementById('wordGroups');
+        const addGroupButton = document.getElementById('addGroupButton');
+        const successMessage = document.getElementById('successMessage');
+
+        // Inicialização do jogo
+        function initGame() {
+            loadConfig();
+            startNewRound();
+            setupEventListeners();
+        }
+
+        // Carrega a configuração do localStorage ou usa a padrão
+        function loadConfig() {
+            const savedConfig = localStorage.getItem('wordSearchConfig');
+            if (savedConfig) {
+                gameState.config = JSON.parse(savedConfig);
+            }
+        }
+
+        // Salva a configuração no localStorage
+        function saveConfig() {
+            localStorage.setItem('wordSearchConfig', JSON.stringify(gameState.config));
+        }
+
+        // Inicia uma nova rodada
+        function startNewRound() {
+            // Avança para o próximo conteúdo na lista circular
+            const contentType = contentOrder[currentContentIndex];
+            currentContentIndex = (currentContentIndex + 1) % contentOrder.length;
+            
+            // Atualiza o tipo de conteúdo na configuração
+            gameState.config.currentContentType = contentType;
+            
+            const groups = gameState.config.wordGroups[contentType];
+            
+            if (!groups || groups.length === 0) {
+                alert('Não há grupos de palavras configurados para este conteúdo. Configure alguns grupos primeiro.');
+                return;
+            }
+            
+            // Seleciona um grupo aleatório
+            const randomIndex = Math.floor(Math.random() * groups.length);
+            gameState.currentGroup = groups[randomIndex];
+            gameState.foundWords = [];
+            
+            // Atualiza a interface
+            updateInstructions();
+            updateHints();
+            generateWordSearch();
+        }
+
+        // Atualiza as instruções com base no conteúdo de estudo
+        function updateInstructions() {
+            const contentType = gameState.config.currentContentType;
+            let instructionText = '';
+            
+            switch(contentType) {
+                case 'sinonimos':
+                    instructionText = 'Encontre os Sinônimos das palavras abaixo';
+                    break;
+                case 'antonimos':
+                    instructionText = 'Encontre os Antônimos das palavras abaixo';
+                    break;
+                case 'diminutivo':
+                    instructionText = 'Encontre os Diminutivos das palavras abaixo';
+                    break;
+                case 'aumentativo':
+                    instructionText = 'Encontre os Aumentativos das palavras abaixo';
+                    break;
+            }
+            
+            instructions.textContent = instructionText;
+        }
+
+        // Atualiza as dicas na interface
+        function updateHints() {
+            hintsContainer.innerHTML = '';
+            
+            if (!gameState.currentGroup) return;
+            
+            gameState.currentGroup.hints.forEach(hint => {
+                const hintElement = document.createElement('div');
+                hintElement.className = 'hint';
+                hintElement.textContent = hint;
+                hintsContainer.appendChild(hintElement);
+            });
+        }
+
+        // Gera o caça-palavras
+        function generateWordSearch() {
+            wordSearch.innerHTML = '';
+            wordSearch.style.gridTemplateColumns = `repeat(${gameState.gridSize}, 1fr)`;
+            
+            // Cria uma matriz vazia
+            const grid = Array(gameState.gridSize).fill().map(() => Array(gameState.gridSize).fill(''));
+            
+            // Insere as palavras na matriz
+            const words = gameState.currentGroup.answers;
+            const usedPositions = [];
+            let lastDirection = 0;
+            
+            words.forEach(word => {
+                let placed = false;
+                let attempts = 0;
+                
+                while (!placed && attempts < 100) {
+                    attempts++;
+                    
+                    // Escolhe uma direção aleatória: 0=horizontal, 1=vertical
+                    const direction = (lastDirection+1)%2;
+                    lastDirection = direction;
+                    const wordLength = word.length;
+                    
+                    // Escolhe uma posição inicial aleatória
+                    let row, col;
+                    
+                    if (direction === 0) { // Horizontal
+                        row = Math.floor(Math.random() * gameState.gridSize);
+                        col = Math.floor(Math.random() * (gameState.gridSize - wordLength));
+                    } else { // Vertical
+                        row = Math.floor(Math.random() * (gameState.gridSize - wordLength));
+                        col = Math.floor(Math.random() * gameState.gridSize);
+                    }
+                    
+                    // Verifica se a palavra cabe na posição escolhida
+                    let canPlace = true;
+                    const positions = [];
+                    
+                    for (let i = 0; i < wordLength; i++) {
+                        let checkRow = row;
+                        let checkCol = col;
+                        
+                        if (direction === 0) { // Horizontal
+                            checkCol = col + i;
+                        } else { // Vertical
+                            checkRow = row + i;
+                        }
+                        
+                        // Verifica se a célula está vazia ou contém a mesma letra
+                        if (grid[checkRow][checkCol] !== '' && grid[checkRow][checkCol] !== word[i]) {
+                            canPlace = false;
+                            break;
+                        }
+                        
+                        positions.push({ row: checkRow, col: checkCol });
+                    }
+                    
+                    // Se a palavra pode ser colocada, insere na matriz
+                    if (canPlace) {
+                        for (let i = 0; i < wordLength; i++) {
+                            const { row: r, col: c } = positions[i];
+                            grid[r][c] = word[i].toUpperCase();
+                        }
+                        
+                        // Registra a posição da palavra
+                        usedPositions.push({
+                            word: word.toUpperCase(),
+                            positions: positions,
+                            direction: direction === 0 ? 'horizontal' : 'vertical'
+                        });
+                        
+                        placed = true;
+                    }
+                }
+            });
+            
+            // Preenche as células vazias com letras aleatórias
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            for (let i = 0; i < gameState.gridSize; i++) {
+                for (let j = 0; j < gameState.gridSize; j++) {
+                    if (grid[i][j] === '') {
+                        grid[i][j] = alphabet[Math.floor(Math.random() * alphabet.length)];
+                    }
+                }
+            }
+            
+            // Cria as células na interface
+            for (let i = 0; i < gameState.gridSize; i++) {
+                for (let j = 0; j < gameState.gridSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.textContent = grid[i][j];
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    
+                    // Adiciona event listeners para seleção
+                    cell.addEventListener('mousedown', handleCellMouseDown);
+                    cell.addEventListener('mouseenter', handleCellMouseEnter);
+                    cell.addEventListener('touchstart', handleCellTouchStart);
+                    
+                    wordSearch.appendChild(cell);
+                }
+            }
+            
+            // Adiciona event listeners para o documento
+            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('touchend', handleTouchEnd);
+            
+            // Armazena as posições das palavras no estado do jogo
+            gameState.wordPositions = usedPositions;
+        }
+
+        // Manipula o início da seleção (mouse)
+        function handleCellMouseDown(e) {
+            e.preventDefault();
+            if (gameState.isMessaging || (gameState.foundWords.length === gameState.currentGroup.answers.length)) return;
+            
+            const cell = e.target;
+            if (!cell.classList.contains('cell')) return;
+            
+            gameState.isSelecting = true;
+            gameState.selectedCells = [cell];
+            gameState.selectionDirection = null; // Reset da direção
+            cell.classList.add('selected');
+        }
+
+        // Manipula o movimento do mouse durante a seleção
+        function handleCellMouseEnter(e) {
+            if (!gameState.isSelecting) return;
+            
+            const cell = e.target;
+            if (!cell.classList.contains('cell') || gameState.selectedCells.includes(cell)) return;
+            
+            const lastCell = gameState.selectedCells[gameState.selectedCells.length - 1];
+            const lastRow = parseInt(lastCell.dataset.row);
+            const lastCol = parseInt(lastCell.dataset.col);
+            const currentRow = parseInt(cell.dataset.row);
+            const currentCol = parseInt(cell.dataset.col);
+            
+            // Verifica se é uma célula adjacente (horizontal ou vertical)
+            const rowDiff = Math.abs(currentRow - lastRow);
+            const colDiff = Math.abs(currentCol - lastCol);
+            
+            // Só permite seleção em linha reta (horizontal ou vertical)
+            if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+                // Determina a direção da seleção
+                if (gameState.selectedCells.length === 1) {
+                    // Primeira célula adicional - define a direção
+                    if (rowDiff === 0) {
+                        gameState.selectionDirection = 'horizontal';
+                    } else {
+                        gameState.selectionDirection = 'vertical';
+                    }
+                } else {
+                    // Verifica se a nova célula segue a direção estabelecida
+                    if (gameState.selectionDirection === 'horizontal' && rowDiff !== 0) {
+                        return; // Não segue a direção horizontal
+                    }
+                    if (gameState.selectionDirection === 'vertical' && colDiff !== 0) {
+                        return; // Não segue a direção vertical
+                    }
+                    
+                    // Verifica se é uma extensão linear da seleção atual
+                    const firstCell = gameState.selectedCells[0];
+                    const firstRow = parseInt(firstCell.dataset.row);
+                    const firstCol = parseInt(firstCell.dataset.col);
+                    
+                    if (gameState.selectionDirection === 'horizontal') {
+                        // Todas as células devem estar na mesma linha
+                        if (currentRow !== firstRow) return;
+                        
+                        // Verifica se está na sequência correta
+                        const minCol = Math.min(...gameState.selectedCells.map(c => parseInt(c.dataset.col)));
+                        const maxCol = Math.max(...gameState.selectedCells.map(c => parseInt(c.dataset.col)));
+                        
+                        if (currentCol !== minCol - 1 && currentCol !== maxCol + 1) return;
+                    } else { // vertical
+                        // Todas as células devem estar na mesma coluna
+                        if (currentCol !== firstCol) return;
+                        
+                        // Verifica se está na sequência correta
+                        const minRow = Math.min(...gameState.selectedCells.map(c => parseInt(c.dataset.row)));
+                        const maxRow = Math.max(...gameState.selectedCells.map(c => parseInt(c.dataset.row)));
+                        
+                        if (currentRow !== minRow - 1 && currentRow !== maxRow + 1) return;
+                    }
+                }
+                
+                gameState.selectedCells.push(cell);
+                cell.classList.add('selected');
+            }
+        }
+
+        // Manipula o início da seleção (toque)
+        function handleCellTouchStart(e) {
+            if (gameState.foundWords.length === gameState.currentGroup.answers.length) return;
+            
+            const cell = e.target;
+            if (!cell.classList.contains('cell')) return;
+            
+            gameState.isSelecting = true;
+            gameState.selectedCells = [cell];
+            gameState.selectionDirection = null;
+            cell.classList.add('selected');
+        }
+
+        // Manipula o fim da seleção (mouse)
+        function handleMouseUp() {
+            if (!gameState.isSelecting) return;
+            
+            gameState.isSelecting = false;
+            checkSelection();
+        }
+
+        // Manipula o fim da seleção (toque)
+        function handleTouchEnd() {
+            if (!gameState.isSelecting) return;
+            
+            gameState.isSelecting = false;
+            checkSelection();
+        }
+
+        // Verifica a seleção do jogador
+        function checkSelection() {
+            if (gameState.selectedCells.length === 0) return;
+            
+            // Obtém a palavra selecionada
+            const selectedWord = gameState.selectedCells.map(cell => cell.textContent).join('');
+            
+            // Verifica se a palavra corresponde a uma das respostas
+            const matchedWord = gameState.wordPositions.find(wordPos => 
+                wordPos.word === selectedWord || 
+                wordPos.word === selectedWord.split('').reverse().join('')
+            );
+            
+            if (matchedWord && !gameState.foundWords.includes(matchedWord.word)) {
+                // Palavra correta
+                gameState.selectedCells.forEach(cell => {
+                    cell.classList.remove('selected');
+                    cell.classList.add('correct');
+                });
+                
+                gameState.foundWords.push(matchedWord.word);
+                
+                // Verifica se todas as palavras foram encontradas
+                if (gameState.foundWords.length === gameState.currentGroup.answers.length) {
+                    showSuccessMessage();
+                }
+            } else {
+                // Palavra incorreta
+                gameState.selectedCells.forEach(cell => {
+                    cell.classList.remove('selected');
+                    cell.classList.add('incorrect');
+                    gameState.isMessaging = true;
+                });
+                
+                // Remove a classe de erro após 3 segundos
+                setTimeout(() => {
+                    gameState.selectedCells.forEach(cell => {
+                        cell.classList.remove('incorrect');
+                    });
+                    gameState.selectedCells = [];
+                    gameState.isMessaging = false;
+                }, 1000);
+            }
+        }
+
+        // Exibe mensagem de sucesso
+        function showSuccessMessage() {
+            const contentType = gameState.config.currentContentType;
+            let message = '';
+            
+            switch(contentType) {
+                case 'sinonimos':
+                    message = 'Parabéns, você é muito bom em Sinônimos!';
+                    break;
+                case 'antonimos':
+                    message = 'Parabéns, você é muito bom em Antônimos!';
+                    break;
+                case 'diminutivo':
+                    message = 'Parabéns, você é muito bom em Diminutivos!';
+                    break;
+                case 'aumentativo':
+                    message = 'Parabéns, você é muito bom em Aumentativos!';
+                    break;
+            }
+            
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+                startNewRound();
+            }, 3000);
+        }
+
+        // Configura os event listeners
+        function setupEventListeners() {
+            // Botão de configuração
+            configButton.addEventListener('click', () => {
+                showConfigPopup();
+            });
+            
+            // Botões do popup de configuração
+            cancelButton.addEventListener('click', () => {
+                configPopup.style.display = 'none';
+            });
+            
+            saveButton.addEventListener('click', () => {
+                saveConfigFromPopup();
+                configPopup.style.display = 'none';
+                startNewRound();
+            });
+            
+            // Alteração do tipo de conteúdo
+            contentTypeSelect.addEventListener('change', () => {
+                updateWordGroupsUI();
+            });
+            
+            // Botão para adicionar grupo
+            addGroupButton.addEventListener('click', addWordGroup);
+        }
+
+        // Exibe o popup de configuração
+        function showConfigPopup() {
+            contentTypeSelect.value = gameState.config.currentContentType;
+            updateWordGroupsUI();
+            configPopup.style.display = 'flex';
+        }
+
+        // Atualiza a interface dos grupos de palavras
+        function updateWordGroupsUI() {
+            const contentType = contentTypeSelect.value;
+            const groups = gameState.config.wordGroups[contentType] || [];
+            
+            wordGroupsContainer.innerHTML = '';
+            
+            groups.forEach((group, groupIndex) => {
+                const groupElement = document.createElement('div');
+                groupElement.className = 'word-group';
+                
+                const groupTitle = document.createElement('h4');
+                groupTitle.textContent = `Grupo ${groupIndex + 1}`;
+                groupElement.appendChild(groupTitle);
+                
+                // Campos para dicas e respostas
+                for (let i = 0; i < 6; i++) {
+                    const pairElement = document.createElement('div');
+                    pairElement.className = 'word-pair';
+                    
+                    const hintInput = document.createElement('input');
+                    hintInput.type = 'text';
+                    hintInput.placeholder = 'Dica';
+                    hintInput.value = group.hints[i] || '';
+                    hintInput.dataset.groupIndex = groupIndex;
+                    hintInput.dataset.pairIndex = i;
+                    hintInput.dataset.type = 'hint';
+                    
+                    const answerInput = document.createElement('input');
+                    answerInput.type = 'text';
+                    answerInput.placeholder = 'Resposta';
+                    answerInput.value = group.answers[i] || '';
+                    answerInput.dataset.groupIndex = groupIndex;
+                    answerInput.dataset.pairIndex = i;
+                    answerInput.dataset.type = 'answer';
+                    
+                    pairElement.appendChild(hintInput);
+                    pairElement.appendChild(answerInput);
+                    groupElement.appendChild(pairElement);
+                }
+                
+                // Botão para remover grupo
+                const removeButton = document.createElement('button');
+                removeButton.className = 'remove-button';
+                removeButton.textContent = 'Remover Grupo';
+                removeButton.addEventListener('click', () => {
+                    removeWordGroup(groupIndex);
+                });
+                
+                groupElement.appendChild(removeButton);
+                wordGroupsContainer.appendChild(groupElement);
+            });
+        }
+
+        // Adiciona um novo grupo de palavras
+        function addWordGroup() {
+            const contentType = contentTypeSelect.value;
+            
+            if (!gameState.config.wordGroups[contentType]) {
+                gameState.config.wordGroups[contentType] = [];
+            }
+            
+            gameState.config.wordGroups[contentType].push({
+                hints: ['', '', '', '', '', ''],
+                answers: ['', '', '', '', '', '']
+            });
+            
+            updateWordGroupsUI();
+        }
+
+        // Remove um grupo de palavras
+        function removeWordGroup(groupIndex) {
+            const contentType = contentTypeSelect.value;
+            gameState.config.wordGroups[contentType].splice(groupIndex, 1);
+            updateWordGroupsUI();
+        }
+
+        // Salva a configuração a partir do popup
+        function saveConfigFromPopup() {
+            // Atualiza o tipo de conteúdo
+            gameState.config.currentContentType = contentTypeSelect.value;
+            
+            // Atualiza os grupos de palavras
+            const contentType = contentTypeSelect.value;
+            const inputs = wordGroupsContainer.querySelectorAll('input');
+            const groups = [];
+            
+            // Agrupa os inputs por grupo
+            const groupMap = {};
+            
+            inputs.forEach(input => {
+                const groupIndex = parseInt(input.dataset.groupIndex);
+                const pairIndex = parseInt(input.dataset.pairIndex);
+                const type = input.dataset.type;
+                
+                if (!groupMap[groupIndex]) {
+                    groupMap[groupIndex] = { hints: [], answers: [] };
+                }
+                
+                if (type === 'hint') {
+                    groupMap[groupIndex].hints[pairIndex] = input.value;
+                } else if (type === 'answer') {
+                    groupMap[groupIndex].answers[pairIndex] = input.value;
+                }
+            });
+            
+            // Converte o mapa em array
+            for (let i = 0; i < Object.keys(groupMap).length; i++) {
+                if (groupMap[i]) {
+                    groups.push(groupMap[i]);
+                }
+            }
+            
+            gameState.config.wordGroups[contentType] = groups;
+            
+            // Salva a configuração
+            saveConfig();
+        }
+
+        // Inicializa o jogo quando a página carrega
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
