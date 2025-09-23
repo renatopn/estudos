@@ -9,7 +9,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', cursive, sans-serif;
         }
         
         body {
@@ -20,12 +20,6 @@
             height: 100vh;
             padding: 10px;
             overflow: hidden;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
         }
         
         .header {
@@ -70,18 +64,17 @@
         
         .hints-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 10px;
-            max-height: 30vh;
-            overflow-y: auto;
+            
         }
         
         .hint {
             background-color: #d1e7ff;
             padding: 8px;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             text-align: center;
         }
         
@@ -102,7 +95,6 @@
             max-height: 100%;
             aspect-ratio: 1/1;
             overflow: hidden;
-            touch-action: pan-x pan-y;
         }
         
         .cell {
@@ -116,12 +108,6 @@
             cursor: pointer;
             user-select: none;
             transition: background-color 0.2s, color 0.2s;
-            touch-action: manipulation;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
         }
         
         .cell.selected {
@@ -195,7 +181,6 @@
             margin: 0 5px;
             border: 1px solid #ccc;
             border-radius: 3px;
-            font-family: Arial, sans-serif;
         }
         
         .add-button, .remove-button {
@@ -206,7 +191,6 @@
             padding: 5px 10px;
             margin: 5px;
             cursor: pointer;
-            font-family: Arial, sans-serif;
         }
         
         .remove-button {
@@ -225,7 +209,6 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 1rem;
-            font-family: Arial, sans-serif;
         }
         
         .save-button {
@@ -258,6 +241,7 @@
                 font-size: 1.2rem;
             }
             
+           
             .cell {
                 font-size: 1rem;
             }
@@ -320,20 +304,21 @@
     <script>
         // Configuração padrão do jogo
         const defaultConfig = {
+            const defaultConfig = {
             currentContentType: "sinonimos",
             wordGroups: {
                 sinonimos: [
                     {
-                        hints: ["Alegre", "Rápido", "Bonito", "Inteligente", "Pequeno", "Fácil"],
-                        answers: ["Feliz", "Veloz", "Formoso", "Esperto", "Miúdo", "Simples"]
+                        hints: ["Alegre", "Rápido", "Bonito", "Inteligente", "Resistente", "Fácil"],
+                        answers: ["Feliz", "Veloz", "Lindo", "Esperto", "Forte", "Simples"]
                     },
                     {
-                        hints: ["Grande", "Triste", "Lento", "Feio", "Burro", "Difícil"],
-                        answers: ["Enorme", "Desolado", "Devagar", "Horrendo", "Ignorante", "Complicado"]
+                        hints: ["Grande", "Chateado", "Lento", "Brincar", "Burro", "Difícil"],
+                        answers: ["Enorme", "Triste", "Devagar", "Jogar", "Ignorante", "Complicado"]
                     },
                     {
-                        hints: ["Corajoso", "Rico", "Novo", "Quente", "Claro", "Doce"],
-                        answers: ["Valente", "Abastado", "Jovem", "Aquecido", "Luminoso", "Açucarado"]
+                        hints: ["Corajoso", "Gelado", "Novo", "Quente", "Claro", "Higienizar"],
+                        answers: ["Valente", "Frio", "Jovem", "Aquecido", "Luminoso", "Limpar"]
                     }
                 ],
                 antonimos: [
@@ -346,36 +331,36 @@
                         answers: ["Lento", "Feio", "Fraco", "Velho", "Vazio", "Barato"]
                     },
                     {
-                        hints: ["Doce", "Molhado", "Quente", "Claro", "Longe", "Aberto"],
-                        answers: ["Amargo", "Seco", "Frio", "Escuro", "Perto", "Fechado"]
+                        hints: ["Medroso", "Molhado", "Difícil", "Gordo", "Longe", "Aberto"],
+                        answers: ["Corajoso", "Seco", "Fácil", "Magro", "Perto", "Fechado"]
                     }
                 ],
                 diminutivo: [
                     {
-                        hints: ["Casa", "Cão", "Gato", "Flor", "Livro", "Pé"],
-                        answers: ["Casebre", "Cãozinho", "Gatinho", "Florzinha", "Livrinho", "Pezinho"]
+                        hints: ["Casa", "Cão", "Gato", "Dedo", "Livro", "Pé"],
+                        answers: ["Casinha", "Cãozinho", "Gatinho", "Dedinho", "Livrinho", "Pezinho"]
                     },
                     {
                         hints: ["Mão", "Rua", "Sol", "Mar", "Rio", "Pão"],
-                        answers: ["Mãozinha", "Ruela", "Solezinho", "Marzinho", "Riacho", "Pãozinho"]
+                        answers: ["Mãozinha", "Ruela", "Solzinho", "Marzinho", "Riacho", "Pãozinho"]
                     },
                     {
                         hints: ["Copo", "Lápis", "Porta", "Janela", "Mesa", "Cadeira"],
-                        answers: ["Copinho", "Lapiseira", "Portinha", "Janelinha", "Mesinha", "Cadeirinha"]
+                        answers: ["Copinho", "Lapisinho", "Portinha", "Janelinha", "Mesinha", "Cadeirinha"]
                     }
                 ],
                 aumentativo: [
                     {
-                        hints: ["Casa", "Homem", "Mulher", "Árvore", "Pedra", "Vento"],
-                        answers: ["Casão", "Homenzarrão", "Mulherona", "Arvoredo", "Pedregulho", "Ventania"]
+                        hints: ["Casa", "Barriga", "Mulher", "Árvore", "Pedra", "Cabeça"],
+                        answers: ["Casarão", "Barrigão", "Mulherão", "Arvoredo", "Pedregulho", "Cabeção"]
                     },
                     {
-                        hints: ["Cão", "Gato", "Porta", "Janela", "Mão", "Pé"],
-                        answers: ["Cãozarrão", "Gatão", "Portão", "Janelona", "Mãozona", "Peão"]
+                        hints: ["Amigo", "Gato", "Porta", "Janela", "Mão", "Pé"],
+                        answers: ["Amigão", "Gatão", "Portão", "Janelona", "Mãozona", "Pezão"]
                     },
                     {
-                        hints: ["Livro", "Copo", "Carro", "Barco", "Prédio", "Sapato"],
-                        answers: ["Livrão", "Copão", "Carrão", "Barcaça", "Prédiozão", "Sapatão"]
+                        hints: ["Livro", "Copo", "Carro", "Barco", "Muro", "Nariz"],
+                        answers: ["Livrão", "Copão", "Carrão", "Barcão", "Muralha", "Narigão"]
                     }
                 ]
             }
