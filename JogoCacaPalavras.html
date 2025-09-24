@@ -307,62 +307,51 @@
 const defaultConfig = {
             currentContentType: "sinonimos",
             wordGroups: {
-                sinonimos: [
+                sinonimos: {
+                    
+                        hints: ["Alegre", "Rápido", "Bonito", "Inteligente", "Resistente", "Fácil",
+                            "Grande", "Chateado", "Lento", "Brincar", "Burro", "Difícil",
+                            "Corajoso", "Gelado", "Novo", "Quente", "Claro", "Higienizar"
+                        ],
+                        answers: ["Feliz", "Veloz", "Lindo", "Esperto", "Forte", "Simples",
+                            "Enorme", "Triste", "Devagar", "Jogar", "Ignorante", "Complicado",
+                            "Valente", "Frio", "Jovem", "Aquecido", "Luminoso", "Limpar"
+                        ]
+                    
+                },
+                antonimos: 
                     {
-                        hints: ["Alegre", "Rápido", "Bonito", "Inteligente", "Resistente", "Fácil"],
-                        answers: ["Feliz", "Veloz", "Lindo", "Esperto", "Forte", "Simples"]
+                        hints: ["Alto", "Quente", "Claro", "Rico", "Feliz", "Grande",
+                            "Rápido", "Bonito", "Forte", "Novo", "Cheio", "Caro",
+                            "Medroso", "Molhado", "Difícil", "Gordo", "Longe", "Aberto"
+                        ],
+                        answers: ["Baixo", "Frio", "Escuro", "Pobre", "Triste", "Pequeno",
+                            "Lento", "Feio", "Fraco", "Velho", "Vazio", "Barato",
+                            "Corajoso", "Seco", "Fácil", "Magro", "Perto", "Fechado"
+                        ]
                     },
+                diminutivo:
                     {
-                        hints: ["Grande", "Chateado", "Lento", "Brincar", "Burro", "Difícil"],
-                        answers: ["Enorme", "Triste", "Devagar", "Jogar", "Ignorante", "Complicado"]
+                        hints: ["Casa", "Cão", "Gato", "Dedo", "Livro", "Pé",
+                            "Mão", "Rua", "Sol", "Mar", "Rio", "Pão",
+                            "Copo", "Lápis", "Porta", "Janela", "Mesa", "Cadeira"
+                        ],
+                        answers: ["Casinha", "Cãozinho", "Gatinho", "Dedinho", "Livrinho", "Pezinho",
+                            "Mãozinha", "Ruela", "Solzinho", "Marzinho", "Riacho", "Pãozinho",
+                            "Copinho", "Lapisinho", "Portinha", "Janelinha", "Mesinha", "Cadeirinha"
+                        ]
                     },
+                aumentativo: 
                     {
-                        hints: ["Corajoso", "Gelado", "Novo", "Quente", "Claro", "Higienizar"],
-                        answers: ["Valente", "Frio", "Jovem", "Aquecido", "Luminoso", "Limpar"]
+                        hints: ["Casa", "Barriga", "Mulher", "Árvore", "Pedra", "Cabeça",
+                            "Amigo", "Gato", "Porta", "Janela", "Mão", "Pé",
+                            "Livro", "Copo", "Carro", "Barco", "Muro", "Nariz"
+                        ],
+                        answers: ["Casarão", "Barrigão", "Mulherão", "Arvoredo", "Pedregulho", "Cabeção",
+                            "Amigão", "Gatão", "Portão", "Janelona", "Mãozona", "Pezão",
+                            "Livrão", "Copão", "Carrão", "Barcão", "Muralha", "Narigão"
+                        ]
                     }
-                ],
-                antonimos: [
-                    {
-                        hints: ["Alto", "Quente", "Claro", "Rico", "Feliz", "Grande"],
-                        answers: ["Baixo", "Frio", "Escuro", "Pobre", "Triste", "Pequeno"]
-                    },
-                    {
-                        hints: ["Rápido", "Bonito", "Forte", "Novo", "Cheio", "Caro"],
-                        answers: ["Lento", "Feio", "Fraco", "Velho", "Vazio", "Barato"]
-                    },
-                    {
-                        hints: ["Medroso", "Molhado", "Difícil", "Gordo", "Longe", "Aberto"],
-                        answers: ["Corajoso", "Seco", "Fácil", "Magro", "Perto", "Fechado"]
-                    }
-                ],
-                diminutivo: [
-                    {
-                        hints: ["Casa", "Cão", "Gato", "Dedo", "Livro", "Pé"],
-                        answers: ["Casinha", "Cãozinho", "Gatinho", "Dedinho", "Livrinho", "Pezinho"]
-                    },
-                    {
-                        hints: ["Mão", "Rua", "Sol", "Mar", "Rio", "Pão"],
-                        answers: ["Mãozinha", "Ruela", "Solzinho", "Marzinho", "Riacho", "Pãozinho"]
-                    },
-                    {
-                        hints: ["Copo", "Lápis", "Porta", "Janela", "Mesa", "Cadeira"],
-                        answers: ["Copinho", "Lapisinho", "Portinha", "Janelinha", "Mesinha", "Cadeirinha"]
-                    }
-                ],
-                aumentativo: [
-                    {
-                        hints: ["Casa", "Barriga", "Mulher", "Árvore", "Pedra", "Cabeça"],
-                        answers: ["Casarão", "Barrigão", "Mulherão", "Arvoredo", "Pedregulho", "Cabeção"]
-                    },
-                    {
-                        hints: ["Amigo", "Gato", "Porta", "Janela", "Mão", "Pé"],
-                        answers: ["Amigão", "Gatão", "Portão", "Janelona", "Mãozona", "Pezão"]
-                    },
-                    {
-                        hints: ["Livro", "Copo", "Carro", "Barco", "Muro", "Nariz"],
-                        answers: ["Livrão", "Copão", "Carrão", "Barcão", "Muralha", "Narigão"]
-                    }
-                ]
             }
         };
 
@@ -373,8 +362,15 @@ const defaultConfig = {
             selectedCells: [],
             foundWords: [],
             isSelecting: false,
+            isMessaging: false,
             gridSize: 10, // Alterado para 10x10
-            selectionDirection: null // 'horizontal' ou 'vertical'
+            selectionDirection: null, // 'horizontal' ou 'vertical'
+            currentIndices: { // NOVO: controla o índice atual para cada categoria
+                sinonimos: 0,
+                antonimos: 0,
+                diminutivo: 0,
+                aumentativo: 0
+            }
         };
 
         // Lista circular de conteúdos
@@ -414,7 +410,7 @@ const defaultConfig = {
             localStorage.setItem('wordSearchConfig', JSON.stringify(gameState.config));
         }
 
-        // Inicia uma nova rodada
+        // Inicia uma nova rodada - ATUALIZADA
         function startNewRound() {
             // Avança para o próximo conteúdo na lista circular
             const contentType = contentOrder[currentContentIndex];
@@ -423,22 +419,83 @@ const defaultConfig = {
             // Atualiza o tipo de conteúdo na configuração
             gameState.config.currentContentType = contentType;
             
-            const groups = gameState.config.wordGroups[contentType];
+            const categoryData = gameState.config.wordGroups[contentType];
             
-            if (!groups || groups.length === 0) {
-                alert('Não há grupos de palavras configurados para este conteúdo. Configure alguns grupos primeiro.');
+            if (!categoryData || categoryData.hints.length === 0) {
+                alert('Não há palavras configuradas para este conteúdo. Configure algumas palavras primeiro.');
                 return;
             }
             
-            // Seleciona um grupo aleatório
-            const randomIndex = Math.floor(Math.random() * groups.length);
-            gameState.currentGroup = groups[randomIndex];
+            // Obtém o índice atual para esta categoria
+            let currentIndex = gameState.currentIndices[contentType];
+            
+            // Verifica se ainda há palavras disponíveis para esta categoria
+            if (currentIndex >= categoryData.hints.length) {
+                // Se não há mais palavras, verifica se todas as categorias foram completadas
+                const allCompleted = Object.values(gameState.currentIndices).every(
+                    (index, i) => index >= gameState.config.wordGroups[contentOrder[i]].hints.length
+                );
+                
+                if (allCompleted) {
+                    showGameCompletedMessage();
+                    return;
+                } else {
+                    // Avança para a próxima categoria que ainda tem palavras
+                    startNewRound();
+                    return;
+                }
+            }
+            
+            // Seleciona as próximas 6 palavras (ou menos se estiver no final)
+            const hints = [];
+            const answers = [];
+            const remainingWords = categoryData.hints.length - currentIndex;
+            const wordsToTake = Math.min(6, remainingWords);
+            
+            for (let i = 0; i < wordsToTake; i++) {
+                hints.push(categoryData.hints[currentIndex + i]);
+                answers.push(categoryData.answers[currentIndex + i]);
+            }
+            
+            // Atualiza o índice para a próxima rodada
+            gameState.currentIndices[contentType] = currentIndex + wordsToTake;
+            
+            // Cria o grupo atual com as palavras selecionadas
+            gameState.currentGroup = { hints, answers };
             gameState.foundWords = [];
             
             // Atualiza a interface
             updateInstructions();
             updateHints();
             generateWordSearch();
+        }
+
+        // NOVA FUNÇÃO: Exibe mensagem de fim de jogo
+        function showGameCompletedMessage() {
+            successMessage.textContent = 'Parabéns! Você completou todas as palavras! Reiniciando o jogo...';
+            successMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+                resetGame();
+            }, 3000);
+        }
+
+        // NOVA FUNÇÃO: Reinicia o jogo completamente
+        function resetGame() {
+            // Reseta todos os índices
+            gameState.currentIndices = {
+                sinonimos: 0,
+                antonimos: 0,
+                diminutivo: 0,
+                aumentativo: 0
+            };
+            
+            // Reseta o índice do conteúdo
+            currentContentIndex = 0;
+            
+            // Inicia uma nova rodada
+            startNewRound();
         }
 
         // Atualiza as instruções com base no conteúdo de estudo
@@ -662,8 +719,8 @@ const defaultConfig = {
         // Manipula o início da seleção (mouse)
         function handleCellMouseDown(e) {
             e.preventDefault();
-            if (gameState.foundWords.length === gameState.currentGroup.answers.length) return;
-            
+            if (gameState.isMessaging || (gameState.foundWords.length === gameState.currentGroup.answers.length)) return;
+
             const cell = e.target;
             if (!cell.classList.contains('cell')) return;
             
@@ -743,8 +800,8 @@ const defaultConfig = {
         // Manipula o início da seleção (toque)
         function handleCellTouchStart(e) {
             e.preventDefault();
-            if (gameState.foundWords.length === gameState.currentGroup.answers.length) return;
-            
+            if (gameState.isMessaging || (gameState.foundWords.length === gameState.currentGroup.answers.length)) return;
+
             const cell = e.target;
             if (!cell.classList.contains('cell')) return;
             
@@ -878,14 +935,15 @@ const defaultConfig = {
                     cell.classList.remove('selected');
                     cell.classList.add('incorrect');
                 });
-                
+                gameState.isMessaging = true;
                 // Remove a classe de erro após 3 segundos
                 setTimeout(() => {
                     gameState.selectedCells.forEach(cell => {
                         cell.classList.remove('incorrect');
+                        gameState.isMessaging = false;
                     });
                     gameState.selectedCells = [];
-                }, 3000);
+                }, 1500);
             }
         }
 
@@ -919,7 +977,7 @@ const defaultConfig = {
         }
 
         // Configura os event listeners
-        function setupEventListeners() {
+       function setupEventListeners() {
             // Botão de configuração
             configButton.addEventListener('click', () => {
                 showConfigPopup();
@@ -941,8 +999,8 @@ const defaultConfig = {
                 updateWordGroupsUI();
             });
             
-            // Botão para adicionar grupo
-            addGroupButton.addEventListener('click', addWordGroup);
+            // Remove o listener do botão de adicionar grupo
+            // addGroupButton.removeEventListener('click', addWordGroup);
         }
 
         // Exibe o popup de configuração
@@ -953,80 +1011,44 @@ const defaultConfig = {
         }
 
         // Atualiza a interface dos grupos de palavras
-        function updateWordGroupsUI() {
+       function updateWordGroupsUI() {
             const contentType = contentTypeSelect.value;
-            const groups = gameState.config.wordGroups[contentType] || [];
+            const categoryData = gameState.config.wordGroups[contentType] || { hints: [], answers: [] };
             
             wordGroupsContainer.innerHTML = '';
             
-            groups.forEach((group, groupIndex) => {
-                const groupElement = document.createElement('div');
-                groupElement.className = 'word-group';
-                
-                const groupTitle = document.createElement('h4');
-                groupTitle.textContent = `Grupo ${groupIndex + 1}`;
-                groupElement.appendChild(groupTitle);
-                
-                // Campos para dicas e respostas
-                for (let i = 0; i < 6; i++) {
-                    const pairElement = document.createElement('div');
-                    pairElement.className = 'word-pair';
-                    
-                    const hintInput = document.createElement('input');
-                    hintInput.type = 'text';
-                    hintInput.placeholder = 'Dica';
-                    hintInput.value = group.hints[i] || '';
-                    hintInput.dataset.groupIndex = groupIndex;
-                    hintInput.dataset.pairIndex = i;
-                    hintInput.dataset.type = 'hint';
-                    
-                    const answerInput = document.createElement('input');
-                    answerInput.type = 'text';
-                    answerInput.placeholder = 'Resposta';
-                    answerInput.value = group.answers[i] || '';
-                    answerInput.dataset.groupIndex = groupIndex;
-                    answerInput.dataset.pairIndex = i;
-                    answerInput.dataset.type = 'answer';
-                    
-                    pairElement.appendChild(hintInput);
-                    pairElement.appendChild(answerInput);
-                    groupElement.appendChild(pairElement);
-                }
-                
-                // Botão para remover grupo
-                const removeButton = document.createElement('button');
-                removeButton.className = 'remove-button';
-                removeButton.textContent = 'Remover Grupo';
-                removeButton.addEventListener('click', () => {
-                    removeWordGroup(groupIndex);
-                });
-                
-                groupElement.appendChild(removeButton);
-                wordGroupsContainer.appendChild(groupElement);
-            });
-        }
-
-        // Adiciona um novo grupo de palavras
-        function addWordGroup() {
-            const contentType = contentTypeSelect.value;
+            const groupElement = document.createElement('div');
+            groupElement.className = 'word-group';
             
-            if (!gameState.config.wordGroups[contentType]) {
-                gameState.config.wordGroups[contentType] = [];
+            const groupTitle = document.createElement('h4');
+            groupTitle.textContent = `Palavras para ${contentType}`;
+            groupElement.appendChild(groupTitle);
+            
+            // Cria 18 pares de inputs (dica e resposta)
+            for (let i = 0; i < 18; i++) {
+                const pairElement = document.createElement('div');
+                pairElement.className = 'word-pair';
+                
+                const hintInput = document.createElement('input');
+                hintInput.type = 'text';
+                hintInput.placeholder = 'Dica';
+                hintInput.value = categoryData.hints[i] || '';
+                hintInput.dataset.index = i;
+                hintInput.dataset.type = 'hint';
+                
+                const answerInput = document.createElement('input');
+                answerInput.type = 'text';
+                answerInput.placeholder = 'Resposta';
+                answerInput.value = categoryData.answers[i] || '';
+                answerInput.dataset.index = i;
+                answerInput.dataset.type = 'answer';
+                
+                pairElement.appendChild(hintInput);
+                pairElement.appendChild(answerInput);
+                groupElement.appendChild(pairElement);
             }
             
-            gameState.config.wordGroups[contentType].push({
-                hints: ['', '', '', '', '', ''],
-                answers: ['', '', '', '', '', '']
-            });
-            
-            updateWordGroupsUI();
-        }
-
-        // Remove um grupo de palavras
-        function removeWordGroup(groupIndex) {
-            const contentType = contentTypeSelect.value;
-            gameState.config.wordGroups[contentType].splice(groupIndex, 1);
-            updateWordGroupsUI();
+            wordGroupsContainer.appendChild(groupElement);
         }
 
         // Salva a configuração a partir do popup
