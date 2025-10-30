@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Revisão Mágica: Escolas e Trabalho</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- ESTILOS GERAIS E LAYOUT --- */
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fce4ec; /* Rosa claro de fundo */
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #ff9800; /* Laranja vibrante */
+            color: white;
+            padding: 20px 0;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        header h1 {
+            font-family: 'Fredoka', cursive;
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        #nav-container {
+            background-color: #f7bb3c; /* Amarelo da navegação */
+            width: 100%;
+            padding: 10px 0;
+            overflow-x: auto; /* Permite rolar na horizontal */
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .topic-button {
+            background-color: #ffcc80;
+            color: #333;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin: 0 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            font-weight: 700;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+
+        .topic-button:hover, .topic-button.active {
+            background-color: #e65100; /* Laranja escuro */
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* --- ESTILOS DO CONTEÚDO (CARDS) --- */
+        #content-area {
+            width: 90%;
+            max-width: 600px;
+            padding: 20px 0;
+            min-height: 250px; /* Garante que a área não encolha demais */
+            position: relative;
+        }
+
+        .review-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+            border-left: 8px solid;
+            transition: opacity 0.3s, transform 0.3s;
+            position: absolute; /* Para sobrepor e exibir apenas 1 */
+            top: 0;
+            width: 100%;
+            box-sizing: border-box;
+            display: none; /* Inicialmente oculto */
+        }
+
+        .review-card.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Cores Temáticas para Bordas */
+        .card-tema-escola { border-left-color: #4CAF50; /* Verde */ }
+        .card-tema-trabalho { border-left-color: #2196F3; /* Azul */ }
+        .card-tema-tecnologia { border-left-color: #FFC107; /* Amarelo */ }
+        .card-tema-antigo { border-left-color: #9C27B0; /* Roxo */ }
+
+        .card-icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .card-title {
+            font-family: 'Fredoka', cursive;
+            font-size: 1.4em;
+            color: #00796b;
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .card-text {
+            font-size: 1em;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        .card-topic-tag {
+            display: block;
+            background-color: #eee;
+            color: #777;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            margin-top: 10px;
+            width: fit-content;
+        }
+
+        /* --- CONTROLES DE NAVEGAÇÃO --- */
+        #controls-container {
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .nav-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            flex: 1; /* Distribui o espaço */
+            margin: 0 5px;
+            transition: background-color 0.2s;
+        }
+
+        #prev-button {
+            background-color: #7986cb; /* Azul suave */
+            color: white;
+        }
+
+        #next-button {
+            background-color: #4CAF50; /* Verde vibrante */
+            color: white;
+        }
+        
+        #card-counter {
+            text-align: center;
+            padding: 10px;
+            color: #333;
+            font-weight: 700;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📚 Revisão Rápida para o Super Quiz! 🧠</h1>
+    </header>
+
+    <div id="nav-container">
+        </div>
+
+    <div id="content-area">
+        </div>
+    
+    <div id="controls-container">
+        <button id="prev-button" class="nav-button" disabled>« Anterior</button>
+        <div id="card-counter">1 / 12</div>
+        <button id="next-button" class="nav-button">Próximo »</button>
+    </div>
+
+    <script>
+        // --- CONTEÚDO DE REVISÃO (BASEADO NAS IMAGENS DO LIVRO) ---
+        const reviewContent = [
+            {
+                topic: "A Escola e a Lei", theme: "escola", icon: "⚖️",
+                title: "O Porquê da Escola!",
+                text: "A lei do Brasil diz que toda criança e adolescente tem direito à **Educação**! O principal objetivo não é só aprender a ler, mas garantir seu **desenvolvimento completo**, ensinar a ser um bom **cidadão** e te ajudar a se **preparar para o trabalho** quando crescer."
+            },
+            {
+                topic: "Escolas do Passado", theme: "antigo", icon: "🕰️",
+                title: "Como era o Colégio Antigamente?",
+                text: "Antigamente, o currículo era diferente. Disciplinas como **Latim**, **Francês**, **Caligrafia** (escrever bonito) e **Bordado** já foram obrigatórias! As escolas refletem o que a sociedade mais valoriza em cada época."
+            },
+            {
+                topic: "Castigos de Outrora", theme: "antigo", icon: "🚫",
+                title: "Objetos Antigos Proibidos!",
+                text: "No passado, usavam a **Palmatória** para bater na mão dos alunos 'desobedientes'. Hoje, o castigo físico é **PROIBIDO**! A escola deve ensinar com respeito e métodos pedagógicos, e não com violência."
+            },
+            {
+                topic: "Educação Indígena", theme: "escola", icon: "🌎",
+                title: "Quem Ensinou no Início do Brasil?",
+                text: "Quando os portugueses chegaram, os **Padres Jesuítas** foram os primeiros a organizar o ensino formal. O objetivo deles era principalmente a **catequização** (ensinar a religião cristã) dos indígenas."
+            },
+            {
+                topic: "Ensino Antigo", theme: "antigo", icon: "📜",
+                title: "Tradição Oral e Memória",
+                text: "Muitos povos antigos, como os indígenas e no Oriente, usavam a **Tradição Oral**. Isso significa que o conhecimento, as histórias e as regras eram passados de geração para geração apenas pela **FALA** e pela **memória**, sem precisar de escrita ou livros."
+            },
+            {
+                topic: "Educação na Grécia", theme: "escola", icon: "🏛️",
+                title: "As Aulas dos Meninos Gregos",
+                text: "Na Grécia Antiga, os meninos tinham aulas de **Ginástica** (para o corpo, tornando-os bons guerreiros) e **Música** (para a mente e o raciocínio, usando instrumentos como a lira). O foco era formar o cidadão completo."
+            },
+            {
+                topic: "Objetos Escolares Antigos", theme: "antigo", icon: "✏️",
+                title: "Os Materiais que Sumiram",
+                text: "Você sabia? Objetos como o **Ábaco** (para calcular), a **Caneta Tinteiro** (que precisava de tinta), e a **Bolsa Udácia** (uma maleta para os livros) já foram muito importantes nas escolas! Hoje usamos caneta esferográfica e calculadora."
+            },
+            {
+                topic: "As Três Etapas do Trabalho", theme: "trabalho", icon: "⛏️",
+                title: "Como Tudo é Produzido?",
+                text: "A produção de qualquer coisa, como um tijolo (feito de argila), passa por 3 etapas: 1. **Extração** (tirar a matéria-prima da natureza); 2. **Transformação** (fabricar o objeto); 3. **Comercialização** (venda e distribuição)."
+            },
+            {
+                topic: "Trabalho Agrícola", theme: "trabalho", icon: "🚜",
+                title: "O Trabalho no Campo",
+                text: "O trabalho no campo é dividido em: **Agricultura** (plantar alimentos como arroz e feijão) e **Pecuária** (criação de animais para carne, leite e couro). É um trabalho que exige esforço e garante nosso alimento!"
+            },
+            {
+                topic: "Trabalho no Passado", theme: "trabalho", icon: "🌾",
+                title: "Crianças e o Campo",
+                text: "Na Idade Média, a maioria das pessoas vivia no campo. As crianças camponesas ajudavam cedo nas tarefas de **Agricultura e Pecuária**, aprendendo na prática a sobreviver e a trabalhar na lavoura."
+            },
+            {
+                topic: "Tecnologia na Escola", theme: "tecnologia", icon: "💻",
+                title: "O Poder da Lousa Digital",
+                text: "A **Lousa Digital** é um recurso moderno que traz interatividade. Ela permite ver objetos em **3D**, assistir a vídeos educativos e até fazer visitas virtuais a **museus** e exposições do mundo todo, encurtando as distâncias!"
+            },
+            {
+                topic: "Tecnologia no Trabalho", theme: "tecnologia", icon: "⚙️",
+                title: "O Que as Máquinas Mudaram?",
+                text: "Com a tecnologia, tarefas repetitivas que antes eram feitas por pessoas (como tecer), agora são feitas por máquinas, como o **Tear Mecânico**. Isso aumenta muito a velocidade e a quantidade de produção (**Mecanização**)."
+            }
+        ];
+
+        // --- VARIÁVEIS DE ESTADO E DOM ---
+        const contentArea = document.getElementById('content-area');
+        const navContainer = document.getElementById('nav-container');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const cardCounter = document.getElementById('card-counter');
+
+        let allCards = [];         // Array de todos os elementos Card HTML
+        let filteredCards = [];    // Array de Cards atualmente visíveis (filtrados pelo tópico)
+        let currentIndex = 0;      // Índice do card atual dentro do array filteredCards
+        
+        const allTopics = ["Todos os Tópicos", ...new Set(reviewContent.map(card => card.topic))];
+
+        // 1. Função para renderizar TODOS os cards (inicialmente ocultos)
+        function renderCards() {
+            contentArea.innerHTML = '';
+            reviewContent.forEach(item => {
+                const card = document.createElement('div');
+                card.classList.add('review-card', `card-tema-${item.theme}`);
+                card.dataset.topic = item.topic;
+                card.innerHTML = `
+                    <div>
+                        <span class="card-icon">${item.icon}</span>
+                        <h2 class="card-title">${item.title}</h2>
+                    </div>
+                    <p class="card-text">${item.text}</p>
+                    <span class="card-topic-tag">#${item.topic.replace(/ /g, '_')}</span>
+                `;
+                contentArea.appendChild(card);
+            });
+            allCards = Array.from(document.querySelectorAll('.review-card'));
+        }
+
+        // 2. Função para renderizar os botões de navegação
+        function renderNavButtons() {
+            navContainer.innerHTML = '';
+            allTopics.forEach(topic => {
+                const button = document.createElement('button');
+                button.classList.add('topic-button');
+                button.textContent = topic;
+                button.dataset.topic = topic;
+                button.addEventListener('click', () => filterCards(topic, button));
+                navContainer.appendChild(button);
+            });
+        }
+
+        // 3. Função principal de filtro e inicialização da visualização
+        function filterCards(topic, selectedButton) {
+            
+            // 3a. Atualiza o estado ativo dos botões
+            document.querySelectorAll('.topic-button').forEach(btn => btn.classList.remove('active'));
+            selectedButton.classList.add('active');
+
+            // 3b. Define o novo array filtrado
+            if (topic === "Todos os Tópicos") {
+                filteredCards = allCards;
+            } else {
+                filteredCards = allCards.filter(card => card.dataset.topic === topic);
+            }
+
+            // 3c. Reseta o índice e mostra o primeiro card (ou nada se o filtro estiver vazio)
+            currentIndex = 0;
+            showCurrentCard();
+            
+            // Rola para o topo da área de conteúdo
+            contentArea.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 4. Função para exibir o card atual e atualizar os controles
+        function showCurrentCard() {
+            // Oculta todos os cards
+            allCards.forEach(card => card.classList.remove('active'));
+
+            if (filteredCards.length > 0) {
+                // Exibe o card atual e o marca como ativo
+                const currentCard = filteredCards[currentIndex];
+                currentCard.classList.add('active');
+
+                // 4a. Atualiza o contador
+                cardCounter.textContent = `${currentIndex + 1} / ${filteredCards.length}`;
+
+                // 4b. Habilita/Desabilita botões
+                prevButton.disabled = currentIndex === 0;
+                //nextButton.disabled = currentIndex === filteredCards.length - 1;
+            } else {
+                cardCounter.textContent = `0 / 0`;
+                prevButton.disabled = true;
+                nextButton.disabled = true;
+            }
+        }
+        
+        // 5. Funções de navegação
+        function navigate(direction) {
+            let newIndex = currentIndex + direction;
+            if (newIndex >= 0 && newIndex < filteredCards.length) {
+                currentIndex = newIndex;
+                showCurrentCard();
+            }else if(newIndex >=  filteredCards.length){
+                location.href = "./JogoHistoriaGeografia.html";
+            }
+        }
+
+        // --- EVENT LISTENERS DE NAVEGAÇÃO ---
+        prevButton.addEventListener('click', () => navigate(-1));
+        nextButton.addEventListener('click', () => navigate(1));
+
+        // --- INICIALIZAÇÃO ---
+        renderCards();
+        renderNavButtons();
+        // Filtra para mostrar todos os cards ao carregar (usando o primeiro botão)
+        filterCards("Todos os Tópicos", document.querySelector('.topic-button'));
+
+    </script>
+</body>
+</html>

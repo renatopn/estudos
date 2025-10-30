@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Quiz Interativo de História e Geografia</title>
+    <style>
+        /* --- ESTILOS CSS --- */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #game-container, #memory-game-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 650px;
+            min-height: 400px;
+            margin-bottom: 20px;
+        }
+        
+        #memory-game-container {
+            display: none;
+        }
+        
+        h1 {
+            color: #4a90e2;
+            text-align: center;
+            font-size: 1.8em;
+        }
+
+        #question-display {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #e9f5ff;
+            font-size: 1.1em;
+            min-height: 60px;
+            font-weight: bold;
+        }
+
+        .option-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            text-align: left;
+            cursor: pointer;
+            background-color: #a8d5ff;
+            color: #1a4d7d;
+            transition: background-color 0.3s;
+            font-size: 1em;
+        }
+
+        .option-button:hover:not(:disabled) {
+            background-color: #8ac0f0;
+        }
+
+        .correct {
+            background-color: #4CAF50; /* Verde */
+            color: white;
+            pointer-events: none;
+        }
+
+        .incorrect {
+            background-color: #F44336; /* Vermelho */
+            color: white;
+            pointer-events: none;
+        }
+
+        #next-button {
+            display: none;
+            padding: 10px 20px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+            width: 100%;
+        }
+
+        #score-display {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        #rationale-display {
+            padding: 10px;
+            margin-top: 10px;
+            border-left: 5px solid #4a90e2;
+            background-color: #f0f8ff;
+            display: none;
+            font-size: 0.9em;
+        }
+
+        #config-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff9800;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 5;
+        }
+
+        /* --- Estilos do Modal de Configuração --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%; 
+            max-width: 800px;
+            border-radius: 8px;
+        }
+        
+        #json-editor {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        #json-error {
+            color: #f44336;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* --- Estilos do Jogo da Memória --- */
+        #memory-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            perspective: 1000px;
+            margin-top: 20px;
+        }
+
+        .memory-card {
+            width: 100%;
+            height: 100px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 0.8em;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            padding: 5px;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+        }
+
+        .card-front {
+            background-color: #e0f7fa;
+            color: #00796b;
+            transform: rotateY(180deg);
+        }
+
+        .card-back {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+        
+        .memory-card.matched .card-back, .memory-card.matched .card-front {
+             background-color: #4CAF50 !important;
+             color: white;
+        }
+        
+        /* --- ESTILOS DO POPUP DE ALERTA PERSONALIZADO --- */
+        #custom-alert-modal {
+            display: none;
+            position: fixed;
+            z-index: 20;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        #custom-alert-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8);
+            animation: bounceIn 0.3s forwards;
+            border: 5px solid;
+        }
+
+        .alert-success {
+            border-color: #4CAF50; /* Verde */
+        }
+
+        .alert-error {
+            border-color: #F44336; /* Vermelho */
+        }
+
+        #alert-message {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #alert-ok-button {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 20px;
+            background-color: #4a90e2;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #alert-ok-button:hover {
+            background-color: #357bd8;
+        }
+
+        @keyframes bounceIn {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        /* Fim dos estilos */
+    </style>
+</head>
+<body>
+
+    <button id="config-button">⚙️ Configurar Jogo</button>
+
+    <div id="game-container">
+        <h1 id="quiz-title">Carregando Quiz...</h1>
+
+        <div id="question-area">
+            <p id="question-number"></p>
+            <div id="question-display"></div>
+            <div id="options-container">
+                </div>
+            <div id="rationale-display"></div>
+            <button id="next-button">Próxima Pergunta</button>
+        </div>
+
+        <div id="score-display"></div>
+    </div>
+    
+    <div id="memory-game-container">
+        </div>
+
+    <div id="config-modal" class="modal">
+        <div class="modal-content">
+            <h2>Editor de JSON do Quiz</h2>
+            <p>Edite o conteúdo das perguntas e do Jogo da Memória. O formato JSON deve ser mantido!</p>
+            <div id="json-error"></div>
+            <textarea id="json-editor"></textarea>
+            <div class="modal-buttons">
+                <button id="save-json-button" style="background-color: #4CAF50; color: white;">Salvar e Atualizar</button>
+                <button id="close-modal-button" style="background-color: #f44336; color: white;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="custom-alert-modal" class="modal">
+        <div id="custom-alert-content">
+            <p id="alert-message"></p>
+            <button id="alert-ok-button">OK!</button>
+        </div>
+    </div>
+
+    <script>
+        // O JSON do Quiz (Mantido com as alterações anteriores)
+          const defaultQuizData = {
+            "settings": {
+                "title": "Super Quiz: História e Geografia - Escolas e o Trabalho",
+                "version": "3.0 - Expandido",
+                "description": "Inclui questões de múltipla escolha, Certo/Errado e 3 níveis de Jogo da Memória Bônus."
+            },
+            "questions": [
+                // PERGUNTAS 1 a 10 (Mantidas)
+                { "questionNumber": 1, "type": "quiz", "question": "De acordo com a lei brasileira, qual é o principal objetivo de todas as crianças terem direito à educação?", "answerOptions": [ { "text": "Apenas garantir que o aluno aprenda a ler e escrever.", "rationale": "A educação tem um papel mais amplo do que apenas alfabetizar.", "isCorrect": false }, { "text": "Garantir o pleno desenvolvimento, o exercício da cidadania e a qualificação para o trabalho.", "rationale": "A lei estabelece que a educação é essencial para o desenvolvimento completo do indivíduo.", "isCorrect": true }, { "text": "Separar meninos e meninas para estudarem disciplinas diferentes.", "rationale": "Essa separação de disciplinas por gênero era uma prática do passado.", "isCorrect": false }, { "text": "Manter os alunos longe de casa durante o dia.", "rationale": "Este não é o objetivo fundamental da garantia legal da educação.", "isCorrect": false } ] },
+                { "questionNumber": 2, "type": "boolean", "question": "Certo ou Errado: No passado, disciplinas como Latim, Francês, Caligrafia e Bordado já foram obrigatórias no currículo escolar brasileiro.", "correctAnswer": true, "rationale": "CERTO! O texto do livro confirma que essas disciplinas fizeram parte do currículo em outras épocas, como Latim, Bordado e Caligrafia.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 3, "type": "quiz", "question": "Quem foram os primeiros responsáveis pelo ensino das crianças indígenas no Brasil, após a chegada dos portugueses?", "answerOptions": [ { "text": "Os índios mais velhos das aldeias.", "rationale": "Eles transmitiam por tradição oral, mas os **primeiros professores formais** foram os jesuítas.", "isCorrect": false }, { "text": "Os padres jesuítas.", "rationale": "Os padres jesuítas vieram ao Brasil com o objetivo de catequizar e foram os primeiros a organizar o ensino formal.", "isCorrect": true }, { "text": "Os nobres que fugiram da Europa na Idade Média.", "rationale": "A nobreza não foi responsável pelo início do ensino formal no Brasil.", "isCorrect": false }, { "text": "As mães das crianças indígenas.", "rationale": "As mães tinham o papel de educar tarefas domésticas, mas não eram as professoras formais da época.", "isCorrect": false } ] },
+                { "questionNumber": 4, "type": "boolean", "question": "Certo ou Errado: A produção de qualquer objeto, como o tijolo, envolve apenas a etapa de **extração** da matéria-prima, não necessitando de transporte ou venda.", "correctAnswer": false, "rationale": "ERRADO! O processo completo envolve **extração**, **transformação** e **comercialização** (venda e distribuição/transporte).", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 5, "type": "quiz", "question": "Na Grécia Antiga, quais eram as duas principais disciplinas que os meninos aprendiam para se tornarem bons guerreiros e desenvolverem o raciocínio?", "answerOptions": [ { "text": "Astronomia e Artes Marciais.", "rationale": "Aulas de ginástica e música eram as principais para o desenvolvimento do físico e da mente.", "isCorrect": false }, { "text": "Ginástica e Música.", "rationale": "Os meninos gregos aprendiam ginástica para o físico e música (incluindo a lira) para o desenvolvimento da mente e do raciocínio.", "isCorrect": true }, { "text": "Bordado e Caligrafia.", "rationale": "Bordado era ensinado às meninas.", "isCorrect": false }, { "text": "Técnicas agrícolas e Latim.", "rationale": "Essas foram disciplinas no Brasil em épocas mais recentes.", "isCorrect": false } ] },
+                { "questionNumber": 6, "type": "boolean", "question": "Certo ou Errado: A lousa digital é um recurso moderno que, além de ser interativo, permite visitar exposições e acervos de museus pela internet.", "correctAnswer": true, "rationale": "CERTO! A tecnologia na escola permite encurtar distâncias e ter acesso a museus e exposições virtualmente.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 7, "type": "quiz", "question": "O que a tradição de 'ensinar de maneira oral' significava para os povos indígenas e do Oriente?", "answerOptions": [ { "text": "Aulas usando a lousa digital.", "rationale": "A lousa digital é uma tecnologia moderna.", "isCorrect": false }, { "text": "Transmitir ensinamentos, histórias e tradições principalmente pela fala e pela memória.", "rationale": "A tradição oral consiste em transmitir o conhecimento de geração para geração através da fala.", "isCorrect": true }, { "text": "Aulas de bordado e costura.", "rationale": "Estas são disciplinas que já foram obrigatórias, mas não definem a tradição oral.", "isCorrect": false }, { "text": "Obrigação de aprender Latim e Francês.", "rationale": "Latim e Francês eram disciplinas obrigatórias no Brasil em certa época, mas não têm relação com a tradição oral.", "isCorrect": false } ] },
+                { "questionNumber": 8, "type": "boolean", "question": "Certo ou Errado: O ábaco, a caneta tinteiro e a bolsa udácia (maleta) são exemplos de objetos escolares usados atualmente.", "correctAnswer": false, "rationale": "ERRADO! Esses são exemplos de objetos escolares **antigos**, substituídos por materiais mais modernos hoje.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 9, "type": "quiz", "question": "Qual era o foco do trabalho das crianças camponesas na Idade Média?", "answerOptions": [ { "text": "Comércio marítimo e navegação.", "rationale": "O foco era na vida no campo, não no comércio marítimo.", "isCorrect": false }, { "text": "Agricultura e pecuária.", "rationale": "A agricultura (plantar) e a pecuária (cuidar de animais) eram as principais atividades de quem vivia no campo naquela época.", "isCorrect": true }, { "text": "Tecnologia e programação de computadores.", "rationale": "Tecnologia e programação são atividades modernas.", "isCorrect": false }, { "text": "Cálculo matemático avançado e física.", "rationale": "O aprendizado era prático, focado na sobrevivência.", "isCorrect": false } ] },
+                { "questionNumber": 10, "type": "boolean", "question": "Certo ou Errado: A palmatória era um objeto usado antigamente para bater na mão dos alunos com mau comportamento, e ainda é permitida em algumas escolas hoje.", "correctAnswer": false, "rationale": "ERRADO! O uso de palmatória e outros castigos físicos é proibido nas escolas atuais.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+
+                // PERGUNTAS 11 a 30 (NOVAS)
+                { "questionNumber": 11, "type": "quiz", "question": "Qual é o principal benefício da lousa digital para o aprendizado, segundo o texto?", "answerOptions": [ { "text": "Possibilidade de visualizar conteúdos em 3D e acessar museus virtuais.", "rationale": "A lousa digital é citada como um recurso que permite a visualização de conteúdos interativos e o acesso a acervos pela internet.", "isCorrect": true }, { "text": "Garantir que a lousa nunca mais precise ser apagada.", "rationale": "A lousa precisa ser apagada, mas pode salvar o conteúdo.", "isCorrect": false }, { "text": "Apenas reduzir o custo de material escolar.", "rationale": "Embora possa reduzir, o principal benefício é o acesso e a interatividade.", "isCorrect": false }, { "text": "Substituir totalmente a figura do professor.", "rationale": "A lousa é um auxílio, não um substituto para o professor.", "isCorrect": false } ] },
+                { "questionNumber": 12, "type": "boolean", "question": "Certo ou Errado: O ábaco, instrumento de cálculo antigo, não tinha relação com o ensino de matemática nas escolas do passado.", "correctAnswer": false, "rationale": "ERRADO! O ábaco foi, sim, um importante instrumento usado no ensino de matemática em épocas passadas.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 13, "type": "quiz", "question": "O que o texto indica como o papel principal da escola na vida da criança e do adolescente?", "answerOptions": [ { "text": "Apenas memorizar datas e nomes de reis.", "rationale": "O papel da escola é mais amplo e focado no desenvolvimento integral.", "isCorrect": false }, { "text": "Preparar para o pleno desenvolvimento e o exercício da cidadania.", "rationale": "Este é o objetivo legal da educação no Brasil.", "isCorrect": true }, { "text": "Ensinar exclusivamente o uso de novas tecnologias.", "rationale": "A tecnologia é uma ferramenta, mas não o objetivo principal.", "isCorrect": false }, { "text": "Garantir que todos se tornem agricultores ou pecuaristas.", "rationale": "É um objetivo de qualificação para o trabalho em geral, não limitado a essas áreas.", "isCorrect": false } ] },
+                { "questionNumber": 14, "type": "boolean", "question": "Certo ou Errado: A invenção da roda está relacionada apenas à indústria, sem impacto no trabalho agrícola.", "correctAnswer": false, "rationale": "ERRADO! A roda teve um impacto fundamental no transporte, afetando desde o trabalho agrícola (carregamento) até a indústria.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 15, "type": "quiz", "question": "Na área de trabalho, o que representou o tear mecânico?", "answerOptions": [ { "text": "Um objeto escolar usado na aula de Bordado.", "rationale": "É uma máquina industrial, não um objeto escolar.", "isCorrect": false }, { "text": "Uma máquina capaz de produzir tecidos de forma mais rápida do que o trabalho manual.", "rationale": "O tear mecânico foi um símbolo da Revolução Industrial e da mecanização.", "isCorrect": true }, { "text": "A máquina que transformava argila em tijolos.", "rationale": "É um tear, usado na indústria têxtil.", "isCorrect": false }, { "text": "O primeiro computador da história.", "rationale": "É uma máquina têxtil.", "isCorrect": false } ] },
+                { "questionNumber": 16, "type": "boolean", "question": "Certo ou Errado: No passado, o estudo de Latim e o bordado eram disciplinas obrigatórias para meninos e meninas, respectivamente.", "correctAnswer": true, "rationale": "CERTO! O currículo antigo separava disciplinas por gênero, sendo o Latim mais focado nos meninos e o Bordado nas meninas.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 17, "type": "quiz", "question": "Qual é uma das transformações mais significativas no trabalho, causada pela tecnologia, de acordo com as imagens?", "answerOptions": [ { "text": "O aumento da necessidade de caligrafia manual.", "rationale": "O computador reduziu a necessidade de caligrafia manual.", "isCorrect": false }, { "text": "A substituição de tarefas manuais repetitivas por máquinas.", "rationale": "A mecanização e a automação são as maiores transformações tecnológicas no trabalho.", "isCorrect": true }, { "text": "O fim completo da agricultura no mundo.", "rationale": "A agricultura ainda existe, mas é mais mecanizada.", "isCorrect": false }, { "text": "O retorno da palmatória nas escolas.", "rationale": "A palmatória é proibida.", "isCorrect": false } ] },
+                { "questionNumber": 18, "type": "boolean", "question": "Certo ou Errado: A vida no campo (agricultura e pecuária) não é considerada trabalho, pois é um modo de vida mais simples.", "correctAnswer": false, "rationale": "ERRADO! Agricultura (plantio) e Pecuária (criação de animais) são formas de trabalho primárias e essenciais para a economia.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 19, "type": "quiz", "question": "Qual objeto era usado nas escolas do passado para castigar fisicamente os alunos com mau comportamento?", "answerOptions": [ { "text": "O ábaco.", "rationale": "O ábaco era usado para o cálculo.", "isCorrect": false }, { "text": "Palmatória.", "rationale": "A palmatória era o instrumento de punição física.", "isCorrect": true }, { "text": "O tear mecânico.", "rationale": "O tear era uma máquina industrial.", "isCorrect": false }, { "text": "A bolsa udácia.", "rationale": "A bolsa era usada para carregar livros.", "isCorrect": false } ] },
+                { "questionNumber": 20, "type": "boolean", "question": "Certo ou Errado: A tradição oral é um método de ensino que depende inteiramente de livros e da escrita.", "correctAnswer": false, "rationale": "ERRADO! A tradição oral se baseia na fala, na audição e na memória para a transmissão do conhecimento, sendo anterior à escrita.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 21, "type": "quiz", "question": "O que a pecuária representa na cadeia de trabalho e produção?", "answerOptions": [ { "text": "O plantio de alimentos como arroz e feijão.", "rationale": "Isto é agricultura.", "isCorrect": false }, { "text": "A criação de animais para consumo, produção de leite ou couro.", "rationale": "A pecuária é a criação de animais.", "isCorrect": true }, { "text": "A venda de produtos industrializados em lojas.", "rationale": "Isto é comercialização/comércio.", "isCorrect": false }, { "text": "A extração de minerais do solo.", "rationale": "Isto é extrativismo mineral.", "isCorrect": false } ] },
+                { "questionNumber": 22, "type": "boolean", "question": "Certo ou Errado: A função da escola mudou ao longo da história, refletindo as necessidades de cada sociedade.", "correctAnswer": true, "rationale": "CERTO! A escola se adaptou, passando de um foco na religião e latim para um foco na ciência e qualificação para o trabalho moderno.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 23, "type": "quiz", "question": "Em que época os meninos da Grécia Antiga aprendiam Ginástica e Música?", "answerOptions": [ { "text": "Para desenvolver o corpo e o raciocínio, preparando-os para serem bons cidadãos e guerreiros.", "rationale": "Era o foco da educação clássica grega para os meninos.", "isCorrect": true }, { "text": "Para se qualificarem para trabalhar na agricultura local.", "rationale": "Este era o foco de camponeses na Idade Média, não na Grécia clássica.", "isCorrect": false }, { "text": "Para se prepararem para o trabalho na indústria têxtil.", "rationale": "A indústria têxtil é muito mais recente.", "isCorrect": false }, { "text": "Apenas para se divertirem no tempo livre.", "rationale": "O ensino era sério, focado na formação do cidadão.", "isCorrect": false } ] },
+                { "questionNumber": 24, "type": "boolean", "question": "Certo ou Errado: O processo de produção de um objeto (como um tijolo) tem apenas as etapas de transformação e comercialização, sem a extração.", "correctAnswer": false, "rationale": "ERRADO! A argila (matéria-prima do tijolo) precisa ser extraída da natureza. O processo é: Extração $\to$ Transformação $\to$ Comercialização.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 25, "type": "quiz", "question": "Qual disciplina, citada no texto como sendo do passado, envolvia o aprendizado de escrever de forma bonita e detalhada?", "answerOptions": [ { "text": "Latim.", "rationale": "Latim é um idioma, não focado na estética da escrita.", "isCorrect": false }, { "text": "Caligrafia.", "rationale": "A caligrafia era a arte de escrever de forma ornamental.", "isCorrect": true }, { "text": "Bordado.", "rationale": "Bordado é costura, não escrita.", "isCorrect": false }, { "text": "Aritmética.", "rationale": "Aritmética é cálculo.", "isCorrect": false } ] },
+                { "questionNumber": 26, "type": "boolean", "question": "Certo ou Errado: Os padres jesuítas, ao chegarem ao Brasil, tiveram como um de seus focos a catequização e o ensino formal dos indígenas.", "correctAnswer": true, "rationale": "CERTO! Os jesuítas vieram com a missão de catequizar, sendo os primeiros a fundar escolas no Brasil Colônia.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 27, "type": "quiz", "question": "O que o texto mostra como o principal efeito da tecnologia (como o uso de um computador) no trabalho moderno?", "answerOptions": [ { "text": "O fim dos trabalhos que exigem criatividade.", "rationale": "A tecnologia ajuda a criar, mas automatiza o repetitivo.", "isCorrect": false }, { "text": "Aumento da velocidade de produção e comunicação.", "rationale": "A tecnologia é crucial para a rapidez e eficiência na era moderna.", "isCorrect": true }, { "text": "A redução da jornada de trabalho para apenas uma hora por dia.", "rationale": "A jornada de trabalho ainda é maior que uma hora.", "isCorrect": false }, { "text": "A necessidade de usar apenas palmatória.", "rationale": "Palmatória é proibida.", "isCorrect": false } ] },
+                { "questionNumber": 28, "type": "boolean", "question": "Certo ou Errado: Em comparação com as escolas do passado, as escolas atuais tendem a ser menos rigorosas quanto a castigos físicos.", "correctAnswer": true, "rationale": "CERTO! A palmatória e outros castigos não são mais permitidos.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] },
+                { "questionNumber": 29, "type": "quiz", "question": "Qual é um exemplo de objeto escolar antigo que não é mais comumente usado nas salas de aula atuais?", "answerOptions": [ { "text": "Lápis.", "rationale": "Lápis ainda são muito usados.", "isCorrect": false }, { "text": "Caneta esferográfica.", "rationale": "Esta é moderna.", "isCorrect": false }, { "text": "Caneta tinteiro.", "rationale": "A caneta tinteiro foi substituída pela esferográfica, sendo um objeto antigo.", "isCorrect": true }, { "text": "Borracha.", "rationale": "Borracha ainda é usada.", "isCorrect": false } ] },
+                { "questionNumber": 30, "type": "boolean", "question": "Certo ou Errado: A agricultura e a pecuária sempre foram atividades importantes, mas a forma de trabalho (manual ou mecanizada) se alterou com o tempo.", "correctAnswer": true, "rationale": "CERTO! As atividades são milenares, mas a tecnologia (máquinas, tratores) mudou como o trabalho é feito.", "answerOptions": [ { "text": "Certo", "isCorrect": true }, { "text": "Errado", "isCorrect": false } ] }
+            ],
+            // ESTRUTURA DOS JOGOS DA MEMÓRIA
+            "memoryGameSets": [
+                // CONJUNTO 1 (PARA 5 ACERTOS)
+                { "term": "Palmatória", "concept": "Instrumento de castigo físico, proibido hoje." },
+                { "term": "Jesuítas", "concept": "Os primeiros a ensinar no Brasil Colônia." },
+                { "term": "Lousa Digital", "concept": "Tecnologia que permite 3D e acesso a sites." },
+                { "term": "Argila", "concept": "Recurso natural usado para fazer tijolos." },
+                { "term": "Grécia Antiga", "concept": "Local onde meninos aprendiam Ginástica e Música." },
+                { "term": "Tradição Oral", "concept": "Ensino pela fala, valorizando a memória." },
+                { "term": "Caneta Tinteiro", "concept": "Objeto escolar antigo que usava tinta." },
+                { "term": "Cidadania", "concept": "Objetivo da educação para o pleno desenvolvimento." }
+                // FIM CONJUNTO 1
+            ],
+            // NOVO: CONJUNTO 2 (PARA 10 ACERTOS)
+            "memoryGameSets2": [
+                { "term": "Caligrafia", "concept": "Disciplina antiga que ensinava a escrever de forma bonita." },
+                { "term": "Tear Mecânico", "concept": "Máquina que substituiu a produção manual de tecidos." },
+                { "term": "Roda", "concept": "Invenção que revolucionou o transporte de mercadorias." },
+                { "term": "Criação de Gado", "concept": "O que significa a atividade de Pecuária." },
+                { "term": "Latim/Francês", "concept": "Idiomas que já foram obrigatórios no currículo escolar." },
+                { "term": "Abandono Escolar", "concept": "Um desafio que a educação moderna tenta combater." },
+                { "term": "Comercialização", "concept": "Etapa final do processo produtivo (venda e distribuição)." },
+                { "term": "Bolsa Udácia", "concept": "Maleta/bolsa usada antigamente para carregar livros." }
+                // FIM CONJUNTO 2
+            ],
+            // NOVO: CONJUNTO 3 (PARA 15 ACERTOS)
+            "memoryGameSets3": [
+                { "term": "Sapiens", "concept": "Refere-se à espécie humana, a que pensa e sabe." },
+                { "term": "Lira", "concept": "Instrumento musical usado no ensino da Música na Grécia." },
+                { "term": "Extração", "concept": "Primeira etapa da produção, retirada da matéria-prima da natureza." },
+                { "term": "Trabalho Industrial", "concept": "Atividade focada na transformação da matéria-prima em produtos." },
+                { "term": "Catequização", "concept": "Objetivo principal dos Jesuítas ao ensinar os indígenas." },
+                { "term": "Ginástica", "concept": "Disciplina grega para o desenvolvimento do corpo (físico)." },
+                { "term": "Mecanização", "concept": "Uso de máquinas para substituir o trabalho manual." },
+                { "term": "Digital", "concept": "Tipo de lousa que permite interação e conexão com a internet." }
+                // FIM CONJUNTO 3
+            ]
+        };
+
+
+        // --- Variáveis de Estado ---
+        let quizData = defaultQuizData;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let questions = [];
+        let isMemoryGameActive = false;
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        // --- Elementos do DOM ---
+        const quizTitleElement = document.getElementById('quiz-title');
+        const questionDisplay = document.getElementById('question-display');
+        const questionNumberElement = document.getElementById('question-number');
+        const optionsContainer = document.getElementById('options-container');
+        const nextButton = document.getElementById('next-button');
+        const scoreDisplay = document.getElementById('score-display');
+        const rationaleDisplay = document.getElementById('rationale-display');
+        const gameContainer = document.getElementById('game-container');
+        const memoryGameContainer = document.getElementById('memory-game-container');
+
+        // Elementos do Modal de Configuração
+        const configButton = document.getElementById('config-button');
+        const configModal = document.getElementById('config-modal');
+        const jsonEditor = document.getElementById('json-editor');
+        const saveJsonButton = document.getElementById('save-json-button');
+        const closeModalButton = document.getElementById('close-modal-button');
+        const jsonError = document.getElementById('json-error');
+        
+        // Elementos do Popup de Alerta Personalizado
+        const customAlertModal = document.getElementById('custom-alert-modal');
+        const customAlertContent = document.getElementById('custom-alert-content');
+        const alertMessage = document.getElementById('alert-message');
+        const alertOkButton = document.getElementById('alert-ok-button');
+
+        // --- Lógica do Popup Personalizado ---
+        function showCustomAlert(message, isSuccess = true) {
+            alertMessage.textContent = message;
+            
+            customAlertContent.classList.remove('alert-success', 'alert-error');
+            if (isSuccess) {
+                customAlertContent.classList.add('alert-success');
+            } else {
+                customAlertContent.classList.add('alert-error');
+            }
+            
+            customAlertModal.style.display = 'flex';
+        }
+
+        function closeCustomAlert() {
+            customAlertModal.style.display = 'none';
+        }
+        
+        alertOkButton.addEventListener('click', closeCustomAlert);
+        
+        // --- Lógica do Jogo Principal (Quiz) ---
+
+        function loadQuiz() {
+            const savedQuiz = localStorage.getItem('quizContent');
+            if (savedQuiz) {
+                try {
+                  //  quizData = JSON.parse(savedQuiz);
+                } catch (e) {
+                    console.error("Erro ao carregar JSON do LocalStorage, usando dados padrão.", e);
+                    quizData = defaultQuizData;
+                }
+            } else {
+                localStorage.setItem('quizContent', JSON.stringify(defaultQuizData, null, 2));
+            }
+
+            questions = quizData.questions;
+            quizTitleElement.textContent = quizData.settings.title;
+            score = 0;
+            currentQuestionIndex = 0;
+            isMemoryGameActive = false;
+            
+            gameContainer.style.display = 'block';
+            memoryGameContainer.style.display = 'none';
+
+            if (questions.length === 0) {
+                questionDisplay.textContent = "Nenhuma pergunta carregada. Por favor, configure o jogo.";
+                return;
+            }
+
+            showQuestion();
+            updateScoreDisplay();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                showResults();
+                return;
+            }
+            
+            // LÓGICA DE CORREÇÃO: Pula a checagem de bônus se o jogo acabou de sair do Memory Game
+            if (!isMemoryGameActive && score > 0 && score % 5 === 0) {
+                isMemoryGameActive = true;
+                showMemoryGame();
+                return;
+            }else if (isMemoryGameActive && score > 0 && score % 5 === 0) {
+                isMemoryGameActive = false;
+            }
+
+
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            optionsContainer.innerHTML = '';
+            rationaleDisplay.style.display = 'none';
+            nextButton.style.display = 'none';
+
+            questionNumberElement.textContent = `Pergunta ${currentQuestionIndex + 1} de ${questions.length}:`;
+            questionDisplay.textContent = currentQuestion.question;
+
+            currentQuestion.answerOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option.text;
+                button.classList.add('option-button');
+                button.addEventListener('click', () => checkAnswer(button, option, currentQuestion.type));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedButton, selectedOption, type) {
+            let isCorrect;
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            if (type === 'quiz') {
+                isCorrect = selectedOption.isCorrect;
+            } else if (type === 'boolean') {
+                isCorrect = selectedOption.text === (currentQuestion.correctAnswer ? "Certo" : "Errado");
+            }
+
+            const allButtons = optionsContainer.querySelectorAll('.option-button');
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            if (isCorrect) {
+                score++;
+                selectedButton.classList.add('correct');
+                rationaleDisplay.textContent = currentQuestion.rationale || 'Resposta correta! Muito bem!';
+            } else {
+                selectedButton.classList.add('incorrect');
+                
+                let correctAnswerText;
+                if (type === 'boolean') {
+                    correctAnswerText = currentQuestion.correctAnswer ? "Certo" : "Errado";
+                } else {
+                    correctAnswerText = currentQuestion.answerOptions.find(opt => opt.isCorrect).text;
+                }
+
+                const correctButton = Array.from(allButtons).find(btn => btn.textContent === correctAnswerText);
+                if (correctButton) {
+                    correctButton.classList.add('correct');
+                }
+                rationaleDisplay.textContent = selectedOption.rationale || currentQuestion.rationale || 'Ops, resposta incorreta.';
+            }
+
+            rationaleDisplay.style.display = 'block';
+            updateScoreDisplay();
+            
+            // Adicionado aqui para garantir que o bônus só seja checado depois de incrementar o score
+            // e antes de ir para a próxima questão.
+            if (score > 0 && score % 5 === 0 && !isMemoryGameActive) {
+                nextButton.textContent = "Iniciar Bônus!";
+                nextButton.style.display = 'block';
+            } else {
+                nextButton.textContent = "Próxima Pergunta";
+                nextButton.style.display = 'block';
+            }
+        }
+
+        function nextQuestion() {
+            // LÓGICA DE CORREÇÃO: Se está no estado de bônus, apenas chama o showQuestion
+            if (isMemoryGameActive) {
+                // A lógica de transição para o Memory Game é chamada dentro do showQuestion
+                showQuestion(); 
+            } else {
+                currentQuestionIndex++;
+                showQuestion();
+            }
+        }
+
+        function showResults() {
+            questionNumberElement.textContent = 'FIM DO QUIZ!';
+            questionDisplay.textContent = `Você completou o Quiz!`;
+            optionsContainer.innerHTML = '';
+            rationaleDisplay.style.display = 'none';
+            nextButton.style.display = 'none';
+            scoreDisplay.innerHTML = `Sua pontuação final é: ${score} de ${questions.length}. **Parabéns!**`;
+
+            const restartButton = document.createElement('button');
+            restartButton.textContent = 'Jogar Novamente';
+            restartButton.id = 'next-button';
+            restartButton.style.display = 'block';
+            restartButton.addEventListener('click', loadQuiz);
+            optionsContainer.appendChild(restartButton);
+        }
+
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `Pontuação: ${score} / ${questions.length}`;
+        }
+
+        // --- Lógica do Jogo da Memória Bônus ---
+
+        function showMemoryGame() {
+            gameContainer.style.display = 'none';
+            memoryGameContainer.style.display = 'block';
+            memoryGameContainer.innerHTML = '<h2>🏆 BÔNUS: Jogo da Memória! 🏆</h2><p>Encontre os 8 pares (Termo e Conceito) para continuar o Quiz!</p>';
+            
+            let cardData = quizData.memoryGameSets;
+            switch (score / 5) {
+                case 1:
+                    cardData = quizData.memoryGameSets;
+                    break;
+                case 2:
+                    cardData = quizData.memoryGameSets2;
+                    break;
+                case 3:
+                    cardData = quizData.memoryGameSets3;
+                    break;
+                default:
+                    cardData = quizData.memoryGameSets;
+            }
+            
+            let cards = [];
+            cardData.forEach(pair => {
+                cards.push({ id: pair.term, content: pair.term, type: 'term' });
+                cards.push({ id: pair.term, content: pair.concept, type: 'concept' });
+            });
+
+            cards.sort(() => 0.5 - Math.random());
+
+            const board = document.createElement('div');
+            board.id = 'memory-board';
+            memoryGameContainer.appendChild(board);
+
+            flippedCards = [];
+            matchedPairs = 0;
+
+            cards.forEach(cardData => {
+                const card = document.createElement('div');
+                card.classList.add('memory-card');
+                card.dataset.id = cardData.id;
+                card.dataset.type = cardData.type;
+                
+                const front = document.createElement('div');
+                front.classList.add('card-front');
+                front.textContent = cardData.content;
+                
+                const back = document.createElement('div');
+                back.classList.add('card-back');
+                back.textContent = '?'; 
+
+                card.appendChild(front);
+                card.appendChild(back);
+
+                card.addEventListener('click', () => flipCard(card));
+                board.appendChild(card);
+            });
+        }
+        
+        // ... (flipCard, checkForMatch, disableCards, unflipCards mantidas) ...
+
+        function flipCard(card) {
+            if (card.classList.contains('flipped') || flippedCards.length === 2) {
+                return;
+            }
+
+            card.classList.add('flipped');
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                checkForMatch();
+            }
+        }
+
+        function checkForMatch() {
+            const [card1, card2] = flippedCards;
+
+            const isMatch = (card1.dataset.id === card2.dataset.id) && (card1.dataset.type !== card2.dataset.type);
+
+            if (isMatch) {
+                matchedPairs++;
+                disableCards(card1, card2);
+                if (matchedPairs === quizData.memoryGameSets.length) {
+                    setTimeout(endMemoryGame, 1000);
+                }
+            } else {
+                setTimeout(() => unflipCards(card1, card2), 1000);
+            }
+        }
+
+        function disableCards(card1, card2) {
+            card1.classList.add('matched');
+            card2.classList.add('matched');
+            card1.removeEventListener('click', flipCard);
+            card2.removeEventListener('click', flipCard);
+            flippedCards = [];
+        }
+
+        function unflipCards(card1, card2) {
+            card1.classList.remove('flipped');
+            card2.classList.remove('flipped');
+            flippedCards = [];
+        }
+        
+        function endMemoryGame() {
+            
+            showCustomAlert("Parabéns! Você completou o Jogo da Memória Bônus! O Quiz será retomado.", true);
+            
+            memoryGameContainer.style.display = 'none';
+            gameContainer.style.display = 'block';
+            
+            // Avança para a próxima pergunta após o bônus
+            currentQuestionIndex++;
+            showQuestion(); 
+        }
+
+        // --- Lógica do Modal de Configuração ---
+
+        function openConfigModal() {
+            const currentContent = localStorage.getItem('quizContent') || JSON.stringify(defaultQuizData, null, 2);
+            jsonEditor.value = currentContent;
+            jsonError.textContent = '';
+            configModal.style.display = 'block';
+        }
+
+        function closeConfigModal() {
+            configModal.style.display = 'none';
+        }
+
+        function saveJson() {
+            const newJsonString = jsonEditor.value;
+            jsonError.textContent = '';
+            
+            try {
+                const newQuizData = JSON.parse(newJsonString);
+
+                if (!newQuizData.questions || !Array.isArray(newQuizData.questions) || !newQuizData.memoryGameSets) {
+                    jsonError.textContent = "Erro: O JSON deve ter as chaves 'questions' (array) e 'memoryGameSets' (array).";
+                    return;
+                }
+
+                localStorage.setItem('quizContent', newJsonString);
+                showCustomAlert('Configurações salvas com sucesso! O Quiz será recarregado.', true);
+                
+                closeConfigModal();
+                loadQuiz(); 
+
+            } catch (e) {
+                jsonError.textContent = `Erro de formatação JSON: ${e.message}`;
+                showCustomAlert(`Erro de formatação JSON: O JSON está inválido. Por favor, verifique a sintaxe.`, false);
+            }
+        }
+
+        // --- Event Listeners ---
+
+        configButton.addEventListener('click', openConfigModal);
+        closeModalButton.addEventListener('click', closeConfigModal);
+        saveJsonButton.addEventListener('click', saveJson);
+        nextButton.addEventListener('click', nextQuestion);
+
+        // Fechar o modal clicando fora dele
+        window.addEventListener('click', (event) => {
+            if (event.target === configModal) {
+                closeConfigModal();
+            }
+        });
+
+        // --- Início do Jogo ---
+        loadQuiz();
+    </script>
+</body>
+</html>
