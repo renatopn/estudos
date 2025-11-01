@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦸‍♂️ Tabuada Aranha 🕸️ - O Jogo</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕷️</text></svg>">
+    
+    <style>
+        /* --- Variáveis e Estilos Globais (Tema Homem-Aranha) --- */
+        :root {
+            --vermelho-aranha: #e62020;
+            --azul-aranha: #153c9e;
+            --amarelo-alerta: #ffeb3b;
+            --branco-teia: #ffffff;
+            --preto-sombra: #222222;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--preto-sombra);
+            background-image: radial-gradient(circle, var(--azul-aranha) 0%, var(--preto-sombra) 100%);
+            color: var(--branco-teia);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        #container-principal {
+            background-color: rgba(25, 25, 25, 0.9);
+            border: 5px solid var(--vermelho-aranha);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 40px var(--vermelho-aranha);
+            max-width: 90%;
+            width: 450px;
+            transition: width 0.5s;
+        }
+        
+        #container-principal.bonus-mode {
+            width: 700px;
+        }
+
+        h1 {
+            color: var(--vermelho-aranha);
+            text-shadow: 2px 2px 4px var(--azul-aranha);
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        /* --- Estilos do Jogo Principal (Tabuada) --- */
+        
+        #jogo-tabuada {
+            display: block; /* Visível por padrão */
+        }
+        
+        #placar {
+            display: flex;
+            justify-content: space-around;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        #pergunta-box {
+            background-color: var(--azul-aranha);
+            border: 3px solid var(--branco-teia);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 0 10px var(--amarelo-alerta);
+        }
+
+        #pergunta {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--branco-teia);
+            margin: 0;
+        }
+
+        #opcoes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .opcao-btn {
+            background-color: var(--vermelho-aranha);
+            color: var(--branco-teia);
+            border: none;
+            padding: 15px 10px;
+            border-radius: 10px;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px var(--preto-sombra);
+        }
+
+        .opcao-btn:hover:not(:disabled) {
+            background-color: #ff3333;
+            transform: translateY(-2px);
+        }
+
+        .opcao-btn:active:not(:disabled) {
+            box-shadow: 0 2px var(--preto-sombra);
+            transform: translateY(2px);
+        }
+
+        #feedback {
+            min-height: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        #iniciar-reiniciar, #iniciar-bonus {
+            background-color: var(--amarelo-alerta);
+            color: var(--preto-sombra);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px var(--preto-sombra);
+            margin-top: 10px;
+        }
+
+        #iniciar-reiniciar:hover, #iniciar-bonus:hover {
+            background-color: #ffd700;
+        }
+
+        /* Estilos de Feedback */
+        .sucesso {
+            color: var(--amarelo-alerta);
+            animation: pulsar 0.5s 2;
+        }
+
+        .erro {
+            color: var(--vermelho-aranha);
+        }
+
+        @keyframes pulsar {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* --- Estilos do Jogo Bônus da Memória --- */
+
+        #jogo-bonus {
+            display: none; /* Escondido por padrão */
+        }
+        
+        #memoria-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background-color: var(--azul-aranha);
+            height: 100px;
+            border: 3px solid var(--vermelho-aranha);
+            border-radius: 10px;
+            perspective: 1000px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            box-shadow: 0 5px var(--preto-sombra);
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .card.flip .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+        
+        .card-back {
+            background: repeating-linear-gradient(45deg, var(--vermelho-aranha), var(--vermelho-aranha) 10px, var(--azul-aranha) 10px, var(--azul-aranha) 20px);
+            color: var(--branco-teia);
+            font-size: 3em;
+        }
+        
+        .card-front {
+            background-color: var(--branco-teia);
+            color: var(--preto-sombra);
+            transform: rotateY(180deg);
+        }
+        
+        .card.matched .card-inner {
+            pointer-events: none; /* Desativa clique */
+            opacity: 0.5;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container-principal">
+        <h1>🕸️ Missão Tabuada Aranha 🕷️</h1>
+
+        <div id="jogo-tabuada">
+            <div id="placar">
+                <span>🦸‍♂️ Acertos: <span id="pontuacao">0</span></span>
+                <span>⏱️ Tempo: <span id="tempo">5.0</span>s</span>
+            </div>
+
+            <div id="pergunta-box">
+                <p id="pergunta">Clique em Iniciar Missão para começar!</p>
+            </div>
+
+            <div id="opcoes">
+                </div>
+
+            <div id="feedback" class="sucesso">
+                </div>
+
+            <button id="iniciar-reiniciar" onclick="iniciarJogo()">Iniciar Missão</button>
+        </div>
+
+        <div id="jogo-bonus">
+            <h2>🏆 Jogo Bônus: Desafio da Memória! 🧠</h2>
+            <p>Combine a operação com o resultado. Você tem 60 segundos!</p>
+            
+            <div id="memoria-placar">
+                 <span>⏱️ Tempo Bônus: <span id="tempo-bonus">60</span>s</span>
+                 <span>✅ Pares Encontrados: <span id="pares-encontrados">0</span>/8</span>
+            </div>
+
+            <div id="memoria-grid">
+                </div>
+            
+            <button id="iniciar-bonus" onclick="iniciarMemoria()">Iniciar Bônus</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Variáveis Globais do Jogo Principal ---
+        const ACERTOS_PARA_BONUS = 10; // Chave para o bônus
+        const TEMPO_MAXIMO_TABUADA = 5.0;
+        const MAX_NUM = 9;
+        const MIN_NUM = 1;
+        let pontuacao = 0;
+        let tempoAtual = TEMPO_MAXIMO_TABUADA;
+        let intervaloTempoTabuada;
+        let respostaCorreta;
+        let jogoAtivo = false;
+        
+        // --- Variáveis Globais do Jogo Bônus ---
+        const TEMPO_MAXIMO_BONUS = 60;
+        let intervaloTempoBonus;
+        let cartasViradas = [];
+        let paresEncontrados = 0;
+        let bloqueioCliques = false; // Para evitar cliques durante a virada
+        
+        // --- Arrays de Mensagens ---
+        const MENSAGENS_SUCESSO = [
+            "🥳 TEIAAAAAAAAA! Você acertou!", "⭐ Parabéns, Gênio da Teia!", 
+            "🚀 Que velocidade, Vingador!", "✅ Uau! Reflexo de Aranha!", 
+            "💯 Missão cumprida com sucesso!"
+        ];
+        const MENSAGENS_ERRO = [
+            "😞 Quase lá! Não desista, herói!", "😅 A teia escapou! Tente de novo!", 
+            "💡 O Homem-Aranha sempre tenta duas vezes!", "💪 Força! Na próxima você pega!", 
+            "⏰ O tempo acabou, mas a luta continua!"
+        ];
+
+        // --- Elementos do DOM ---
+        const elContainerPrincipal = document.getElementById('container-principal');
+        const elJogoTabuada = document.getElementById('jogo-tabuada');
+        const elJogoBonus = document.getElementById('jogo-bonus');
+        const elPontuacao = document.getElementById('pontuacao');
+        const elTempo = document.getElementById('tempo');
+        const elPergunta = document.getElementById('pergunta');
+        const elOpcoes = document.getElementById('opcoes');
+        const elFeedback = document.getElementById('feedback');
+        const elBotaoIniciar = document.getElementById('iniciar-reiniciar');
+        
+        // DOM Bônus
+        const elTempoBonus = document.getElementById('tempo-bonus');
+        const elParesEncontrados = document.getElementById('pares-encontrados');
+        const elMemoriaGrid = document.getElementById('memoria-grid');
+
+
+        // --- Funções Auxiliares ---
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function exibirFeedback(mensagem, tipo) {
+            elFeedback.textContent = mensagem;
+            elFeedback.className = tipo;
+        }
+
+        function misturarArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Lógica Principal do Jogo (Tabuada) ---
+
+        function gerarPergunta() {
+            const operacao = Math.random() < 0.5 ? 'multiplicacao' : 'divisao';
+            let num1, num2, resultado;
+            let sinal;
+
+            if (operacao === 'multiplicacao') {
+                num1 = getRandomInt(MIN_NUM, MAX_NUM);
+                num2 = getRandomInt(MIN_NUM, MAX_NUM);
+                resultado = num1 * num2;
+                sinal = '×';
+            } else { // Divisão
+                resultado = getRandomInt(MIN_NUM, MAX_NUM);
+                num2 = getRandomInt(MIN_NUM, MAX_NUM);
+                num1 = resultado * num2;
+                sinal = '÷';
+            }
+
+            elPergunta.textContent = `${num1} ${sinal} ${num2} = ?`;
+            respostaCorreta = resultado;
+            gerarOpcoes(resultado);
+        }
+
+        function gerarOpcoes(respostaCerta) {
+            const opcoes = new Set();
+            opcoes.add(respostaCerta);
+
+            while (opcoes.size < 4) {
+                let erro = getRandomInt(1, MAX_NUM * MAX_NUM);
+                if (erro !== respostaCerta) {
+                    opcoes.add(erro);
+                }
+            }
+
+            const opcoesArray = misturarArray(Array.from(opcoes));
+            
+            elOpcoes.innerHTML = '';
+            opcoesArray.forEach(opcao => {
+                const btn = document.createElement('button');
+                btn.className = 'opcao-btn';
+                btn.textContent = opcao;
+                btn.onclick = () => checarResposta(opcao);
+                elOpcoes.appendChild(btn);
+            });
+        }
+
+        function iniciarContadorTabuada() {
+            tempoAtual = TEMPO_MAXIMO_TABUADA;
+            elTempo.textContent = tempoAtual.toFixed(1);
+            clearInterval(intervaloTempoTabuada);
+
+            intervaloTempoTabuada = setInterval(() => {
+                tempoAtual -= 0.1;
+                elTempo.textContent = tempoAtual.toFixed(1);
+
+                if (tempoAtual <= 0) {
+                    pararContadorTabuada();
+                    checarResposta(null);
+                }
+            }, 100);
+        }
+
+        function pararContadorTabuada() {
+            clearInterval(intervaloTempoTabuada);
+        }
+
+        function checarResposta(respostaDoJogador) {
+            if (!jogoAtivo) return;
+
+            pararContadorTabuada();
+            // Desabilita botões temporariamente
+            Array.from(elOpcoes.children).forEach(btn => btn.disabled = true);
+
+
+            if (respostaDoJogador === respostaCorreta) {
+                // Acertou
+                pontuacao++;
+                elPontuacao.textContent = pontuacao;
+                const msg = MENSAGENS_SUCESSO[getRandomInt(0, MENSAGENS_SUCESSO.length - 1)];
+                exibirFeedback(msg, 'sucesso');
+                
+                if (pontuacao > 0 && pontuacao % ACERTOS_PARA_BONUS === 0) {
+                    setTimeout(mostrarBonus, 1500);
+                } else {
+                    setTimeout(proximaRodada, 1500);
+                }
+
+            } else {
+                // Errou ou o tempo esgotou
+                let msg = respostaDoJogador === null 
+                    ? `😭 Tempo Esgotado! A resposta era: ${respostaCorreta}`
+                    : MENSAGENS_ERRO[getRandomInt(0, MENSAGENS_ERRO.length - 1)] + ` (Resposta correta: ${respostaCorreta})`;
+                
+                exibirFeedback(msg, 'erro');
+                
+                finalizarJogo();
+            }
+        }
+
+        function proximaRodada() {
+            elFeedback.textContent = '';
+            Array.from(elOpcoes.children).forEach(btn => btn.disabled = false); // Habilita botões
+            gerarPergunta();
+            iniciarContadorTabuada();
+        }
+
+        function iniciarJogo() {
+            // Resetar o estado do jogo
+            pontuacao = 0;
+            elPontuacao.textContent = pontuacao;
+            jogoAtivo = true;
+            elBotaoIniciar.textContent = 'Reiniciar Missão';
+            elBotaoIniciar.disabled = true;
+            elBotaoIniciar.style.opacity = 0.5;
+
+            proximaRodada();
+        }
+
+        function finalizarJogo() {
+            jogoAtivo = false;
+            pararContadorTabuada();
+            elBotaoIniciar.textContent = 'Tentar Novamente (Reiniciar)';
+            elBotaoIniciar.disabled = false;
+            elBotaoIniciar.style.opacity = 1;
+            
+            elPergunta.textContent = `Fim de Jogo! Pontuação Final: ${pontuacao} 🏆`;
+            elOpcoes.innerHTML = '';
+            exibirFeedback("Você fez um total de " + pontuacao + " acertos!", "sucesso");
+        }
+        
+        // --- Lógica do Jogo Bônus (Memória) ---
+        
+        function gerarCartasMemoria() {
+            const operacoes = [];
+            // Gerar 8 operações únicas
+            while (operacoes.length < 8) {
+                let num1, num2, resultado, operacaoStr;
+                
+                // Prioriza Multiplicação para simplificar a geração de inteiros
+                if (Math.random() < 0.7) { 
+                    num1 = getRandomInt(2, 9);
+                    num2 = getRandomInt(2, 9);
+                    resultado = num1 * num2;
+                    operacaoStr = `${num1} × ${num2}`;
+                } else {
+                    // Garante que o resultado seja inteiro para a divisão
+                    resultado = getRandomInt(2, 9);
+                    num2 = getRandomInt(2, 9);
+                    num1 = resultado * num2;
+                    operacaoStr = `${num1} ÷ ${num2}`;
+                }
+                
+                // Verifica se a operação e o resultado são únicos nos pares gerados
+                const par = { op: operacaoStr, res: resultado };
+                if (!operacoes.some(p => p.op === par.op || p.res === par.res)) {
+                    operacoes.push(par);
+                }
+            }
+            
+            // Criar o array de cartas
+            let cartasData = [];
+            operacoes.forEach((par, index) => {
+                cartasData.push({ id: index, conteudo: par.op, tipo: 'op' });
+                cartasData.push({ id: index, conteudo: par.res, tipo: 'res' });
+            });
+
+            return misturarArray(cartasData);
+        }
+
+        function renderizarCartas(cartas) {
+            elMemoriaGrid.innerHTML = '';
+            cartas.forEach(cartaData => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.id = cartaData.id;
+                card.dataset.tipo = cartaData.tipo;
+                card.onclick = () => virarCarta(card);
+                
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-face card-back">🕷️</div>
+                        <div class="card-face card-front">${cartaData.conteudo}</div>
+                    </div>
+                `;
+                elMemoriaGrid.appendChild(card);
+            });
+        }
+        
+        function virarCarta(card) {
+            if (bloqueioCliques || card.classList.contains('flip') || card.classList.contains('matched')) return;
+            
+            card.classList.add('flip');
+            cartasViradas.push(card);
+            
+            if (cartasViradas.length === 2) {
+                bloqueioCliques = true;
+                checarPar();
+            }
+        }
+        
+        function checarPar() {
+            const [card1, card2] = cartasViradas;
+            const id1 = card1.dataset.id;
+            const id2 = card2.dataset.id;
+            
+            if (id1 === id2) {
+                // Par encontrado (IDs correspondem)
+                paresEncontrados++;
+                elParesEncontrados.textContent = paresEncontrados;
+                
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+
+                if (paresEncontrados === 8) {
+                    finalizarMemoria(true);
+                } else {
+                    bloqueioCliques = false; // Libera cliques para a próxima
+                }
+                
+            } else {
+                // Não é um par
+                setTimeout(() => {
+                    card1.classList.remove('flip');
+                    card2.classList.remove('flip');
+                    bloqueioCliques = false; // Libera cliques
+                }, 1000); // Vira de volta após 1 segundo
+            }
+            
+            cartasViradas = [];
+        }
+        
+        function iniciarContadorBonus() {
+            let tempoBonus = TEMPO_MAXIMO_BONUS;
+            elTempoBonus.textContent = tempoBonus;
+            clearInterval(intervaloTempoBonus);
+            
+            intervaloTempoBonus = setInterval(() => {
+                tempoBonus--;
+                elTempoBonus.textContent = tempoBonus;
+                
+                if (tempoBonus <= 0) {
+                    clearInterval(intervaloTempoBonus);
+                    finalizarMemoria(false); // Tempo esgotado
+                }
+            }, 1000);
+        }
+
+        function iniciarMemoria() {
+            elContainerPrincipal.classList.add('bonus-mode');
+            
+            // Resetar estado
+            paresEncontrados = 0;
+            cartasViradas = [];
+            bloqueioCliques = false;
+            elParesEncontrados.textContent = '0';
+            
+            renderizarCartas(gerarCartasMemoria());
+            document.getElementById('iniciar-bonus').disabled = true;
+            
+            iniciarContadorBonus();
+        }
+
+        function finalizarMemoria(vitoria) {
+            clearInterval(intervaloTempoBonus);
+            document.getElementById('iniciar-bonus').disabled = false;
+            document.getElementById('iniciar-bonus').textContent = 'Próximo Desafio (Reiniciar Bônus)';
+            
+            let mensagem;
+            if (vitoria) {
+                mensagem = "✨ Missão Bônus COMPLETA! Você é um MESTRE da Memória!";
+            } else {
+                mensagem = "💔 Fim do Tempo Bônus! Tente novamente para ganhar a Medalha!";
+            }
+            
+            // Exibir mensagem na área de feedback do Bônus (pode ser um novo elemento ou um alerta)
+            alert(mensagem + "\nVoltando para a Tabuada...");
+
+            // Voltar para o jogo principal
+            mostrarTabuada();
+            
+            // Se o jogo principal não estiver ativo (ex: o jogo principal foi finalizado e só ficou o botão de reiniciar), não inicia a próxima rodada
+            if(jogoAtivo) {
+                 proximaRodada();
+            }
+        }
+        
+        // --- Controle de Fluxo (Alternar entre Jogos) ---
+        
+        function mostrarBonus() {
+            jogoAtivo = false; // Pausa o jogo principal
+            elJogoTabuada.style.display = 'none';
+            elJogoBonus.style.display = 'block';
+            elContainerPrincipal.classList.add('bonus-mode');
+            document.getElementById('iniciar-bonus').textContent = 'Iniciar Bônus!';
+            document.getElementById('iniciar-bonus').disabled = false;
+            elFeedback.textContent = ''; // Limpa feedback da tabuada
+            elPergunta.textContent = "Bônus Desbloqueado!";
+        }
+        
+        function mostrarTabuada() {
+            jogoAtivo = true; // Retoma o jogo principal
+            elJogoTabuada.style.display = 'block';
+            elJogoBonus.style.display = 'none';
+            elContainerPrincipal.classList.remove('bonus-mode');
+        }
+
+
+        // Inicialização: Configura o estado inicial do botão
+        document.addEventListener('DOMContentLoaded', () => {
+             // Estado inicial
+             elBotaoIniciar.onclick = iniciarJogo;
+             elPergunta.textContent = "Clique em 'Iniciar Missão' para começar!";
+        });
+    </script>
+</body>
+</html>
