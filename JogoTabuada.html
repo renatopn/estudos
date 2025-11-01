@@ -579,7 +579,7 @@
         }
 
         function iniciarMemoria() {
-            elContainerPrincipal.classList.add('bonus-mode');
+           // elContainerPrincipal.classList.add('bonus-mode');
             
             // Resetar estado do Jogo da Memória
             paresEncontrados = 0;
@@ -610,34 +610,45 @@
         function mostrarBonus() {
             jogoAtivo = false; // Pausa o jogo principal
             pararContadorTabuada();
+            
+            // Transiciona a UI
             elJogoTabuada.style.display = 'none';
             elJogoBonus.style.display = 'block';
             elContainerPrincipal.classList.add('bonus-mode');
-            elPergunta.textContent = "Bônus Desbloqueado!";
+            elPergunta.textContent = "Bônus Desbloqueado! Encontre os 8 pares!";
             
+            // CORREÇÃO: Chama a função de inicialização do jogo da memória.
             iniciarMemoria();
         }
         
-        function mostrarTabuada(retomar) {
+         function mostrarTabuada(retomar) {
+            // Garante que o container volte ao tamanho normal
+            elContainerPrincipal.classList.remove('bonus-mode');
+            
+            // Transiciona a UI
             elJogoTabuada.style.display = 'block';
             elJogoBonus.style.display = 'none';
-            elContainerPrincipal.classList.remove('bonus-mode');
             
             if(retomar) {
                  jogoAtivo = true; // Retoma o jogo principal
                  proximaRodada();
             } else {
-                // Estado inicial
+                 // Estado inicial
                  elBotaoIniciar.disabled = false;
                  elBotaoIniciar.style.opacity = 1;
+                 elBotaoIniciar.onclick = iniciarJogo; // Garante que a função iniciar esteja conectada
+                 elPergunta.textContent = "Clique em 'Iniciar Missão' para começar!";
             }
         }
 
 
-        // Inicialização: Configura o estado inicial
+       // Inicialização: Configura o estado inicial
         document.addEventListener('DOMContentLoaded', () => {
              elBotaoIniciar.onclick = iniciarJogo;
              elPergunta.textContent = "Clique em 'Iniciar Missão' para começar!";
+             
+             // CORREÇÃO: Garante que a função de finalizarMemoria chame mostrarTabuada corretamente.
+             document.getElementById('continuar-tabuada').onclick = () => finalizarMemoria(false);
         });
     </script>
 </body>
