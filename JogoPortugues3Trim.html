@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ Revisão Capitão América - Português</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇺🇸</text></svg>">
+    
+    <style>
+        /* --- Variáveis e Estilos Globais (Tema Capitão América) --- */
+        :root {
+            --azul-capitao: #002868;
+            --vermelho-capitao: #BF0A30;
+            --branco-escudo: #FFFFFF;
+            --cinza-sombra: #333333;
+            --tempo-alerta: #FFD700;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--cinza-sombra);
+            background-image: radial-gradient(circle, var(--azul-capitao) 0%, var(--cinza-sombra) 100%);
+            color: var(--branco-escudo);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        #container-principal {
+            background-color: rgba(10, 10, 10, 0.9);
+            border: 5px solid var(--vermelho-capitao);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 30px var(--vermelho-capitao);
+            max-width: 90%;
+            width: 450px;
+        }
+        
+        h1 {
+            color: var(--branco-escudo);
+            text-shadow: 2px 2px 4px var(--vermelho-capitao);
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        /* --- Estilos do Jogo Principal (Português) --- */
+        
+        #placar {
+            display: flex;
+            justify-content: space-around;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        #placar .contador-bonus {
+            color: var(--tempo-alerta);
+        }
+
+        #pergunta-box {
+            background-color: var(--azul-capitao);
+            border: 3px solid var(--branco-escudo);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 0 10px var(--vermelho-capitao);
+        }
+
+        #pergunta {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--branco-escudo);
+            margin: 0;
+        }
+        
+        #topico-pergunta {
+            font-size: 0.9em;
+            color: var(--tempo-alerta);
+            margin-bottom: 5px;
+        }
+
+        #opcoes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .opcao-btn {
+            background-color: var(--vermelho-capitao);
+            color: var(--branco-escudo);
+            border: none;
+            padding: 15px 10px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px var(--cinza-sombra);
+        }
+
+        .opcao-btn:hover:not(:disabled) {
+            background-color: #e31842; /* Vermelho mais claro */
+            transform: translateY(-2px);
+        }
+
+        .opcao-btn:active:not(:disabled) {
+            box-shadow: 0 2px var(--cinza-sombra);
+            transform: translateY(2px);
+        }
+
+        #feedback {
+            min-height: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        #iniciar-reiniciar {
+            background-color: var(--tempo-alerta);
+            color: var(--cinza-sombra);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px var(--cinza-sombra);
+            margin-top: 10px;
+        }
+
+        #iniciar-reiniciar:hover {
+            background-color: #ffd700;
+        }
+
+        /* Estilos de Feedback */
+        .sucesso {
+            color: var(--tempo-alerta);
+            animation: pulsar 0.5s 2;
+        }
+
+        .erro {
+            color: var(--vermelho-capitao);
+            animation: shake 0.5s;
+        }
+        
+        /* O Jogo Bônus (Memória) será omitido neste modelo para focar na correção de Português.
+           Caso queira reincluir, a estrutura deve ser copiada da versão anterior. */
+        #jogo-bonus {
+            display: none;
+        }
+
+        @keyframes pulsar {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container-principal">
+        <h1>🇺🇸 Revisão - Escudo de Português 🛡️</h1>
+
+        <div id="jogo-tabuada">
+            <div id="placar">
+                <span>⭐ Acertos Total: <span id="pontuacao">0</span></span>
+                <span class="contador-bonus">🎯 Próximo Bônus: <span id="acertos-rodada">0</span>/10</span>
+                <span>⏱️ Tempo: <span id="tempo">7.0</span>s</span>
+            </div>
+
+            <div id="pergunta-box">
+                <div id="topico-pergunta"></div>
+                <p id="pergunta">Clique em Iniciar Missão para começar!</p>
+            </div>
+
+            <div id="opcoes">
+                </div>
+
+            <div id="feedback">
+                </div>
+
+            <button id="iniciar-reiniciar" onclick="iniciarJogo()">Iniciar Missão</button>
+        </div>
+
+        <div id="jogo-bonus">
+             <h2>O Jogo Bônus não está ativo neste modo de revisão.</h2>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Variáveis Globais ---
+        const ACERTOS_PARA_BONUS = 10;
+        const TEMPO_MAXIMO = 7.0; 
+        let pontuacao = 0; 
+        let acertosRodada = 0; 
+        let tempoAtual = TEMPO_MAXIMO;
+        let intervaloTempo;
+        let respostaCorreta;
+        let jogoAtivo = false;
+        
+        // --- Elementos do DOM ---
+        const elPontuacao = document.getElementById('pontuacao');
+        const elAcertosRodada = document.getElementById('acertos-rodada');
+        const elTempo = document.getElementById('tempo');
+        const elPergunta = document.getElementById('pergunta');
+        const elTopico = document.getElementById('topico-pergunta');
+        const elOpcoes = document.getElementById('opcoes');
+        const elFeedback = document.getElementById('feedback');
+        const elBotaoIniciar = document.getElementById('iniciar-reiniciar');
+        
+        // --- Arrays de Mensagens ---
+        const MENSAGENS_SUCESSO = [
+            "🎯 SUCESSO! Escudo Posicionado!", "⭐ GOLPE PERFEITO!","🚀 Que velocidade, Vingador!", 
+            "✅ Uau! Reflexo de Herói!", "💯 MISSÃO CUMPRIDA!"
+        ];
+        const MENSAGENS_ERRO = [
+            "❌ Erro! Não desista, herói! O certo era: ", "😅 Quase! Tente de novo! O correto era: ", 
+            "💡 Persista! Você vai conseguir! A resposta certa era: ", "💪 Força! O Capitão sempre tenta! A resposta correta era: "
+        ];
+        
+        // --- Banco de Perguntas (Focado nos Tópicos de Gramática) ---
+        const BANCO_PERGUNTAS = [
+            // Sílaba Tônica (Páginas 202 a 205)
+            { topico: "Sílaba Tônica", pergunta: "A palavra 'FÁCIL' é classificada como:", resposta: "Paroxítona", opcoes: ["Oxítona", "Paroxítona", "Proparoxítona", "Dissílaba"] },
+            { topico: "Sílaba Tônica", pergunta: "A palavra 'CAFÉ' é classificada como:", resposta: "Oxítona", opcoes: ["Oxítona", "Paroxítona", "Proparoxítona", "Tritônica"] },
+            { topico: "Sílaba Tônica", pergunta: "A palavra 'MÁGICO' é classificada como:", resposta: "Proparoxítona", opcoes: ["Oxítona", "Paroxítona", "Proparoxítona", "Trissílaba"] },
+            
+            // Uso do E ou I (Páginas 208 a 210)
+            { topico: "Uso do E/I", pergunta: "Qual palavra completa a frase: 'O Brasil é um p__s?'", resposta: "País", opcoes: ["Páis", "Pez", "Peis", "País"] },
+            { topico: "Uso do E/I", pergunta: "Qual palavra completa: 'A pr__são está cheia.'", resposta: "Prisão", opcoes: ["Presão", "Prisãu", "Prisão", "Prezão"] },
+            { topico: "Uso do E/I", pergunta: "Complete: 'O c__mércio está aberto.'", resposta: "Comércio", opcoes: ["Comércio", "Comérçio", "Comirceu", "Comerceu"] },
+
+            // Uso do O ou U (Páginas 216 e 217)
+            { topico: "Uso do O/U", pergunta: "Qual a grafia correta: 'Bisc__ito'?", resposta: "Biscoito", opcoes: ["Biscoitu", "Biscoito", "Biscúito", "Biscoto"] },
+            { topico: "Uso do O/U", pergunta: "Complete a palavra: 'Cach__rro'", resposta: "Cachorro", opcoes: ["Cachorro", "Cachurru", "Caxorro", "Caxuru"] },
+            { topico: "Uso do O/U", pergunta: "A palavra correta é:", resposta: "Bolacha", opcoes: ["Bulacha", "Bolacha", "Bolaxa", "Bôlacha"] },
+
+            // Uso da letra H (Páginas 266 e 267)
+            { topico: "Uso do H", pergunta: "Qual palavra está escrita corretamente?", resposta: "Hiena", opcoes: ["Iena", "Hiena", "Jena", "Gena"] },
+            { topico: "Uso do H", pergunta: "Qual palavra precisa do 'H' inicial?", resposta: "Honesto", opcoes: ["Onesto", "Honesto", "Orário", "Ora"] },
+            { topico: "Uso do H", pergunta: "Qual é a forma correta do verbo?", resposta: "Haver", opcoes: ["Aver", "Haver", "Avér", "Haverr"] },
+
+            // Dígrafos (Páginas 270 a 273 e 277 a 280)
+            { topico: "Dígrafos", pergunta: "Qual palavra tem o dígrafo 'CH'?", resposta: "Chave", opcoes: ["Cerveja", "Casa", "Chave", "Cavalo"] },
+            { topico: "Dígrafos", pergunta: "Qual palavra tem o dígrafo 'SS'?", resposta: "Pássaro", opcoes: ["Pasaro", "Sapato", "Pássaro", "Passarou"] },
+            { topico: "Dígrafos", pergunta: "Qual palavra tem o dígrafo 'RR'?", resposta: "Carro", opcoes: ["Carro", "Coro", "Cano", "Caro"] },
+            { topico: "Dígrafos", pergunta: "Qual palavra tem o dígrafo 'LH'?", resposta: "Ovelha", opcoes: ["Ovela", "Ovelha", "Ovelá", "Ovelâ"] },
+        ];
+        
+        let perguntasRestantes = [];
+
+        // --- Funções Auxiliares ---
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function exibirFeedback(mensagem, tipo) {
+            elFeedback.textContent = mensagem;
+            elFeedback.className = tipo;
+        }
+
+        // --- Lógica Principal do Jogo ---
+
+        function gerarPergunta() {
+            if (perguntasRestantes.length === 0) {
+                // Reinicia o banco se acabarem as perguntas
+                perguntasRestantes = [...BANCO_PERGUNTAS];
+                perguntasRestantes = misturarArray(perguntasRestantes);
+            }
+            
+            const perguntaAtual = perguntasRestantes.pop();
+
+            elTopico.textContent = `Tópico: ${perguntaAtual.topico}`;
+            elPergunta.textContent = perguntaAtual.pergunta;
+            respostaCorreta = perguntaAtual.resposta;
+            
+            gerarOpcoes(perguntaAtual.opcoes, respostaCorreta);
+        }
+
+        function gerarOpcoes(opcoesOriginais, respostaCerta) {
+            // As opções originais já contêm a resposta, apenas misturamos
+            const opcoesArray = misturarArray([...opcoesOriginais]);
+            
+            elOpcoes.innerHTML = '';
+            opcoesArray.forEach(opcao => {
+                const btn = document.createElement('button');
+                btn.className = 'opcao-btn';
+                btn.textContent = opcao;
+                btn.onclick = () => checarResposta(opcao);
+                elOpcoes.appendChild(btn);
+            });
+        }
+
+        function iniciarContador() {
+            tempoAtual = TEMPO_MAXIMO;
+            elTempo.textContent = tempoAtual.toFixed(1);
+            clearInterval(intervaloTempo);
+
+            intervaloTempo = setInterval(() => {
+                tempoAtual -= 0.1;
+                elTempo.textContent = tempoAtual.toFixed(1);
+
+                if (tempoAtual <= 0) {
+                    pararContador();
+                    checarResposta(null); // Tempo esgotado
+                }
+            }, 100);
+        }
+
+        function pararContador() {
+            clearInterval(intervaloTempo);
+        }
+
+        function checarResposta(respostaDoJogador) {
+            if (!jogoAtivo) return;
+
+            pararContador();
+            Array.from(elOpcoes.children).forEach(btn => btn.disabled = true);
+
+
+            if (respostaDoJogador === respostaCorreta) {
+                // Acertou
+                pontuacao++;
+                acertosRodada++;
+                elPontuacao.textContent = pontuacao;
+                elAcertosRodada.textContent = `${acertosRodada}/${ACERTOS_PARA_BONUS}`;
+                
+                const msg = MENSAGENS_SUCESSO[getRandomInt(0, MENSAGENS_SUCESSO.length - 1)];
+                exibirFeedback(msg, 'sucesso');
+                
+                if (acertosRodada === ACERTOS_PARA_BONUS) {
+                    // Aqui iria a chamada para o Jogo Bônus (omitido neste modelo)
+                    alert("🏆 Missão Bônus Desbloqueada! (Fim da Rodada de 10)");
+                    acertosRodada = 0; // Reseta o contador da rodada
+                    elAcertosRodada.textContent = `${acertosRodada}/${ACERTOS_PARA_BONUS}`;
+                    setTimeout(proximaRodada, 2000);
+                } else {
+                    setTimeout(proximaRodada, 1500);
+                }
+
+            } else {
+                // Errou ou o tempo esgotou (jogo continua!)
+                let msgIndex = getRandomInt(0, MENSAGENS_ERRO.length - 1);
+                let msg = MENSAGENS_ERRO[msgIndex] + `"${respostaCorreta}"`;
+
+                if (respostaDoJogador === null) {
+                    msg = "😭 Tempo Esgotado! O correto era: " + `"${respostaCorreta}"`;
+                }
+                
+                exibirFeedback(msg, 'erro');
+                
+                // Continua para a próxima rodada após o feedback
+                setTimeout(proximaRodada, 2000); 
+            }
+        }
+
+        function proximaRodada() {
+            elFeedback.textContent = '';
+            Array.from(elOpcoes.children).forEach(btn => btn.disabled = false);
+            generarPergunta();
+            iniciarContador();
+        }
+
+        function iniciarJogo() {
+            // Resetar o estado da rodada e a pontuação
+            pontuacao = 0;
+            acertosRodada = 0;
+            elPontuacao.textContent = pontuacao;
+            elAcertosRodada.textContent = `${acertosRodada}/${ACERTOS_PARA_BONUS}`;
+
+            jogoAtivo = true;
+            elBotaoIniciar.textContent = 'Reiniciar Pontuação';
+            elBotaoIniciar.disabled = true;
+            elBotaoIniciar.style.opacity = 0.5;
+
+            // Inicializa e mistura o banco de perguntas
+            perguntasRestantes = misturarArray([...BANCO_PERGUNTAS]);
+
+            proximaRodada();
+        }
+
+        // Inicialização: Configura o estado inicial
+        document.addEventListener('DOMContentLoaded', () => {
+             elBotaoIniciar.onclick = iniciarJogo;
+             elPergunta.textContent = "Clique em 'Iniciar Missão' para começar!";
+        });
+    </script>
+</body>
+</html>
