@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Captain America English Quiz 🇺🇸</title>
+    <title>Captain America English Games 🛡️</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='90' font-size='90'>🛡️</text></svg>">
     
     <style>
-        /* --- CSS (Estilo do Jogo) --- */
+        /* --- CSS GERAL --- */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #212121; /* Fundo escuro */
-            color: #f5f5f5; /* Texto claro */
+            background-color: #212121;
+            color: #f5f5f5;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -19,23 +19,53 @@
         }
 
         header {
-            background-color: #003366; /* Azul Escuro */
+            background-color: #003366;
             color: #ffffff;
             padding: 15px 30px;
             border-radius: 10px;
             margin-bottom: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            border: 3px solid #ff0000; /* Borda vermelha */
+            border: 3px solid #ff0000;
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        .navbar {
+            background-color: #333;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0099ff;
+        }
+
+        .nav-btn {
+            background: none;
+            color: #f5f5f5;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background-color: #0099ff;
+            color: #fff;
+            border-radius: 3px;
         }
 
         .game-container {
             width: 90%;
             max-width: 700px;
-            background-color: #333333; /* Fundo do jogo */
+            background-color: #333333;
             padding: 25px;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-            border: 5px solid #ff0000; /* Borda vermelha de destaque */
+            border: 5px solid #ff0000;
         }
 
         .screen {
@@ -47,9 +77,9 @@
             display: block;
         }
 
-        /* Estilos de Botão */
-        button {
-            background-color: #ff0000; /* Vermelho */
+        /* Estilos de Botão Comum */
+        button:not(.nav-btn, .cell) {
+            background-color: #ff0000;
             color: white;
             padding: 10px 20px;
             border: 2px solid #ffffff;
@@ -60,12 +90,12 @@
             transition: background-color 0.2s, transform 0.1s;
         }
 
-        button:hover {
+        button:not(.nav-btn, .cell):hover {
             background-color: #cc0000;
             transform: scale(1.05);
         }
-
-        /* Estilos do Quiz */
+        
+        /* --- ESTILOS DO QUIZ --- */
         .stats {
             display: flex;
             justify-content: space-between;
@@ -76,8 +106,8 @@
             color: #ffffff;
         }
 
-        #vocab-question-icon {
-            font-size: 4em; /* Icone grande */
+        #quiz-icon {
+            font-size: 4em;
             margin-bottom: 15px;
         }
 
@@ -99,28 +129,12 @@
             transition: background-color 0.2s, border-color 0.2s;
         }
 
-        .option-btn:hover {
-            background-color: #555555;
-            border-color: #0099ff; /* Azul do Capitão América */
-        }
+        .option-btn.correct { background-color: #00cc00; border-color: #ffffff; }
+        .option-btn.incorrect { background-color: #cc0000; border-color: #ffffff; }
+        .feedback-message { margin-top: 15px; font-weight: bold; min-height: 20px; }
+        #timer { font-weight: bold; color: #0099ff; }
 
-        .option-btn.correct {
-            background-color: #00cc00; /* Verde para correto */
-            border-color: #ffffff;
-        }
-
-        .option-btn.incorrect {
-            background-color: #cc0000; /* Vermelho para incorreto */
-            border-color: #ffffff;
-        }
-
-        .feedback-message {
-            margin-top: 15px;
-            font-weight: bold;
-            min-height: 20px;
-        }
-
-        /* Jogo da Memória */
+        /* --- ESTILOS DO MEMORY GAME (JOGO DA MEMÓRIA) --- */
         .memory-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -129,7 +143,7 @@
         }
 
         .memory-card {
-            background-color: #003366; /* Azul */
+            background-color: #003366;
             color: white;
             height: 80px;
             display: flex;
@@ -138,93 +152,127 @@
             font-size: 1.2em;
             cursor: pointer;
             border-radius: 8px;
-            border: 3px solid #ff0000; /* Borda Vermelha */
+            border: 3px solid #ff0000;
             perspective: 1000px;
             transition: transform 0.6s;
             transform-style: preserve-3d;
         }
 
-        .memory-card.flipped {
-            transform: rotateY(180deg);
+        .memory-card.flipped { transform: rotateY(180deg); }
+        .card-content { position: absolute; backface-visibility: hidden; }
+        .card-back { font-size: 2em; line-height: 1; }
+        .card-front { transform: rotateY(180deg); }
+        .memory-card.matched { border-color: #00cc00; pointer-events: none; opacity: 1; }
+
+        /* --- ESTILOS DO WORD SEARCH (CAÇA-PALAVRAS) --- */
+        .word-search-grid {
+            display: grid;
+            margin: 20px auto;
+            border: 3px solid #0099ff;
+            border-radius: 5px;
         }
 
-        .card-content {
-            position: absolute;
-            backface-visibility: hidden;
-        }
-
-        .card-back {
-            font-size: 2em;
-            line-height: 1;
-        }
-
-        .card-front {
-            transform: rotateY(180deg);
-        }
-
-        .memory-card.matched {
-            border-color: #00cc00;
-            pointer-events: none;
-            opacity: 1; /* Garantindo visibilidade total */
-        }
-
-        /* Contador regressivo */
-        #timer {
+        .cell {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1em;
             font-weight: bold;
-            color: #0099ff; /* Azul vibrante */
+            border: 1px solid #444;
+            cursor: pointer;
+            background-color: #444;
+            user-select: none; /* Desabilita seleção de texto nativa */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+        }
+        
+        .cell.highlighted {
+            background-color: #ff0000; /* Destaque ao arrastar */
+            color: white;
+        }
+
+        .cell.found {
+            background-color: #00cc00 !important; /* Verde para palavras encontradas */
+            color: white;
+            font-style: italic;
+        }
+
+        #word-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #word-list li {
+            background-color: #003366;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #word-list li.found-word {
+            background-color: #00cc00;
+            text-decoration: line-through;
+            color: #212121;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Captain America English Challenge! 🛡️</h1>
+        <h1>Captain America English Games 🇺🇸</h1>
     </header>
+
+    <div class="navbar">
+        <button id="nav-quiz" class="nav-btn active">Quiz 📝</button>
+        <button id="nav-memory" class="nav-btn">Memory Game 🧠</button>
+        <button id="nav-wordsearch" class="nav-btn">Word Search 🔍</button>
+    </div>
 
     <div class="game-container">
         
-        <div id="start-screen" class="screen active">
-            <h2>Welcome, Agent! Are you ready?</h2>
-            <p>Your mission: Answer the questions to save the world!</p>
-            <button id="start-quiz-btn">Start Mission!</button>
-        </div>
-
-        <div id="vocab-quiz-screen" class="screen">
+        <div id="quiz-screen" class="screen active">
+            <h2>The Challenge Quiz 🎯</h2>
             <div class="stats">
-                <span>🎯 Vocab Hits: <span id="vocab-score">0</span>/10</span>
+                <span>Score: <span id="quiz-score">0</span></span>
+                <span>Question: <span id="quiz-count">0</span>/10</span>
                 <span id="timer">⏳ 7s</span>
             </div>
-            <h3 id="vocab-question-icon"></h3>
-            <div id="vocab-options" class="options-grid">
-                </div>
-            <p id="vocab-feedback" class="feedback-message"></p>
+            <h3 id="quiz-icon"></h3>
+            <div id="quiz-text-context"></div>
+            <p id="quiz-question-text"></p>
+            <div id="quiz-options" class="options-grid"></div>
+            <p id="quiz-feedback" class="feedback-message"></p>
+            <button id="start-quiz-btn">Start 10 Questions 🚀</button>
         </div>
 
         <div id="memory-game-screen" class="screen">
-            <h2>Memory Training: Match the Words! 🧠</h2>
-            <p style="color: #00cc00;">*Dica: As cartas corretas permanecem abertas para conferência.*</p>
-            <div id="memory-board" class="memory-grid">
-                </div>
+            <h2>Memory Training 🧠</h2>
+            <p id="memory-current-set" style="color: #0099ff;">Set 1: Body Parts</p>
+            <div id="memory-board" class="memory-grid"></div>
             <p id="memory-feedback" class="feedback-message"></p>
-            <button id="next-gram-btn" style="display: none;">Continue to Grammar Quiz ➡️</button>
-            <button id="next-final-btn" style="display: none;">Mission Complete! 🎉</button>
-        </div>
-
-        <div id="grammar-quiz-screen" class="screen">
-            <div class="stats">
-                <span>📝 Grammar Questions: <span id="grammar-count">0</span>/10</span>
-            </div>
-            <div id="grammar-text-context"></div>
-            <h3 id="grammar-question-text"></h3>
-            <div id="grammar-options" class="options-grid">
-                </div>
-            <p id="grammar-feedback" class="feedback-message"></p>
+            <button id="memory-set-btn" data-set="1">Next Set (Set 2) ➡️</button>
         </div>
         
-        <div id="end-screen" class="screen">
-            <h2>Mission Accomplished! You are a Hero! ⭐</h2>
-            <p>You mastered the English challenge!</p>
-            <button onclick="window.location.reload()">Restart Mission</button>
+        <div id="word-search-screen" class="screen">
+            <h2>Word Search Puzzle 🔍</h2>
+            <div id="word-search-grid" class="word-search-grid"></div>
+            <p style="margin-top: 15px;">**Find these words:**</p>
+            <ul id="word-list"></ul>
+            <p id="search-feedback" class="feedback-message"></p>
+            <button id="start-search-btn">Start Word Search 🧩</button>
+            <button id="next-search-btn" style="display: none;">Next Puzzle ➡️</button>
+        </div>
+        
+        <div id="end-screen" class="screen" style="display: none;">
+            <h2>Mission Complete! ⭐</h2>
+            <p id="final-message">You are a Hero!</p>
+            <button onclick="window.location.reload()">Back to Menu</button>
         </div>
 
     </div>
@@ -233,155 +281,158 @@
         // --- JAVASCRIPT (Lógica do Jogo) ---
 
         // --- DADOS DO JOGO ---
-        const vocabQuestions = [
-            { icon: '👂', correct: 'ear', options: ['hand', 'head', 'ear', 'eye'] },
-            { icon: '🦵', correct: 'leg', options: ['arm', 'leg', 'neck', 'foot'] },
-            { icon: '🏃', correct: 'run', options: ['walk', 'clap', 'run', 'sing'] },
-            { icon: '🧍', correct: 'walk', options: ['jump', 'run', 'walk', 'clap'] },
-            { icon: '🍌', correct: 'banana', options: ['apple', 'lemonade', 'banana', 'orange'] },
-            { icon: '🍕', correct: 'cheese pizza', options: ['salad', 'soup', 'sandwich', 'cheese pizza'] },
-            { icon: '🥛', correct: 'milk', options: ['water', 'tea', 'milk', 'juice'] },
-            { icon: '🐟', correct: 'fish', options: ['cookie', 'egg', 'fish', 'rice'] },
-            { icon: '👵', correct: 'grandmother', options: ['grandfather', 'girl', 'grandmother', 'boy'] },
-            { icon: '🐰', correct: 'rabbit', options: ['cat', 'dog', 'rabbit', 'cow'] },
-            { icon: '🐴', correct: 'horse', options: ['goat', 'sheep', 'duck', 'horse'] },
-            { icon: '🐈', correct: 'kitten', options: ['puppy', 'chick', 'bunny', 'kitten'] },
-            { icon: '🐘', correct: 'elephant', options: ['calf', 'lamb', 'elephant', 'chick'] },
-            { icon: '🧗', correct: 'climbing', options: ['hopping', 'swimming', 'climbing', 'flying'] },
-            { icon: '🗣️', correct: 'talking', options: ['eating', 'singing', 'talking', 'doing'] },
-            { icon: '👶', correct: 'crawling', options: ['jumping', 'flying', 'crawling', 'running'] },
-        ];
 
+        // Vocabulário Completo com Ícones (usado no Quiz e Caça-Palavras)
+        const fullVocabulary = {
+            'ear': '👂', 'head': '👤', 'neck': '👔', 'arm': '💪', 'hand': '🖐️', 'leg': '🦵', 'feet': '🦶', 'foot': '👣',
+            'hair': '💇', 'eye': '👁️', 'nose': '👃', 'mouth': '👄', 'body': '🧍', 'run': '🏃', 'walk': '🚶', 'clap': '👏',
+            'sing': '🎤', 'jump': '⬆️', 'short': '🔽', 'big': '🐘', 'small': '🐜', 'strong': '🏋️', 'long': '📏', 'tall': '🦒',
+            'banana': '🍌', 'apple': '🍎', 'chicken': '🍗', 'cheese pizza': '🍕', 'lemonade': '🍋', 'milk': '🥛', 'water': '💧',
+            'orange juice': '🍊', 'tea': '☕', 'drink': '🥤', 'eat': '🍽️', 'cookie': '🍪', 'fish': '🐟', 'egg': '🥚', 'orange': '🟠',
+            'rice': '🍚', 'salad': '🥗', 'sandwich': '🥪', 'soup': '🥣', 'juice': '🧃', 'fruit': '🍇', 'grapes': '🍇',
+            'grandmother': '👵', 'grandfather': '👴', 'boy': '👦', 'girl': '👧', 'rabbit': '🐇', 'cat': '🐈', 'cow': '🐄',
+            'dog': '🐕', 'donkey': '🐴', 'duck': '🦆', 'frog': '🐸', 'horse': '🐎', 'goat': '🐐', 'sheep': '🐑', 'turtle': '🐢',
+            'pets': '🐾', 'bird': '🐦', 'kitten': '🐱', 'puppy': '🐶', 'chick': '🐥', 'bunny': '🐰', 'lamb': '🐑', 'calf': '🐄',
+            'elephant': '🐘', 'hopping': '🐸', 'climbing': '🧗', 'running': '🏃', 'eating': '🍽️', 'playing': '⚽', 'singing': '🎤',
+            'talking': '🗣️', 'doing': '🛠️', 'crawling': '👶', 'swimming': '🏊', 'flying': '✈️', 'jumping': '🤸'
+        };
+
+        const conjunctions = ['his', 'her', 'your', 'is', 'are', 'a', 'an', 'can’t', 'aren’t', 'they’re', 'don’t', 'doesn’t', 'what’s'];
+        const adjectives = ['short', 'big', 'small', 'strong', 'long', 'tall'];
+
+        // --- QUIZ DATA (Perguntas de Vocabulário e Gramática abrangentes) ---
+
+        // 1. VOCABULÁRIO (Uma pergunta para cada item principal do vocabulário)
+        const vocabQuestions = Object.keys(fullVocabulary).map(word => {
+            const icon = fullVocabulary[word];
+            // Gera 3 opções incorretas aleatórias
+            const allWords = Object.keys(fullVocabulary).filter(w => w !== word);
+            const incorrectOptions = shuffleArray(allWords).slice(0, 3);
+            return {
+                type: 'vocab',
+                icon: icon,
+                question: 'What is this word?',
+                correct: word,
+                options: [...incorrectOptions, word]
+            };
+        });
+        
+        // 2. GRAMÁTICA (Uma pergunta para cada estrutura gramatical solicitada)
         const grammarQuestions = [
-            { 
-                question: "Can your cat fly? Answer based on the text below.", 
-                context: "My cat is a kitten. My cat has **short** legs. He can jump but he **can’t** fly.",
-                correct: "No, he can't.",
-                options: ["No, he can't.", 'Yes, he can.', 'Yes, I do.', 'No, I don’t.'] 
-            },
-            { 
-                question: "Complete the sentence: **Your** sister **is** _____.", 
-                context: null,
-                correct: 'short',
-                options: ['short', 'feet', 'run', 'cheese pizza'] 
-            },
-            { 
-                question: "Choose the correct sentence: **His** favorite food is **apple**.", 
-                context: null,
-                correct: 'He likes apple.',
-                options: ['I like apple.', 'He is eating apple.', 'He likes apple.', 'He doesn’t like apple.'] 
-            },
-            { 
-                question: "Are your animals **running**? Complete the answer.", 
-                context: null,
-                correct: 'Yes, they are.',
-                options: ['No, they aren’t.', 'Yes, they are.', 'No, he can’t.', 'Yes, I do.'] 
-            },
-            { 
-                question: "Complete: I want **___** orange.", 
-                context: "Tip: Use 'an' for words starting with a vowel (a, e, i, o, u)",
-                correct: 'an',
-                options: ['a', 'an', 'is', 'are'] 
-            },
-            { 
-                question: "Do you want **some** **water**? Give a positive answer.", 
-                context: null,
-                correct: 'Yes, please.',
-                options: ['No, thank you.', 'Yes, please.', 'No, he doesn’t.', 'Yes, I do.'] 
-            },
-            { 
-                question: "Complete the question: Where **___** the **dog**?", 
-                context: null,
-                correct: 'is',
-                options: ['are', 'is', 'a', 'an'] 
-            },
-            { 
-                question: "Choose the correct description based on the text.", 
-                context: "John is a boy. He is **tall**. John has an apple.",
-                correct: 'John is tall.',
-                options: ['John is short.', 'John is tall.', 'John has short hair.', 'John is eating cheese pizza.'] 
-            },
-            { 
-                question: "Choose the correct action: The cow **is** **___** grass.", 
-                context: null,
-                correct: 'eating',
-                options: ['run', 'clap', 'eating', 'jump'] 
-            },
-            { 
-                question: "Choose the correct article: I see **___** boy.", 
-                context: "Tip: Use 'a' for words starting with a consonant.",
-                correct: 'a',
-                options: ['a', 'an', 'is', 'are'] 
-            },
+            // is / are
+            { type: 'gram', question: "My dog **___** small. My cats **___** strong. (is / are)", correct: 'is', options: ['is', 'are', 'am', 'can'], context: "Choose the verb for the first sentence." },
+            // a / an
+            { type: 'gram', question: "I see **___** boy and **___** elephant. (a / an)", correct: 'a', options: ['a', 'an', 'the', 'is'], context: "Choose the article for the first word 'boy'." },
+            // his / her / your
+            { type: 'gram', question: "**___** name is John. **___** name is Mary. (His / Her)", correct: 'His', options: ['His', 'Her', 'Your', 'They'], context: "Choose the possessive for a boy (John)." },
+            // can / can't
+            { type: 'gram', question: "Can a horse **run**? Yes, it **___**.", correct: "can", options: ["can", "can't", "is", "are"], context: "Choose the correct short answer." },
+            // has / have
+            { type: 'gram', question: "I **___** a big nose. She **___** long hair. (have / has)", correct: 'have', options: ['have', 'has', 'is', 'are'], context: "Choose the verb for the first sentence ('I')." },
+            // My/Your/His/Her is/are
+            { type: 'gram', question: "Complete: **His** **legs** **are** **long**.", correct: 'long', options: ['long', 'run', 'apple', 'mouth'], context: "His legs are (adjective)." },
+            // What is this? / It's your...
+            { type: 'gram', question: "Answer the question: What is this? 
+
+[Image of ear]
+", correct: "It's your ear.", options: ["It's your ear.", "Yes, it is.", "He is eating.", "No, it isn't."], context: "The object is an ear." },
+            // What are they doing?
+            { type: 'gram', question: "The children are **jumping**. Answer the question: What are they doing?", correct: "They are jumping.", options: ["They are jumping.", "He is jumping.", "It is jumping.", "I am jumping."], context: "Refer to 'they' and the action 'jumping'." },
+            // Do you want...? / Yes, please.
+            { type: 'gram', question: "Do you want some lemonade? Give a positive answer.", correct: "Yes, please.", options: ["No, thank you.", "Yes, please.", "No, he doesn't.", "Yes, I do."], context: "Use the politeness phrases." },
+            // What's your favorite...?
+            { type: 'gram', question: "What's your favorite animal? Choose a response.", correct: "I like dogs.", options: ["I like dogs.", "It's a dog.", "Yes, I do.", "He likes dogs."], context: "The structure I like..." },
+            // What is he/she eating?
+            { type: 'gram', question: "John is eating a sandwich. What is he eating?", correct: "He is eating a sandwich.", options: ["He is eating a sandwich.", "I am eating a sandwich.", "She is eating a sandwich.", "Yes, he is."], context: "Use the structure He is eating..." },
+            // Contractions (can't, don't, what's)
+            { type: 'gram', question: "The dog **can not** climb. Choose the contraction.", correct: "can't", options: ["can't", "don't", "what's", "doesn't"], context: "Choose the contraction for 'can not'." }
         ];
 
-        const memoryPairs1 = [
-            { icon: '🖐️', word: 'hand' },
-            { icon: '🍎', word: 'apple' },
-            { icon: '🦆', word: 'duck' },
-            { icon: '⬆️', word: 'tall' },
-            { icon: '💧', word: 'water' },
-            { icon: '🗣️', word: 'talking' },
-            { icon: '🧍', word: 'walk' },
-            { icon: '👑', word: 'king' }
+        // Combina e embaralha todas as perguntas
+        const allQuizQuestions = shuffleArray([...vocabQuestions, ...grammarQuestions]);
+
+        // --- MEMORY GAME DATA (3 Sets) ---
+        const memorySets = [
+            { name: "Set 1: Body Parts", pairs: [
+                { icon: '👂', word: 'ear' }, { icon: '🖐️', word: 'hand' }, { icon: '👤', word: 'head' }, { icon: '🦵', word: 'leg' },
+                { icon: '👁️', word: 'eye' }, { icon: '👃', word: 'nose' }, { icon: '👄', word: 'mouth' }, { icon: '💇', word: 'hair' }
+            ]},
+            { name: "Set 2: Food & Drinks", pairs: [
+                { icon: '🍌', word: 'banana' }, { icon: '🍎', word: 'apple' }, { icon: '🍕', word: 'cheese pizza' }, { icon: '🥛', word: 'milk' },
+                { icon: '💧', word: 'water' }, { icon: '☕', word: 'tea' }, { icon: '🥪', word: 'sandwich' }, { icon: '🥗', word: 'salad' }
+            ]},
+            { name: "Set 3: Animals & Actions", pairs: [
+                { icon: '🐇', word: 'rabbit' }, { icon: '🐈', word: 'cat' }, { icon: '🏃', word: 'running' }, { icon: '🎤', word: 'singing' },
+                { icon: '🐢', word: 'turtle' }, { icon: '🐘', word: 'elephant' }, { icon: '🏊', word: 'swimming' }, { icon: '🧗', word: 'climbing' }
+            ]}
         ];
 
-        const congratulatoryMessages = [
-            'Amazing! Captain America is proud! 🛡️',
-            'Great job! You got it right! 👍',
-            'Perfect! You are a hero! ⭐',
-            'Excellent! Keep going! 💪',
-        ];
-
-        const encouragementMessages = [
-            'Almost! Try the next one! 🤔',
-            'Don’t give up! Captain America believes in you! 🫡',
-            'Oops! You can do better! Keep practicing! 📝',
-            'Incorrect. Focus on the word! 👀',
-        ];
+        // --- WORD SEARCH DATA ---
+        // Palavras para caça-palavras (apenas aquelas com 3 letras ou mais)
+        const searchableWords = Object.keys(fullVocabulary).filter(w => w.length >= 3 && w.length <= 8);
+        const MAX_GRID_SIZE = 12; 
+        const WORDS_PER_ROUND = 5;
 
         // --- VARIÁVEIS DE ESTADO ---
-        let currentVocabIndex = 0;
-        let vocabScore = 0;
-        let questionsVocabAsked = 0;
-        let grammarQuestionsAsked = 0;
-        let currentGrammarIndex = 0;
-        let vocabTimer;
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+        let questionsQuizAsked = 0;
+        let quizTimer;
         let isTimerRunning = false;
-        let questionsVocabShuffled = [];
-        let questionsGrammarShuffled = [];
+        let currentMemorySetIndex = 0;
+        
+        // Word Search State
+        let currentWordSearchWords = [];
+        let foundWords = [];
+        let wordSearchGrid = [];
+        let isDragging = false;
+        let startCell = null;
+        let highlightedCells = [];
 
         // --- ELEMENTOS HTML ---
-        const startScreen = document.getElementById('start-screen');
-        const vocabQuizScreen = document.getElementById('vocab-quiz-screen');
-        const grammarQuizScreen = document.getElementById('grammar-quiz-screen');
-        const memoryGameScreen = document.getElementById('memory-game-screen');
-        const endScreen = document.getElementById('end-screen');
-        const startQuizBtn = document.getElementById('start-quiz-btn');
-        const vocabQuestionIcon = document.getElementById('vocab-question-icon');
-        const vocabOptionsDiv = document.getElementById('vocab-options');
-        const vocabFeedback = document.getElementById('vocab-feedback');
-        const vocabScoreSpan = document.getElementById('vocab-score');
+        const navBtns = {
+            quiz: document.getElementById('nav-quiz'),
+            memory: document.getElementById('nav-memory'),
+            wordsearch: document.getElementById('nav-wordsearch')
+        };
+        const screens = {
+            quiz: document.getElementById('quiz-screen'),
+            memory: document.getElementById('memory-game-screen'),
+            wordsearch: document.getElementById('word-search-screen'),
+            end: document.getElementById('end-screen')
+        };
+        const quizIcon = document.getElementById('quiz-icon');
+        const quizTextContext = document.getElementById('quiz-text-context');
+        const quizQuestionText = document.getElementById('quiz-question-text');
+        const quizOptionsDiv = document.getElementById('quiz-options');
+        const quizFeedback = document.getElementById('quiz-feedback');
+        const quizScoreSpan = document.getElementById('quiz-score');
         const timerSpan = document.getElementById('timer');
-        const grammarQuestionText = document.getElementById('grammar-question-text');
-        const grammarTextContext = document.getElementById('grammar-text-context');
-        const grammarOptionsDiv = document.getElementById('grammar-options');
-        const grammarFeedback = document.getElementById('grammar-feedback');
-        const grammarCountSpan = document.getElementById('grammar-count');
-        const nextGramBtn = document.getElementById('next-gram-btn');
-        const nextFinalBtn = document.getElementById('next-final-btn');
+        const quizCountSpan = document.getElementById('quiz-count');
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const memoryBoard = document.getElementById('memory-board');
+        const memoryFeedback = document.getElementById('memory-feedback');
+        const memorySetBtn = document.getElementById('memory-set-btn');
+        const memoryCurrentSetSpan = document.getElementById('memory-current-set');
+        const wordSearchGridDiv = document.getElementById('word-search-grid');
+        const wordListUl = document.getElementById('word-list');
+        const searchFeedback = document.getElementById('search-feedback');
+        const startSearchBtn = document.getElementById('start-search-btn');
+        const nextSearchBtn = document.getElementById('next-search-btn');
 
         // --- FUNÇÕES DE LÓGICA GERAL ---
 
-        /** Troca a tela visível. */
         function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
+            Object.values(screens).forEach(screen => screen.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            
+            Object.values(navBtns).forEach(btn => btn.classList.remove('active'));
+            if (id.includes('quiz')) navBtns.quiz.classList.add('active');
+            else if (id.includes('memory')) navBtns.memory.classList.add('active');
+            else if (id.includes('search')) navBtns.wordsearch.classList.add('active');
+            else if (id.includes('end')) navBtns.quiz.classList.add('active'); // Mantém o Quiz ativo após o fim
         }
 
-        /** Embaralha um array (Algoritmo Fisher-Yates). */
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -390,201 +441,150 @@
             return array;
         }
 
-        // --- LÓGICA DO QUIZ DE VOCABULÁRIO ---
+        // --- LÓGICA DO QUIZ ---
 
-        /** Inicia o contador de 7 segundos. */
-        function startTimer() {
+        function startQuiz() {
+            quizScore = 0;
+            questionsQuizAsked = 0;
+            currentQuizIndex = 0;
+            quizScoreSpan.textContent = quizScore;
+            quizCountSpan.textContent = `${questionsQuizAsked}/10`;
+            startQuizBtn.style.display = 'none';
+            loadNextQuizQuestion();
+        }
+
+        function loadNextQuizQuestion() {
+            clearInterval(quizTimer);
+            quizFeedback.textContent = '';
+            timerSpan.textContent = '⏳ 7s';
+            quizOptionsDiv.innerHTML = '';
+            quizIcon.textContent = '';
+            quizTextContext.innerHTML = '';
+            
+            if (questionsQuizAsked >= 10) {
+                showScreen('end-screen');
+                document.getElementById('final-message').textContent = `Mission Complete! Your final score is ${quizScore}/10! ⭐`;
+                return;
+            }
+
+            const q = allQuizQuestions[currentQuizIndex];
+            quizCountSpan.textContent = `${questionsQuizAsked + 1}/10`;
+            
+            if (q.type === 'vocab') {
+                quizIcon.textContent = q.icon;
+                quizQuestionText.textContent = q.question;
+            } else {
+                // Gramática
+                quizIcon.textContent = '📝';
+                quizQuestionText.textContent = q.question;
+                if (q.context) {
+                     quizTextContext.innerHTML = `<blockquote style="color:#0099ff; border-left: 3px solid #ff0000; padding-left: 10px;">Tip: ${q.context}</blockquote>`;
+                }
+            }
+            
+            const shuffledOptions = shuffleArray([...q.options]);
+
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.classList.add('option-btn');
+                button.textContent = option.charAt(0).toUpperCase() + option.slice(1);
+                button.onclick = () => checkQuizAnswer(button, option, q.correct);
+                quizOptionsDiv.appendChild(button);
+            });
+
+            currentQuizIndex++;
+            startQuizTimer();
+        }
+
+        function startQuizTimer() {
             let timeLeft = 7;
             timerSpan.textContent = `⏳ ${timeLeft}s`;
             isTimerRunning = true;
 
-            vocabTimer = setInterval(() => {
+            quizTimer = setInterval(() => {
                 timeLeft--;
                 timerSpan.textContent = `⏳ ${timeLeft}s`;
 
                 if (timeLeft <= 0) {
-                    clearInterval(vocabTimer);
+                    clearInterval(quizTimer);
                     isTimerRunning = false;
-                    vocabFeedback.textContent = 'Time\'s up! ⏱️ Keep going!';
-                    
-                    // Simula clique em resposta errada para avançar
-                    setTimeout(() => {
-                        questionsVocabAsked++;
-                        if (questionsVocabAsked < 10) {
-                            loadNextVocabQuestion();
-                        } else {
-                            checkQuizProgression();
-                        }
-                    }, 1000);
+                    quizFeedback.textContent = "Time's up! ⏱️ Keep going!";
+                    questionsQuizAsked++;
+                    setTimeout(loadNextQuizQuestion, 1500);
                 }
             }, 1000);
         }
 
-        /** Carrega a próxima pergunta de vocabulário. */
-        function loadNextVocabQuestion() {
-            clearInterval(vocabTimer);
-            vocabFeedback.textContent = '';
-            timerSpan.textContent = '⏳ 7s';
-            vocabOptionsDiv.innerHTML = '';
-            
-            if (questionsVocabAsked >= 10) {
-                checkQuizProgression();
-                return;
-            }
+        function checkQuizAnswer(button, selected, correct) {
+            if (!isTimerRunning) return;
 
-            // Garante que o índice não exceda o número de perguntas embaralhadas
-            const q = questionsVocabShuffled[questionsVocabAsked]; 
-            vocabQuestionIcon.textContent = q.icon;
-            
-            // Embaralha as opções
-            const shuffledOptions = shuffleArray([...q.options]);
-
-            shuffledOptions.forEach(option => {
-                const button = document.createElement('button');
-                button.classList.add('option-btn');
-                button.textContent = option.charAt(0).toUpperCase() + option.slice(1);
-                button.onclick = () => checkVocabAnswer(button, option, q.correct);
-                vocabOptionsDiv.appendChild(button);
-            });
-
-            currentVocabIndex++;
-            startTimer();
-        }
-
-        /** Verifica a resposta do vocabulário. */
-        function checkVocabAnswer(button, selected, correct) {
-            if (!isTimerRunning) return; // Não aceita cliques após o tempo ou resposta
-
-            clearInterval(vocabTimer);
+            clearInterval(quizTimer);
             isTimerRunning = false;
-
-            // Desabilita todos os botões
-            Array.from(vocabOptionsDiv.children).forEach(btn => btn.disabled = true);
+            Array.from(quizOptionsDiv.children).forEach(btn => btn.disabled = true);
             
             if (selected === correct) {
-                vocabScore++;
-                vocabScoreSpan.textContent = vocabScore;
+                quizScore++;
+                quizScoreSpan.textContent = quizScore;
                 button.classList.add('correct');
-                const message = congratulatoryMessages[Math.floor(Math.random() * congratulatoryMessages.length)];
-                vocabFeedback.textContent = message;
+                quizFeedback.textContent = congratulatoryMessages[Math.floor(Math.random() * congratulatoryMessages.length)];
             } else {
                 button.classList.add('incorrect');
-                // Marca a correta
-                Array.from(vocabOptionsDiv.children).find(btn => btn.textContent.toLowerCase() === correct).classList.add('correct');
-                const message = encouragementMessages[Math.floor(Math.random() * encouragementMessages.length)];
-                vocabFeedback.textContent = message;
+                Array.from(quizOptionsDiv.children).find(btn => btn.textContent.toLowerCase() === correct.toLowerCase()).classList.add('correct');
+                quizFeedback.textContent = encouragementMessages[Math.floor(Math.random() * encouragementMessages.length)];
             }
 
-            questionsVocabAsked++;
-
-            setTimeout(() => {
-                if (questionsVocabAsked < 10) {
-                    loadNextVocabQuestion();
-                } else {
-                    checkQuizProgression();
-                }
-            }, 2000);
+            questionsQuizAsked++;
+            setTimeout(loadNextQuizQuestion, 2000);
         }
 
-        // --- LÓGICA DO QUIZ DE GRAMÁTICA ---
+        const congratulatoryMessages = [
+            'Amazing! Captain America is proud! 🛡️', 'Great job! You got it right! 👍',
+            'Perfect! You are a hero! ⭐', 'Excellent! Keep going! 💪',
+        ];
+        const encouragementMessages = [
+            'Almost! Try the next one! 🤔', 'Don’t give up! Captain America believes in you! 🫡',
+            'Oops! You can do better! Keep practicing! 📝', 'Incorrect. Focus on the word! 👀',
+        ];
 
-        /** Carrega a próxima pergunta de gramática. */
-        function loadNextGrammarQuestion() {
-            grammarFeedback.textContent = '';
-            grammarOptionsDiv.innerHTML = '';
-            
-            if (grammarQuestionsAsked >= 10) {
-                checkQuizProgression();
-                return;
-            }
-
-            // Garante que o índice não exceda o número de perguntas embaralhadas
-            const q = questionsGrammarShuffled[grammarQuestionsAsked]; 
-            
-            // Texto de contexto opcional
-            grammarTextContext.innerHTML = q.context ? `<blockquote style="color:#0099ff; border-left: 3px solid #ff0000; padding-left: 10px;">${q.context}</blockquote>` : '';
-            
-            grammarQuestionText.textContent = q.question;
-            grammarCountSpan.textContent = `${grammarQuestionsAsked + 1}`;
-            
-            // Embaralha as opções
-            const shuffledOptions = shuffleArray([...q.options]);
-
-            shuffledOptions.forEach(option => {
-                const button = document.createElement('button');
-                button.classList.add('option-btn');
-                button.textContent = option.charAt(0).toUpperCase() + option.slice(1);
-                button.onclick = () => checkGrammarAnswer(button, option, q.correct);
-                grammarOptionsDiv.appendChild(button);
-            });
-
-            currentGrammarIndex++;
-        }
-
-        /** Verifica a resposta da gramática. */
-        function checkGrammarAnswer(button, selected, correct) {
-            // Desabilita todos os botões
-            Array.from(grammarOptionsDiv.children).forEach(btn => btn.disabled = true);
-            
-            if (selected.toLowerCase() === correct.toLowerCase()) {
-                button.classList.add('correct');
-                const message = congratulatoryMessages[Math.floor(Math.random() * congratulatoryMessages.length)];
-                grammarFeedback.textContent = message;
-            } else {
-                button.classList.add('incorrect');
-                // Marca a correta
-                Array.from(grammarOptionsDiv.children).find(btn => btn.textContent.toLowerCase() === correct.toLowerCase()).classList.add('correct');
-                const message = encouragementMessages[Math.floor(Math.random() * encouragementMessages.length)];
-                grammarFeedback.textContent = message;
-            }
-
-            grammarQuestionsAsked++;
-
-            setTimeout(() => {
-                loadNextGrammarQuestion();
-            }, 2500);
-        }
-
-        // --- LÓGICA DO JOGO DA MEMÓRIA ---
+        // --- LÓGICA DO MEMORY GAME ---
 
         let hasFlippedCard = false;
         let lockBoard = false;
         let firstCard, secondCard;
         let matchesFound = 0;
-        const totalMemoryPairs = 8;
-
-        /** Embaralha e exibe as cartas do Jogo da Memória. */
-        function setupMemoryGame(pairs) {
+        let totalMemoryPairs = 0;
+        
+        function setupMemoryGame(setIndex) {
+            const currentSet = memorySets[setIndex];
+            totalMemoryPairs = currentSet.pairs.length;
             matchesFound = 0;
-            const board = document.getElementById('memory-board');
-            board.innerHTML = '';
-            nextGramBtn.style.display = 'none';
-            nextFinalBtn.style.display = 'none';
+            memoryBoard.innerHTML = '';
+            memoryFeedback.textContent = '';
+            memoryCurrentSetSpan.textContent = `${currentSet.name}`;
 
-            // Cria os pares (icon e word) e duplica
             let cards = [];
-            pairs.forEach(pair => {
+            currentSet.pairs.forEach(pair => {
                 cards.push({ content: pair.icon, isIcon: true, matchId: pair.word });
-                cards.push({ content: pair.word, isIcon: false, matchId: pair.word });
+                cards.push({ content: pair.word.toUpperCase(), isIcon: false, matchId: pair.word });
             });
 
             shuffleArray(cards);
+
+            memoryBoard.style.gridTemplateColumns = `repeat(4, 1fr)`;
 
             cards.forEach(cardData => {
                 const card = document.createElement('div');
                 card.classList.add('memory-card');
                 card.dataset.matchId = cardData.matchId;
-                card.dataset.isIcon = cardData.isIcon;
                 card.innerHTML = `
                     <div class="card-content card-back">🛡️</div>
                     <div class="card-content card-front">${cardData.content}</div>
                 `;
                 card.addEventListener('click', flipCard);
-                board.appendChild(card);
+                memoryBoard.appendChild(card);
             });
         }
 
-        /** Vira uma carta. */
         function flipCard() {
             if (lockBoard) return;
             if (this === firstCard) return;
@@ -592,114 +592,350 @@
             this.classList.add('flipped');
 
             if (!hasFlippedCard) {
-                // Primeiro clique
                 hasFlippedCard = true;
                 firstCard = this;
                 return;
             }
 
-            // Segundo clique
             secondCard = this;
             checkForMatch();
         }
 
-        /** Verifica se as duas cartas viradas formam um par. */
         function checkForMatch() {
             let isMatch = firstCard.dataset.matchId === secondCard.dataset.matchId;
 
             if (isMatch) {
                 disableCards();
             } else {
-                unflipCards(); // Mantém a lógica de desvirar se for diferente
+                unflipCards();
             }
         }
 
-        /** Desabilita as cartas que formaram um par. */
         function disableCards() {
-            // Remove os event listeners, mas MANTÉM o estado 'flipped'
             firstCard.removeEventListener('click', flipCard);
             secondCard.removeEventListener('click', flipCard);
             
-            // Adiciona a classe matched (para estilo e ponteiro)
             firstCard.classList.add('matched');
             secondCard.classList.add('matched');
             
-            document.getElementById('memory-feedback').textContent = 'Match! Keep it open! ✅';
+            memoryFeedback.textContent = 'Match! Keep it open! ✅';
 
             resetBoard();
             matchesFound++;
 
             if (matchesFound === totalMemoryPairs) {
-                document.getElementById('memory-feedback').textContent = 'Match found! All clear! 💥';
-                // Mostra o botão para avançar
-                if (questionsVocabAsked === 10) {
-                    nextGramBtn.style.display = 'block';
-                } else if (grammarQuestionsAsked === 10) {
-                    nextFinalBtn.style.display = 'block';
-                }
+                memoryFeedback.textContent = 'Set Complete! All pairs found! 💥';
+                memorySetBtn.style.display = 'block';
             }
         }
 
-        /** Desvira as cartas que não formaram um par. */
         function unflipCards() {
             lockBoard = true;
-            document.getElementById('memory-feedback').textContent = 'No match! Try again.';
+            memoryFeedback.textContent = 'No match! Try again.';
 
             setTimeout(() => {
                 firstCard.classList.remove('flipped');
                 secondCard.classList.remove('flipped');
-                document.getElementById('memory-feedback').textContent = '';
+                memoryFeedback.textContent = '';
                 resetBoard();
             }, 1500);
         }
 
-        /** Reinicia o estado de viragem das cartas. */
         function resetBoard() {
             [hasFlippedCard, lockBoard] = [false, false];
             [firstCard, secondCard] = [null, null];
         }
 
-        // --- FLUXO DO JOGO ---
+        function nextMemorySet() {
+            currentMemorySetIndex = (currentMemorySetIndex + 1) % memorySets.length;
+            setupMemoryGame(currentMemorySetIndex);
+            memorySetBtn.dataset.set = currentMemorySetIndex + 1;
+            
+            let nextSetIndex = (currentMemorySetIndex + 1) % memorySets.length;
+            if (nextSetIndex === 0) {
+                 memorySetBtn.textContent = 'Restart Memory Games (Set 1) 🔄';
+            } else {
+                 memorySetBtn.textContent = `Next Set (Set ${nextSetIndex + 1}) ➡️`;
+            }
+            memorySetBtn.style.display = 'none';
+        }
 
-        /** Verifica o estado do jogo e avança para a próxima fase. */
-        function checkQuizProgression() {
-            if (questionsVocabAsked === 10 && vocabQuizScreen.classList.contains('active')) {
-                showScreen('memory-game-screen');
-                setupMemoryGame(memoryPairs1);
-            } else if (grammarQuestionsAsked === 10 && grammarQuizScreen.classList.contains('active')) {
-                showScreen('memory-game-screen');
-                // Usando o mesmo conjunto de cartas para o segundo jogo da memória
-                setupMemoryGame(memoryPairs1); 
-            } else if (grammarQuestionsAsked === 10 && memoryGameScreen.classList.contains('active') && nextFinalBtn.style.display === 'block') {
-                // O botão "Mission Complete" só aparece após o segundo jogo da memória
-                showScreen('end-screen');
+        // --- LÓGICA DO WORD SEARCH (CAÇA-PALAVRAS) ---
+
+        function startWordSearch() {
+            startSearchBtn.style.display = 'none';
+            nextSearchBtn.style.display = 'none';
+            foundWords = [];
+            selectRandomWords();
+            generateWordSearchGrid();
+            renderWordSearch();
+        }
+
+        function selectRandomWords() {
+            // Garante que há palavras suficientes
+            const remainingWords = searchableWords.filter(w => !foundWords.includes(w));
+            if (remainingWords.length === 0) {
+                searchFeedback.textContent = 'All possible words found! Restarting...';
+                foundWords = [];
+                currentWordSearchWords = shuffleArray(searchableWords).slice(0, WORDS_PER_ROUND);
+            } else {
+                currentWordSearchWords = shuffleArray(remainingWords).slice(0, WORDS_PER_ROUND);
+            }
+        }
+        
+        function generateWordSearchGrid() {
+            const size = MAX_GRID_SIZE;
+            wordSearchGrid = Array(size).fill(0).map(() => Array(size).fill(''));
+
+            currentWordSearchWords.forEach(word => {
+                let placed = false;
+                let attempts = 0;
+                while (!placed && attempts < 50) {
+                    attempts++;
+                    const direction = Math.random() < 0.5 ? 'horizontal' : 'vertical';
+                    const length = word.length;
+
+                    let startRow, startCol;
+                    
+                    if (direction === 'horizontal') {
+                        startRow = Math.floor(Math.random() * size);
+                        startCol = Math.floor(Math.random() * (size - length + 1));
+                    } else { // vertical
+                        startRow = Math.floor(Math.random() * (size - length + 1));
+                        startCol = Math.floor(Math.random() * size);
+                    }
+
+                    // Verifica se o espaço está livre ou contém as mesmas letras
+                    let canPlace = true;
+                    for (let i = 0; i < length; i++) {
+                        let r = startRow + (direction === 'vertical' ? i : 0);
+                        let c = startCol + (direction === 'horizontal' ? i : 0);
+
+                        if (wordSearchGrid[r][c] !== '' && wordSearchGrid[r][c] !== word[i]) {
+                            canPlace = false;
+                            break;
+                        }
+                    }
+
+                    if (canPlace) {
+                        for (let i = 0; i < length; i++) {
+                            let r = startRow + (direction === 'vertical' ? i : 0);
+                            let c = startCol + (direction === 'horizontal' ? i : 0);
+                            wordSearchGrid[r][c] = word[i].toUpperCase();
+                        }
+                        placed = true;
+                    }
+                }
+            });
+
+            // Preenche os espaços vazios com letras aleatórias
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size; c++) {
+                    if (wordSearchGrid[r][c] === '') {
+                        wordSearchGrid[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
+                    }
+                }
+            }
+        }
+        
+        function renderWordSearch() {
+            wordSearchGridDiv.innerHTML = '';
+            wordSearchGridDiv.style.gridTemplateColumns = `repeat(${MAX_GRID_SIZE}, 1fr)`;
+
+            const size = MAX_GRID_SIZE;
+            for (let r = 0; r < size; r++) {
+                for (let c = 0; c < size; c++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.textContent = wordSearchGrid[r][c];
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    
+                    // Adiciona eventos de toque e mouse
+                    cell.addEventListener('mousedown', startDrag);
+                    cell.addEventListener('mousemove', drag);
+                    cell.addEventListener('mouseup', endDrag);
+                    cell.addEventListener('touchstart', startDrag, { passive: true });
+                    cell.addEventListener('touchmove', drag, { passive: false });
+                    cell.addEventListener('touchend', endDrag);
+
+                    if (isCellFound(r, c)) {
+                         cell.classList.add('found');
+                    }
+                    wordSearchGridDiv.appendChild(cell);
+                }
+            }
+            
+            // Renderiza a lista de palavras
+            wordListUl.innerHTML = currentWordSearchWords.map(word => 
+                `<li id="word-item-${word}" class="${foundWords.includes(word) ? 'found-word' : ''}">${word.toUpperCase()}</li>`
+            ).join('');
+        }
+        
+        function isCellFound(r, c) {
+            // Verifica se a célula faz parte de alguma palavra encontrada
+            for (const word of foundWords) {
+                const upperWord = word.toUpperCase();
+                // Simplesmente para colorir se a letra está na grid e foi encontrada.
+                // Esta verificação é mais complexa em um app real. Aqui, simplificamos.
+                // O check real é feito em checkSelection.
+                
+                // Melhorias: Se a palavra foi encontrada, todas as suas células devem ter a classe 'found'.
+                // Como não armazenamos as coordenadas exatas das palavras encontradas, vamos simplificar:
+                
+                // Se o jogo está reiniciando e queremos mostrar as encontradas:
+                if (foundWords.includes(word) && currentWordSearchWords.includes(word)) {
+                     // Não é ideal, mas funciona: A célula deve ser marcada como 'found' durante a renderização.
+                     // A lógica de colorir é mais fácil de implementar via DOM após a seleção.
+                     // Vamos garantir que a classe 'found' só seja aplicada pela função checkSelection.
+                     return false; 
+                }
+            }
+            return false;
+        }
+
+        // --- LÓGICA DE DRAG AND DROP (TOUCH/MOUSE) ---
+        
+        function startDrag(e) {
+            e.preventDefault();
+            isDragging = true;
+            const target = e.type.startsWith('touch') ? document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY) : e.target;
+            
+            if (target && target.classList.contains('cell') && !target.classList.contains('found')) {
+                startCell = target;
+                highlightedCells = [startCell];
+                startCell.classList.add('highlighted');
             }
         }
 
-        /** Inicializa o jogo. */
-        function initGame() {
-            // Embaralha todas as perguntas (para o quiz pegar 10 aleatórias)
-            questionsVocabShuffled = shuffleArray([...vocabQuestions]);
-            questionsGrammarShuffled = shuffleArray([...grammarQuestions]);
-
-            startQuizBtn.addEventListener('click', () => {
-                showScreen('vocab-quiz-screen');
-                loadNextVocabQuestion();
-            });
-
-            nextGramBtn.addEventListener('click', () => {
-                showScreen('grammar-quiz-screen');
-                loadNextGrammarQuestion();
-            });
+        function drag(e) {
+            if (!isDragging || !startCell) return;
+            e.preventDefault(); 
             
-            nextFinalBtn.addEventListener('click', () => {
-                showScreen('end-screen');
-            });
+            let target;
+            if (e.type.startsWith('touch')) {
+                const touch = e.touches[0];
+                target = document.elementFromPoint(touch.clientX, touch.clientY);
+            } else {
+                target = e.target;
+            }
 
-            showScreen('start-screen');
+            if (target && target.classList.contains('cell') && !target.classList.contains('found')) {
+                const endCell = target;
+                updateHighlight(startCell, endCell);
+            }
+        }
+        
+        function endDrag(e) {
+            if (!isDragging || !startCell) return;
+            isDragging = false;
+            
+            // Verifica a palavra selecionada
+            const selection = highlightedCells.map(cell => cell.textContent).join('');
+            checkSelection(selection);
+
+            // Limpa o destaque, exceto se for uma palavra encontrada (handled by checkSelection)
+            setTimeout(() => {
+                highlightedCells.forEach(cell => cell.classList.remove('highlighted'));
+                startCell = null;
+                highlightedCells = [];
+            }, 300);
         }
 
-        // Inicia o jogo quando a página carrega
+        function updateHighlight(start, end) {
+            const sRow = parseInt(start.dataset.row);
+            const sCol = parseInt(start.dataset.col);
+            const eRow = parseInt(end.dataset.row);
+            const eCol = parseInt(end.dataset.col);
+            
+            const newCells = [];
+            
+            // Horizontal ou Vertical (ignora diagonais)
+            const isHorizontal = sRow === eRow;
+            const isVertical = sCol === eCol;
+            
+            if (isHorizontal) {
+                const minC = Math.min(sCol, eCol);
+                const maxC = Math.max(sCol, eCol);
+                for (let c = minC; c <= maxC; c++) {
+                    newCells.push(document.querySelector(`.cell[data-row="${sRow}"][data-col="${c}"]`));
+                }
+            } else if (isVertical) {
+                const minR = Math.min(sRow, eRow);
+                const maxR = Math.max(sRow, eRow);
+                for (let r = minR; r <= maxR; r++) {
+                    newCells.push(document.querySelector(`.cell[data-row="${r}"][data-col="${sCol}"]`));
+                }
+            }
+            
+            // Limpa o destaque anterior e aplica o novo
+            highlightedCells.forEach(cell => cell.classList.remove('highlighted'));
+            newCells.forEach(cell => cell.classList.add('highlighted'));
+            highlightedCells = newCells;
+        }
+
+        function checkSelection(selection) {
+            let found = false;
+            
+            // Verifica a palavra em ambas as direções (normal e inversa)
+            const reversedSelection = selection.split('').reverse().join('');
+            
+            currentWordSearchWords.forEach(word => {
+                const upperWord = word.toUpperCase();
+                if (selection === upperWord || reversedSelection === upperWord) {
+                    found = true;
+                    if (!foundWords.includes(word)) {
+                        foundWords.push(word);
+                        highlightedCells.forEach(cell => cell.classList.add('found'));
+                        document.getElementById(`word-item-${word}`).classList.add('found-word');
+                        searchFeedback.textContent = `Success! You found: ${word.toUpperCase()}! ✅`;
+                        
+                        if (foundWords.length % WORDS_PER_ROUND === 0) {
+                            setTimeout(showRoundSuccess, 1000);
+                        }
+                    }
+                }
+            });
+            
+            if (!found && selection.length > 1) {
+                searchFeedback.textContent = `Not a match. Keep searching! 🤔`;
+            }
+        }
+        
+        function showRoundSuccess() {
+            searchFeedback.textContent = `Round Complete! Found ${WORDS_PER_ROUND} words! Ready for the next challenge? 🏆`;
+            nextSearchBtn.style.display = 'block';
+        }
+        
+        function nextSearchRound() {
+            nextSearchBtn.style.display = 'none';
+            searchFeedback.textContent = '';
+            selectRandomWords();
+            generateWordSearchGrid();
+            renderWordSearch();
+        }
+
+        // --- INICIALIZAÇÃO ---
+
+        function initGame() {
+            // Configura os navegadores
+            navBtns.quiz.onclick = () => showScreen('quiz-screen');
+            navBtns.memory.onclick = () => showScreen('memory-game-screen');
+            navBtns.wordsearch.onclick = () => showScreen('word-search-screen');
+            
+            // Configura botões de Ação
+            startQuizBtn.onclick = startQuiz;
+            memorySetBtn.onclick = nextMemorySet;
+            startSearchBtn.onclick = startWordSearch;
+            nextSearchBtn.onclick = nextSearchRound;
+
+            // Inicializa Quiz (na primeira tela)
+            showScreen('quiz-screen');
+            // Inicializa Memory Game (Set 1)
+            setupMemoryGame(0); 
+        }
+
         document.addEventListener('DOMContentLoaded', initGame);
     </script>
 </body>
