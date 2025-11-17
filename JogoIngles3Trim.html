@@ -288,7 +288,7 @@
         const fullVocabulary = {
             'ear': '👂', 'head': '👤', 'neck': '👔', 'arm': '💪', 'hand': '🖐️', 'leg': '🦵', 'feet': '🦶', 'foot': '👣',
             'hair': '💇', 'eye': '👁️', 'nose': '👃', 'mouth': '👄', 'body': '🧍', 'run': '🏃', 'walk': '🚶', 'clap': '👏',
-            'sing': '🎤', 'jump': '⬆️', 'short': '🔽', 'big': '🐘', 'small': '🐜', 'strong': '🏋️', 'long': '📏', 'tall': '🦒',
+            'sing': '🎤', 'jump': '⬆️', 'short': '🔽', 'big': '🦒', 'small': '🐜', 'strong': '🏋️', 'long': '📏', 'tall': '🦒',
             'banana': '🍌', 'apple': '🍎', 'chicken': '🍗', 'cheese pizza': '🍕', 'lemonade': '🍋', 'milk': '🥛', 'water': '💧',
             'orange juice': '🍊', 'tea': '☕', 'drink': '🥤', 'eat': '🍽️', 'cookie': '🍪', 'fish': '🐟', 'egg': '🥚', 'orange': '🟠',
             'rice': '🍚', 'salad': '🥗', 'sandwich': '🥪', 'soup': '🥣', 'juice': '🧃', 'fruit': '🍇', 'grapes': '🍇',
@@ -496,7 +496,14 @@
         }
 
         function startQuizTimer() {
+            const q = allQuizQuestions[currentQuizIndex];
             let timeLeft = 7;
+             if (q.type === 'vocab') {
+                timeLeft = 7;
+            } else {
+                // Gramática
+                timeLeft = 15;
+            }
             timerSpan.textContent = `⏳ ${timeLeft}s`;
             isTimerRunning = true;
 
@@ -506,16 +513,16 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(quizTimer);
-                    isTimerRunning = false;
+                   // isTimerRunning = false;
                     quizFeedback.textContent = "Time's up! ⏱️ Keep going!";
-                    questionsQuizAsked++;
-                    setTimeout(loadNextQuizQuestion, 1500);
+                    //questionsQuizAsked++;
+                    //setTimeout(loadNextQuizQuestion, 1500);
                 }
             }, 1000);
         }
 
         function checkQuizAnswer(button, selected, correct) {
-            if (!isTimerRunning) return;
+            //if (!isTimerRunning) return;
 
             clearInterval(quizTimer);
             isTimerRunning = false;
@@ -776,7 +783,7 @@
             
             // Renderiza a lista de palavras
             wordListUl.innerHTML = currentWordSearchWords.map(word => 
-                `<li id="word-item-${word.toUpperCase()}" class="${foundWords.includes(word.toUpperCase()) ? 'found-word' : ''}">${word.toUpperCase()}</li>`
+                `<li id="word-item-${word.toUpperCase()}" class="${foundWords.includes(word.toUpperCase()) ? 'found-word' : ''}"><h3 id="quiz-icon">${fullVocabulary[word]}</h3></li>`
             ).join('');
         }
         
