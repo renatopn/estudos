@@ -165,7 +165,7 @@
         .memory-card.matched {
             border-color: #00cc00;
             pointer-events: none;
-            opacity: 0.7;
+            opacity: 1; /* Garantindo visibilidade total */
         }
 
         /* Contador regressivo */
@@ -202,6 +202,7 @@
 
         <div id="memory-game-screen" class="screen">
             <h2>Memory Training: Match the Words! 🧠</h2>
+            <p style="color: #00cc00;">*Dica: As cartas corretas permanecem abertas para conferência.*</p>
             <div id="memory-board" class="memory-grid">
                 </div>
             <p id="memory-feedback" class="feedback-message"></p>
@@ -606,16 +607,24 @@
         function checkForMatch() {
             let isMatch = firstCard.dataset.matchId === secondCard.dataset.matchId;
 
-            isMatch ? disableCards() : unflipCards();
+            if (isMatch) {
+                disableCards();
+            } else {
+                unflipCards(); // Mantém a lógica de desvirar se for diferente
+            }
         }
 
         /** Desabilita as cartas que formaram um par. */
         function disableCards() {
+            // Remove os event listeners, mas MANTÉM o estado 'flipped'
             firstCard.removeEventListener('click', flipCard);
             secondCard.removeEventListener('click', flipCard);
             
+            // Adiciona a classe matched (para estilo e ponteiro)
             firstCard.classList.add('matched');
             secondCard.classList.add('matched');
+            
+            document.getElementById('memory-feedback').textContent = 'Match! Keep it open! ✅';
 
             resetBoard();
             matchesFound++;
