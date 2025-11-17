@@ -34,6 +34,7 @@
         .navbar {
             background-color: #333;
             width: 100%;
+            max-width: 700px;
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
@@ -254,6 +255,7 @@
         <div id="memory-game-screen" class="screen">
             <h2>Memory Training 🧠</h2>
             <p id="memory-current-set" style="color: #0099ff;">Set 1: Body Parts</p>
+            <p style="color: #00cc00; font-size: 0.9em;">*Dica: As cartas corretas permanecem abertas para conferência.*</p>
             <div id="memory-board" class="memory-grid"></div>
             <p id="memory-feedback" class="feedback-message"></p>
             <button id="memory-set-btn" data-set="1">Next Set (Set 2) ➡️</button>
@@ -297,9 +299,6 @@
             'talking': '🗣️', 'doing': '🛠️', 'crawling': '👶', 'swimming': '🏊', 'flying': '✈️', 'jumping': '🤸'
         };
 
-        const conjunctions = ['his', 'her', 'your', 'is', 'are', 'a', 'an', 'can’t', 'aren’t', 'they’re', 'don’t', 'doesn’t', 'what’s'];
-        const adjectives = ['short', 'big', 'small', 'strong', 'long', 'tall'];
-
         // --- QUIZ DATA (Perguntas de Vocabulário e Gramática abrangentes) ---
 
         // 1. VOCABULÁRIO (Uma pergunta para cada item principal do vocabulário)
@@ -311,7 +310,7 @@
             return {
                 type: 'vocab',
                 icon: icon,
-                question: 'What is this word?',
+                question: `What is the English word for this: ${icon}?`,
                 correct: word,
                 options: [...incorrectOptions, word]
             };
@@ -320,7 +319,7 @@
         // 2. GRAMÁTICA (Uma pergunta para cada estrutura gramatical solicitada)
         const grammarQuestions = [
             // is / are
-            { type: 'gram', question: "My dog **___** small. My cats **___** strong. (is / are)", correct: 'is', options: ['is', 'are', 'am', 'can'], context: "Choose the verb for the first sentence." },
+            { type: 'gram', question: "My dog **___** small. My cats **___** strong. (is / are)", correct: 'is', options: ['is', 'are', 'am', 'can'], context: "Choose the verb for the first sentence ('My dog')." },
             // a / an
             { type: 'gram', question: "I see **___** boy and **___** elephant. (a / an)", correct: 'a', options: ['a', 'an', 'the', 'is'], context: "Choose the article for the first word 'boy'." },
             // his / her / your
@@ -330,12 +329,9 @@
             // has / have
             { type: 'gram', question: "I **___** a big nose. She **___** long hair. (have / has)", correct: 'have', options: ['have', 'has', 'is', 'are'], context: "Choose the verb for the first sentence ('I')." },
             // My/Your/His/Her is/are
-            { type: 'gram', question: "Complete: **His** **legs** **are** **long**.", correct: 'long', options: ['long', 'run', 'apple', 'mouth'], context: "His legs are (adjective)." },
+            { type: 'gram', question: "Complete: **His** **legs** **are** **___**.", correct: 'long', options: ['long', 'run', 'apple', 'mouth'], context: "His legs are (adjective)." },
             // What is this? / It's your...
-            { type: 'gram', question: "Answer the question: What is this? 
-
-[Image of ear]
-", correct: "It's your ear.", options: ["It's your ear.", "Yes, it is.", "He is eating.", "No, it isn't."], context: "The object is an ear." },
+            { type: 'gram', question: "Answer the question: What is this? (Referring to the ear icon: 👂)", correct: "It's your ear.", options: ["It's your ear.", "Yes, it is.", "He is eating.", "No, it isn't."], context: "The object is an ear." },
             // What are they doing?
             { type: 'gram', question: "The children are **jumping**. Answer the question: What are they doing?", correct: "They are jumping.", options: ["They are jumping.", "He is jumping.", "It is jumping.", "I am jumping."], context: "Refer to 'they' and the action 'jumping'." },
             // Do you want...? / Yes, please.
@@ -358,7 +354,7 @@
                 { icon: '👁️', word: 'eye' }, { icon: '👃', word: 'nose' }, { icon: '👄', word: 'mouth' }, { icon: '💇', word: 'hair' }
             ]},
             { name: "Set 2: Food & Drinks", pairs: [
-                { icon: '🍌', word: 'banana' }, { icon: '🍎', word: 'apple' }, { icon: '🍕', word: 'cheese pizza' }, { icon: '🥛', word: 'milk' },
+                { icon: '🍌', word: 'banana' }, { icon: '🍎', word: 'apple' }, { icon: '🍕', word: 'pizza' }, { icon: '🥛', word: 'milk' },
                 { icon: '💧', word: 'water' }, { icon: '☕', word: 'tea' }, { icon: '🥪', word: 'sandwich' }, { icon: '🥗', word: 'salad' }
             ]},
             { name: "Set 3: Animals & Actions", pairs: [
@@ -430,7 +426,7 @@
             if (id.includes('quiz')) navBtns.quiz.classList.add('active');
             else if (id.includes('memory')) navBtns.memory.classList.add('active');
             else if (id.includes('search')) navBtns.wordsearch.classList.add('active');
-            else if (id.includes('end')) navBtns.quiz.classList.add('active'); // Mantém o Quiz ativo após o fim
+            else if (id.includes('end')) navBtns.quiz.classList.add('active'); 
         }
 
         function shuffleArray(array) {
@@ -464,6 +460,7 @@
             if (questionsQuizAsked >= 10) {
                 showScreen('end-screen');
                 document.getElementById('final-message').textContent = `Mission Complete! Your final score is ${quizScore}/10! ⭐`;
+                startQuizBtn.style.display = 'block'; // Mostra botão para reiniciar ao voltar
                 return;
             }
 
@@ -482,6 +479,9 @@
                 }
             }
             
+            // Garantir que o índice avance para a próxima pergunta
+            currentQuizIndex = (currentQuizIndex + 1) % allQuizQuestions.length;
+            
             const shuffledOptions = shuffleArray([...q.options]);
 
             shuffledOptions.forEach(option => {
@@ -492,7 +492,6 @@
                 quizOptionsDiv.appendChild(button);
             });
 
-            currentQuizIndex++;
             startQuizTimer();
         }
 
@@ -583,11 +582,21 @@
                 card.addEventListener('click', flipCard);
                 memoryBoard.appendChild(card);
             });
+            
+            // Define o texto do botão
+            let nextSetIndex = (currentMemorySetIndex + 1) % memorySets.length;
+            if (nextSetIndex === 0) {
+                 memorySetBtn.textContent = 'Restart Memory Games (Set 1) 🔄';
+            } else {
+                 memorySetBtn.textContent = `Next Set (Set ${nextSetIndex + 1}) ➡️`;
+            }
+            memorySetBtn.style.display = 'none';
         }
 
         function flipCard() {
             if (lockBoard) return;
             if (this === firstCard) return;
+            if (this.classList.contains('matched')) return; // Evita clicar em cartas já encontradas
 
             this.classList.add('flipped');
 
@@ -650,14 +659,6 @@
             currentMemorySetIndex = (currentMemorySetIndex + 1) % memorySets.length;
             setupMemoryGame(currentMemorySetIndex);
             memorySetBtn.dataset.set = currentMemorySetIndex + 1;
-            
-            let nextSetIndex = (currentMemorySetIndex + 1) % memorySets.length;
-            if (nextSetIndex === 0) {
-                 memorySetBtn.textContent = 'Restart Memory Games (Set 1) 🔄';
-            } else {
-                 memorySetBtn.textContent = `Next Set (Set ${nextSetIndex + 1}) ➡️`;
-            }
-            memorySetBtn.style.display = 'none';
         }
 
         // --- LÓGICA DO WORD SEARCH (CAÇA-PALAVRAS) ---
@@ -666,21 +667,23 @@
             startSearchBtn.style.display = 'none';
             nextSearchBtn.style.display = 'none';
             foundWords = [];
-            selectRandomWords();
-            generateWordSearchGrid();
-            renderWordSearch();
+            nextSearchRound(); // Inicia a primeira rodada
         }
 
         function selectRandomWords() {
-            // Garante que há palavras suficientes
-            const remainingWords = searchableWords.filter(w => !foundWords.includes(w));
+            // Palavras já encontradas
+            const alreadyFound = foundWords.map(w => w.toUpperCase());
+            // Palavras restantes no vocabulário que têm 3-8 letras e ainda não foram encontradas nesta sessão.
+            const remainingWords = searchableWords.filter(w => !alreadyFound.includes(w.toUpperCase()));
+            
             if (remainingWords.length === 0) {
-                searchFeedback.textContent = 'All possible words found! Restarting...';
-                foundWords = [];
-                currentWordSearchWords = shuffleArray(searchableWords).slice(0, WORDS_PER_ROUND);
-            } else {
-                currentWordSearchWords = shuffleArray(remainingWords).slice(0, WORDS_PER_ROUND);
+                searchFeedback.textContent = 'All possible words found! Restarting word list...';
+                // Reinicia a lista de palavras encontradas para recomeçar o ciclo de busca
+                foundWords = []; 
+                return shuffleArray(searchableWords).slice(0, WORDS_PER_ROUND);
             }
+            
+            return shuffleArray(remainingWords).slice(0, WORDS_PER_ROUND);
         }
         
         function generateWordSearchGrid() {
@@ -690,10 +693,12 @@
             currentWordSearchWords.forEach(word => {
                 let placed = false;
                 let attempts = 0;
+                const upperWord = word.toUpperCase();
+                
                 while (!placed && attempts < 50) {
                     attempts++;
                     const direction = Math.random() < 0.5 ? 'horizontal' : 'vertical';
-                    const length = word.length;
+                    const length = upperWord.length;
 
                     let startRow, startCol;
                     
@@ -711,7 +716,7 @@
                         let r = startRow + (direction === 'vertical' ? i : 0);
                         let c = startCol + (direction === 'horizontal' ? i : 0);
 
-                        if (wordSearchGrid[r][c] !== '' && wordSearchGrid[r][c] !== word[i]) {
+                        if (wordSearchGrid[r][c] !== '' && wordSearchGrid[r][c] !== upperWord[i]) {
                             canPlace = false;
                             break;
                         }
@@ -721,7 +726,7 @@
                         for (let i = 0; i < length; i++) {
                             let r = startRow + (direction === 'vertical' ? i : 0);
                             let c = startCol + (direction === 'horizontal' ? i : 0);
-                            wordSearchGrid[r][c] = word[i].toUpperCase();
+                            wordSearchGrid[r][c] = upperWord[i];
                         }
                         placed = true;
                     }
@@ -742,6 +747,7 @@
         function renderWordSearch() {
             wordSearchGridDiv.innerHTML = '';
             wordSearchGridDiv.style.gridTemplateColumns = `repeat(${MAX_GRID_SIZE}, 1fr)`;
+            searchFeedback.textContent = ''; // Limpa feedback
 
             const size = MAX_GRID_SIZE;
             for (let r = 0; r < size; r++) {
@@ -760,6 +766,7 @@
                     cell.addEventListener('touchmove', drag, { passive: false });
                     cell.addEventListener('touchend', endDrag);
 
+                    // Aplica a classe 'found' se a célula fizer parte de uma palavra encontrada
                     if (isCellFound(r, c)) {
                          cell.classList.add('found');
                     }
@@ -769,29 +776,19 @@
             
             // Renderiza a lista de palavras
             wordListUl.innerHTML = currentWordSearchWords.map(word => 
-                `<li id="word-item-${word}" class="${foundWords.includes(word) ? 'found-word' : ''}">${word.toUpperCase()}</li>`
+                `<li id="word-item-${word.toUpperCase()}" class="${foundWords.includes(word.toUpperCase()) ? 'found-word' : ''}">${word.toUpperCase()}</li>`
             ).join('');
         }
         
         function isCellFound(r, c) {
-            // Verifica se a célula faz parte de alguma palavra encontrada
-            for (const word of foundWords) {
-                const upperWord = word.toUpperCase();
-                // Simplesmente para colorir se a letra está na grid e foi encontrada.
-                // Esta verificação é mais complexa em um app real. Aqui, simplificamos.
-                // O check real é feito em checkSelection.
-                
-                // Melhorias: Se a palavra foi encontrada, todas as suas células devem ter a classe 'found'.
-                // Como não armazenamos as coordenadas exatas das palavras encontradas, vamos simplificar:
-                
-                // Se o jogo está reiniciando e queremos mostrar as encontradas:
-                if (foundWords.includes(word) && currentWordSearchWords.includes(word)) {
-                     // Não é ideal, mas funciona: A célula deve ser marcada como 'found' durante a renderização.
-                     // A lógica de colorir é mais fácil de implementar via DOM após a seleção.
-                     // Vamos garantir que a classe 'found' só seja aplicada pela função checkSelection.
-                     return false; 
-                }
-            }
+            // Se a célula já foi marcada como parte de uma palavra encontrada nesta rodada, ela deve ser renderizada como 'found'.
+            // Para isso, precisaríamos de uma matriz de células encontradas, mas vamos simplificar a verificação no DOM após a seleção.
+            // Para rodadas futuras, a lista 'foundWords' armazena o que foi encontrado globalmente.
+            
+            // Simplesmente checa se a palavra já foi marcada como encontrada. 
+            // A coloração persistente entre rodadas é tratada em `renderWordSearch` e `checkSelection`.
+            // Não é necessário implementar a lógica de coordenadas aqui, pois `checkSelection` aplica a classe ao DOM.
+            
             return false;
         }
 
@@ -799,10 +796,21 @@
         
         function startDrag(e) {
             e.preventDefault();
-            isDragging = true;
-            const target = e.type.startsWith('touch') ? document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY) : e.target;
             
+            // Determina o elemento que iniciou o arrasto (touch ou mouse)
+            let target;
+            if (e.type.startsWith('touch')) {
+                // Use document.elementFromPoint para touch, pois e.target pode ser um elemento intermediário
+                target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+            } else {
+                target = e.target;
+            }
+
             if (target && target.classList.contains('cell') && !target.classList.contains('found')) {
+                isDragging = true;
+                // Limpa o destaque anterior
+                highlightedCells.forEach(cell => cell.classList.remove('highlighted'));
+                
                 startCell = target;
                 highlightedCells = [startCell];
                 startCell.classList.add('highlighted');
@@ -831,13 +839,19 @@
             if (!isDragging || !startCell) return;
             isDragging = false;
             
-            // Verifica a palavra selecionada
-            const selection = highlightedCells.map(cell => cell.textContent).join('');
-            checkSelection(selection);
-
-            // Limpa o destaque, exceto se for uma palavra encontrada (handled by checkSelection)
+            if (highlightedCells.length > 0) {
+                // Monta a palavra selecionada (ordem: da célula inicial para a célula final)
+                const selection = highlightedCells.map(cell => cell.textContent).join('');
+                checkSelection(selection);
+            }
+            
+            // Limpa o destaque, exceto se a palavra for encontrada (handled by checkSelection)
             setTimeout(() => {
-                highlightedCells.forEach(cell => cell.classList.remove('highlighted'));
+                highlightedCells.forEach(cell => {
+                    if (!cell.classList.contains('found')) {
+                        cell.classList.remove('highlighted');
+                    }
+                });
                 startCell = null;
                 highlightedCells = [];
             }, 300);
@@ -855,63 +869,72 @@
             const isHorizontal = sRow === eRow;
             const isVertical = sCol === eCol;
             
-            if (isHorizontal) {
-                const minC = Math.min(sCol, eCol);
-                const maxC = Math.max(sCol, eCol);
-                for (let c = minC; c <= maxC; c++) {
+            if (isHorizontal && sCol !== eCol) {
+                // Ordem correta para a seleção
+                const step = sCol < eCol ? 1 : -1;
+                for (let c = sCol; c !== eCol + step; c += step) {
                     newCells.push(document.querySelector(`.cell[data-row="${sRow}"][data-col="${c}"]`));
                 }
-            } else if (isVertical) {
-                const minR = Math.min(sRow, eRow);
-                const maxR = Math.max(sRow, eRow);
-                for (let r = minR; r <= maxR; r++) {
+            } else if (isVertical && sRow !== eRow) {
+                // Ordem correta para a seleção
+                const step = sRow < eRow ? 1 : -1;
+                for (let r = sRow; r !== eRow + step; r += step) {
                     newCells.push(document.querySelector(`.cell[data-row="${r}"][data-col="${sCol}"]`));
                 }
+            } else if (start === end) {
+                // Seleção de uma única célula
+                newCells.push(start);
             }
             
             // Limpa o destaque anterior e aplica o novo
-            highlightedCells.forEach(cell => cell.classList.remove('highlighted'));
+            document.querySelectorAll('.cell.highlighted').forEach(cell => cell.classList.remove('highlighted'));
             newCells.forEach(cell => cell.classList.add('highlighted'));
             highlightedCells = newCells;
         }
 
         function checkSelection(selection) {
+            if (selection.length < 3) return; // Palavras muito curtas
+            
             let found = false;
             
-            // Verifica a palavra em ambas as direções (normal e inversa)
-            const reversedSelection = selection.split('').reverse().join('');
+            // Verifica a palavra normal e inversa
+            const selectionUpper = selection.toUpperCase();
+            const reversedSelectionUpper = selectionUpper.split('').reverse().join('');
             
             currentWordSearchWords.forEach(word => {
                 const upperWord = word.toUpperCase();
-                if (selection === upperWord || reversedSelection === upperWord) {
+                
+                if (selectionUpper === upperWord || reversedSelectionUpper === upperWord) {
                     found = true;
-                    if (!foundWords.includes(word)) {
-                        foundWords.push(word);
+                    if (!foundWords.includes(upperWord)) {
+                        foundWords.push(upperWord);
                         highlightedCells.forEach(cell => cell.classList.add('found'));
-                        document.getElementById(`word-item-${word}`).classList.add('found-word');
-                        searchFeedback.textContent = `Success! You found: ${word.toUpperCase()}! ✅`;
+                        document.getElementById(`word-item-${upperWord}`).classList.add('found-word');
+                        searchFeedback.textContent = `Success! You found: ${upperWord}! ✅`;
                         
-                        if (foundWords.length % WORDS_PER_ROUND === 0) {
+                        if (currentWordSearchWords.every(w => foundWords.includes(w.toUpperCase()))) {
                             setTimeout(showRoundSuccess, 1000);
                         }
+                    } else {
+                        searchFeedback.textContent = `You already found: ${upperWord}!`;
                     }
                 }
             });
             
-            if (!found && selection.length > 1) {
+            if (!found) {
                 searchFeedback.textContent = `Not a match. Keep searching! 🤔`;
             }
         }
         
         function showRoundSuccess() {
-            searchFeedback.textContent = `Round Complete! Found ${WORDS_PER_ROUND} words! Ready for the next challenge? 🏆`;
+            // A palavra "foundWords.length" não é útil aqui, pois o contador pode ter reiniciado
+            searchFeedback.textContent = `Round Complete! You found all ${WORDS_PER_ROUND} words in this puzzle! 🏆`;
             nextSearchBtn.style.display = 'block';
         }
         
         function nextSearchRound() {
             nextSearchBtn.style.display = 'none';
-            searchFeedback.textContent = '';
-            selectRandomWords();
+            currentWordSearchWords = selectRandomWords();
             generateWordSearchGrid();
             renderWordSearch();
         }
@@ -934,6 +957,12 @@
             showScreen('quiz-screen');
             // Inicializa Memory Game (Set 1)
             setupMemoryGame(0); 
+            
+            // Pré-renderiza a grid do Caça-Palavras com palavras aleatórias
+            currentWordSearchWords = shuffleArray(searchableWords).slice(0, WORDS_PER_ROUND);
+            generateWordSearchGrid();
+            renderWordSearch();
+            searchFeedback.textContent = 'Ready to start!';
         }
 
         document.addEventListener('DOMContentLoaded', initGame);
