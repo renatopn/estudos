@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iron Man English Quiz</title>
+    <style>
+        :root {
+            --stark-red: #950101;
+            --stark-gold: #FFD700;
+            --stark-dark: #1a1a1a;
+            --stark-blue: #00d4ff;
+        }
+
+        body {
+            background-color: var(--stark-dark);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #game-container {
+            background: linear-gradient(145deg, var(--stark-red), #5e0000);
+            border: 4px solid var(--stark-gold);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 25px var(--stark-blue);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        h1 {
+            color: var(--stark-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0;
+            text-shadow: 2px 2px black;
+        }
+
+        #score-board {
+            font-weight: bold;
+            color: var(--stark-blue);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        #display-area {
+            font-size: 80px;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .question {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            border-radius: 5px;
+            border: 2px solid var(--stark-gold);
+            width: 80%;
+            font-size: 1.1rem;
+            outline: none;
+            text-align: center;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background-color: var(--stark-gold);
+            color: var(--stark-red);
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: white;
+            box-shadow: 0 0 10px var(--stark-blue);
+        }
+
+        #feedback {
+            margin-top: 20px;
+            min-height: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .correct { color: #00ff00; }
+        .wrong { color: #ffeb00; }
+        
+        #arc-reactor {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--stark-blue);
+            box-shadow: 0 0 20px var(--stark-blue);
+            margin: 10px auto;
+            border: 5px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="arc-reactor"></div>
+        <h1>Stark Academy</h1>
+        <div id="score-board">Score: <span id="score">0</span></div>
+        
+        <div id="display-area">🚀</div>
+        
+        <div class="question">What is this?</div>
+        
+        <input type="text" id="answer-input" placeholder="Type here..." autocomplete="off">
+        <br>
+        <button onclick="checkAnswer()">Submit</button>
+
+        <div id="feedback"></div>
+    </div>
+
+    <script>
+        const vocabulary = [
+            // Unit 1
+            { word: "reading", icon: "📖" },
+            { word: "writing", icon: "✍️" },
+            { word: "counting", icon: "🔢" },
+            { word: "drawing", icon: "🎨" },
+            { word: "coloring", icon: "🖍️" },
+            { word: "cutting", icon: "✂️" },
+            { word: "gluing", icon: "🧴" },
+            { word: "listening", icon: "🎧" },
+            { word: "notebook", icon: "📓" },
+            { word: "marker", icon: "🖊️" },
+            { word: "paintbrush", icon: "🖌️" },
+            { word: "scissors", icon: "✂️" },
+            { word: "glue", icon: "🧪" },
+            { word: "crayons", icon: "🖍️" },
+            // Unit 2
+            { word: "sunny", icon: "☀️" },
+            { word: "rainy", icon: "🌧️" },
+            { word: "cloudy", icon: "☁️" },
+            { word: "windy", icon: "💨" },
+            { word: "snowy", icon: "❄️" },
+            { word: "hot", icon: "🔥" },
+            { word: "cold", icon: "🥶" },
+            { word: "raincoat", icon: "🧥" },
+            { word: "boots", icon: "👢" },
+            { word: "sweater", icon: "🧶" },
+            { word: "coat", icon: "🧥" },
+            { word: "sneakers", icon: "👟" },
+            { word: "shorts", icon: "🩳" },
+            { word: "bathing suit", icon: "🩱" },
+            // Unit 3
+            { word: "basketball", icon: "🏀" },
+            { word: "soccer", icon: "⚽" },
+            { word: "bike", icon: "🚲" },
+            { word: "skateboard", icon: "🛹" },
+            { word: "fkite", icon: "🪁" },
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+
+        const congrats = ["Excellent, Avenger!", "Stark is proud!", "Jarvis: Correct!", "Perfect hit!", "Target neutralized!"];
+        const encourage = ["Don't give up, hero!", "Recalibrating...", "Next time you'll get it!", "Armor needs a fix!"];
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        const gameVocab = shuffle([...vocabulary]);
+
+        function loadQuestion() {
+            document.getElementById('feedback').innerHTML = "";
+            document.getElementById('answer-input').value = "";
+            document.getElementById('answer-input').disabled = false;
+            
+            const current = gameVocab[currentIndex];
+            document.getElementById('display-area').innerText = current.icon;
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('answer-input').value.toLowerCase().trim();
+            const correctWord = gameVocab[currentIndex].word.toLowerCase();
+            const feedbackEl = document.getElementById('feedback');
+            const inputEl = document.getElementById('answer-input');
+
+            inputEl.disabled = true;
+
+            if (input === correctWord) {
+                score += 10;
+                document.getElementById('score').innerText = score;
+                feedbackEl.innerHTML = `<span class="correct">${congrats[Math.floor(Math.random() * congrats.length)]}</span>`;
+                
+                setTimeout(() => {
+                    nextQuestion();
+                }, 1500);
+            } else {
+                feedbackEl.innerHTML = `<span class="wrong">${encourage[Math.floor(Math.random() * encourage.length)]}<br>Correct answer: ${correctWord}</span>`;
+                
+                setTimeout(() => {
+                    nextQuestion();
+                }, 4000);
+            }
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < gameVocab.length) {
+                loadQuestion();
+            } else {
+                document.getElementById('game-container').innerHTML = `<h1>Mission Accomplished!</h1><p>Final Score: ${score}</p><button onclick="location.reload()">Restart</button>`;
+            }
+        }
+
+        // Permitir usar a tecla Enter
+        document.getElementById('answer-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        loadQuestion();
+    </script>
+</body>
+</html>
