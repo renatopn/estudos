@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -56,67 +56,79 @@
             border: 2px solid #000;
             font-size: 40px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            animation: spin 10s linear infinite;
         }
 
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
         .word-display {
-            font-size: 32px;
+            font-size: 35px;
             font-weight: bold;
             margin: 20px 0;
-            padding: 15px;
+            padding: 20px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            border-bottom: 3px solid var(--cap-red);
+            border-bottom: 4px solid var(--cap-red);
+            letter-spacing: 3px;
         }
 
         input[type="text"] {
             width: 80%;
-            padding: 12px;
-            font-size: 20px;
-            border-radius: 5px;
-            border: none;
+            padding: 15px;
+            font-size: 22px;
+            border-radius: 8px;
+            border: 3px solid var(--cap-silver);
             margin-bottom: 20px;
             text-align: center;
             text-transform: lowercase;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--cap-red);
         }
 
         button {
             background-color: var(--cap-red);
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 15px 30px;
             font-size: 18px;
             font-weight: bold;
             border-radius: 5px;
             cursor: pointer;
-            transition: transform 0.2s, background-color 0.2s;
+            transition: all 0.3s;
             text-transform: uppercase;
+            box-shadow: 0 4px #800000;
         }
 
-        button:hover {
-            background-color: #ff0000;
-            transform: scale(1.05);
+        button:active {
+            box-shadow: 0 0 #800000;
+            transform: translateY(4px);
         }
 
         #feedback {
-            margin-top: 20px;
-            font-size: 18px;
-            min-height: 50px;
+            margin-top: 25px;
+            font-size: 20px;
+            min-height: 60px;
             font-weight: bold;
+            padding: 10px;
         }
 
-        .correct { color: #4CAF50; }
-        .wrong { color: #ffcccc; }
+        .correct { color: #4CAF50; text-shadow: 1px 1px #000; }
+        .wrong { color: #ff6666; text-shadow: 1px 1px #000; }
 
         .stats {
             margin-top: 20px;
-            font-size: 14px;
+            font-size: 16px;
             color: var(--cap-silver);
+            font-weight: bold;
         }
 
         .instruction {
-            font-size: 14px;
-            margin-bottom: 10px;
-            font-style: italic;
+            font-size: 15px;
+            margin-bottom: 15px;
+            color: #ddd;
         }
     </style>
 </head>
@@ -125,26 +137,24 @@
 <div id="game-container">
     <div class="shield">⭐</div>
     <h1>Missão Silábica</h1>
-    <p>Capitão, ajude a separar as palavras corretamente!</p>
-    <p class="instruction">Use hífen (-) para separar. Ex: he-rói</p>
+    <p>Capitão, mostre que você domina as sílabas!</p>
+    <p class="instruction">Use o hífen (<b>-</b>) para separar. Exemplo: <b>he-rói</b></p>
 
-    <div class="word-display" id="current-word">CARREGANDO...</div>
+    <div class="word-display" id="current-word">INICIANDO...</div>
     
-    <input type="text" id="user-input" placeholder="Separe aqui..." autocomplete="off">
+    <input type="text" id="user-input" placeholder="Digite aqui..." autocomplete="off">
     <br>
     <button onclick="checkAnswer()">Lançar Escudo!</button>
 
     <div id="feedback"></div>
 
     <div class="stats">
-        Progresso: <span id="progress">0</span> / 30
+        Progresso da Missão: <span id="progress">0</span> de 30
     </div>
 </div>
 
 <script>
-    // Lista de 30 palavras (Hiatos, Ditongos e Tritongos)
-    const wordList = [
-        // Ditongos
+    const originalWordList = [
         { word: "herói", answer: "he-rói" },
         { word: "caixa", answer: "cai-xa" },
         { word: "peixe", answer: "pei-xe" },
@@ -155,8 +165,6 @@
         { word: "muito", answer: "mui-to" },
         { word: "glória", answer: "gló-ria" },
         { word: "história", answer: "his-tó-ria" },
-        
-        // Hiatos
         { word: "saúde", answer: "sa-ú-de" },
         { word: "poeta", answer: "po-e-ta" },
         { word: "moeda", answer: "mo-e-da" },
@@ -167,8 +175,6 @@
         { word: "rainha", answer: "ra-i-nha" },
         { word: "baú", answer: "ba-ú" },
         { word: "piada", answer: "pi-a-da" },
-
-        // Tritongos
         { word: "paraguai", answer: "pa-ra-guai" },
         { word: "uruguai", answer: "u-ru-guai" },
         { word: "quaisquer", answer: "quais-quer" },
@@ -181,22 +187,37 @@
         { word: "enxaguou", answer: "en-xa-guou" }
     ];
 
+    // Função para embaralhar a lista (Algoritmo de Fisher-Yates)
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex != 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    // Embaralha a lista no início
+    let wordList = shuffle([...originalWordList]);
     let currentIndex = 0;
 
     const positiveFeedback = [
-        "Excelente, Vingador! Você acertou!",
+        "Avante, Vingador! Acerto perfeito!",
         "O Capitão América está orgulhoso!",
         "Precisão de herói! Continue assim!",
-        "Fantástico! Sua mente é um escudo impenetrável!",
-        "Isso aí! Você dominou essa palavra!"
+        "Fantástico! Sua mente é um escudo forte!",
+        "Isso aí! Você dominou essa palavra!",
+        "Missão cumprida com sucesso nessa palavra!"
     ];
 
     const retryFeedback = [
-        "Não desista, recrutar! Tente novamente.",
-        "Um herói nunca desiste. Vamos tentar de novo!",
-        "Quase lá! Lembre-se: hiatos se separam, ditongos ficam juntos!",
+        "Não desista, recruta! Tente novamente.",
+        "Um herói nunca desiste. Tente de novo!",
+        "Quase lá! Lembre-se: Hiatos se separam, Ditongos ficam juntos!",
         "Ajuste sua mira! Tente separar essa palavra outra vez.",
-        "Persistência é a chave! Tente mais uma vez."
+        "Persistência é a chave! Vamos tentar mais uma vez?",
+        "O escudo falhou, mas você pode tentar novamente!"
     ];
 
     function loadWord() {
@@ -205,13 +226,14 @@
             document.getElementById('user-input').value = '';
             document.getElementById('feedback').innerText = '';
             document.getElementById('progress').innerText = currentIndex;
+            document.getElementById('user-input').focus();
         } else {
             document.getElementById('game-container').innerHTML = `
                 <div class="shield">⭐</div>
                 <h1>Missão Cumprida!</h1>
-                <p style="font-size: 20px;">Você completou o treinamento, Capitão!</p>
-                <p>Você dominou Hiatos, Ditongos e Tritongos.</p>
-                <button onclick="location.reload()">Reiniciar Missão</button>
+                <p style="font-size: 20px;">Parabéns, Capitão! Todas as palavras foram vencidas!</p>
+                <p>Você é agora um mestre em Hiatos, Ditongos e Tritongos.</p>
+                <button onclick="location.reload()">Reiniciar Treinamento</button>
             `;
         }
     }
@@ -223,25 +245,24 @@
 
         if (userInput === correctAnswer) {
             const randomPositive = positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)];
-            feedbackEl.innerHTML = `<span class="correct">${randomPositive}</span>`;
+            feedbackEl.innerHTML = `<span class="correct">✔️ ${randomPositive}</span>`;
             currentIndex++;
-            setTimeout(loadWord, 1500);
+            setTimeout(loadWord, 1800);
         } else {
             const randomRetry = retryFeedback[Math.floor(Math.random() * retryFeedback.length)];
-            feedbackEl.innerHTML = `<span class="wrong">${randomRetry}</span>`;
+            feedbackEl.innerHTML = `<span class="wrong">❌ ${randomRetry}</span>`;
             document.getElementById('user-input').select();
         }
     }
 
-    // Permitir apertar Enter para enviar
     document.getElementById('user-input').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
             checkAnswer();
         }
     });
 
-    // Iniciar o jogo
-    loadWord();
+    // Inicia o jogo
+    window.onload = loadWord;
 </script>
 
 </body>
