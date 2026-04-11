@@ -1,0 +1,248 @@
+
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missão Silábica: Capitão América</title>
+    <style>
+        :root {
+            --cap-blue: #003366;
+            --cap-red: #cc0000;
+            --cap-white: #ffffff;
+            --cap-silver: #c0c0c0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0a0a0a;
+            color: var(--cap-white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        #game-container {
+            background: linear-gradient(135deg, var(--cap-blue), #001a33);
+            border: 5px solid var(--cap-silver);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 51, 102, 0.8);
+            position: relative;
+        }
+
+        h1 {
+            color: var(--cap-white);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px var(--cap-red);
+            margin-bottom: 10px;
+        }
+
+        .shield {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #fff 10%, var(--cap-red) 11%, var(--cap-red) 30%, var(--cap-white) 31%, var(--cap-white) 50%, var(--cap-red) 51%, var(--cap-red) 70%, var(--cap-blue) 71%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #000;
+            font-size: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .word-display {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-bottom: 3px solid var(--cap-red);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 12px;
+            font-size: 20px;
+            border-radius: 5px;
+            border: none;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: lowercase;
+        }
+
+        button {
+            background-color: var(--cap-red);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background-color: #ff0000;
+            transform: scale(1.05);
+        }
+
+        #feedback {
+            margin-top: 20px;
+            font-size: 18px;
+            min-height: 50px;
+            font-weight: bold;
+        }
+
+        .correct { color: #4CAF50; }
+        .wrong { color: #ffcccc; }
+
+        .stats {
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--cap-silver);
+        }
+
+        .instruction {
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="shield">⭐</div>
+    <h1>Missão Silábica</h1>
+    <p>Capitão, ajude a separar as palavras corretamente!</p>
+    <p class="instruction">Use hífen (-) para separar. Ex: he-rói</p>
+
+    <div class="word-display" id="current-word">CARREGANDO...</div>
+    
+    <input type="text" id="user-input" placeholder="Separe aqui..." autocomplete="off">
+    <br>
+    <button onclick="checkAnswer()">Lançar Escudo!</button>
+
+    <div id="feedback"></div>
+
+    <div class="stats">
+        Progresso: <span id="progress">0</span> / 30
+    </div>
+</div>
+
+<script>
+    // Lista de 30 palavras (Hiatos, Ditongos e Tritongos)
+    const wordList = [
+        // Ditongos
+        { word: "herói", answer: "he-rói" },
+        { word: "caixa", answer: "cai-xa" },
+        { word: "peixe", answer: "pei-xe" },
+        { word: "noite", answer: "noi-te" },
+        { word: "papai", answer: "pa-pai" },
+        { word: "leite", answer: "lei-te" },
+        { word: "aula", answer: "au-la" },
+        { word: "muito", answer: "mui-to" },
+        { word: "glória", answer: "gló-ria" },
+        { word: "história", answer: "his-tó-ria" },
+        
+        // Hiatos
+        { word: "saúde", answer: "sa-ú-de" },
+        { word: "poeta", answer: "po-e-ta" },
+        { word: "moeda", answer: "mo-e-da" },
+        { word: "viagem", answer: "vi-a-gem" },
+        { word: "coelho", answer: "co-e-lho" },
+        { word: "lua", answer: "lu-a" },
+        { word: "dia", answer: "di-a" },
+        { word: "rainha", answer: "ra-i-nha" },
+        { word: "baú", answer: "ba-ú" },
+        { word: "piada", answer: "pi-a-da" },
+
+        // Tritongos
+        { word: "paraguai", answer: "pa-ra-guai" },
+        { word: "uruguai", answer: "u-ru-guai" },
+        { word: "quaisquer", answer: "quais-quer" },
+        { word: "saguão", answer: "sa-guão" },
+        { word: "iguais", answer: "i-guais" },
+        { word: "enxaguei", answer: "en-xa-guei" },
+        { word: "averiguei", answer: "a-ve-ri-guei" },
+        { word: "quais", answer: "quais" },
+        { word: "apaziguou", answer: "a-pa-zi-guou" },
+        { word: "enxaguou", answer: "en-xa-guou" }
+    ];
+
+    let currentIndex = 0;
+
+    const positiveFeedback = [
+        "Excelente, Vingador! Você acertou!",
+        "O Capitão América está orgulhoso!",
+        "Precisão de herói! Continue assim!",
+        "Fantástico! Sua mente é um escudo impenetrável!",
+        "Isso aí! Você dominou essa palavra!"
+    ];
+
+    const retryFeedback = [
+        "Não desista, recrutar! Tente novamente.",
+        "Um herói nunca desiste. Vamos tentar de novo!",
+        "Quase lá! Lembre-se: hiatos se separam, ditongos ficam juntos!",
+        "Ajuste sua mira! Tente separar essa palavra outra vez.",
+        "Persistência é a chave! Tente mais uma vez."
+    ];
+
+    function loadWord() {
+        if (currentIndex < wordList.length) {
+            document.getElementById('current-word').innerText = wordList[currentIndex].word;
+            document.getElementById('user-input').value = '';
+            document.getElementById('feedback').innerText = '';
+            document.getElementById('progress').innerText = currentIndex;
+        } else {
+            document.getElementById('game-container').innerHTML = `
+                <div class="shield">⭐</div>
+                <h1>Missão Cumprida!</h1>
+                <p style="font-size: 20px;">Você completou o treinamento, Capitão!</p>
+                <p>Você dominou Hiatos, Ditongos e Tritongos.</p>
+                <button onclick="location.reload()">Reiniciar Missão</button>
+            `;
+        }
+    }
+
+    function checkAnswer() {
+        const userInput = document.getElementById('user-input').value.trim().toLowerCase();
+        const correctAnswer = wordList[currentIndex].answer;
+        const feedbackEl = document.getElementById('feedback');
+
+        if (userInput === correctAnswer) {
+            const randomPositive = positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)];
+            feedbackEl.innerHTML = `<span class="correct">${randomPositive}</span>`;
+            currentIndex++;
+            setTimeout(loadWord, 1500);
+        } else {
+            const randomRetry = retryFeedback[Math.floor(Math.random() * retryFeedback.length)];
+            feedbackEl.innerHTML = `<span class="wrong">${randomRetry}</span>`;
+            document.getElementById('user-input').select();
+        }
+    }
+
+    // Permitir apertar Enter para enviar
+    document.getElementById('user-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+
+    // Iniciar o jogo
+    loadWord();
+</script>
+
+</body>
+</html>
