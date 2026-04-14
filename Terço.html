@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mistérios Gozosos e PCEs - Santo Terço</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --azul-mariano: #1e4d8c;
+            --azul-claro: #e3f2fd;
+            --dourado: #c5a059;
+            --branco: #ffffff;
+            --texto: #2c3e50;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Lora', serif;
+            background-color: var(--azul-claro);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            touch-action: pan-y;
+        }
+
+        .container {
+            position: relative;
+            width: 95%;
+            max-width: 500px;
+            height: 90vh;
+            max-height: 700px;
+        }
+
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--branco);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: none;
+            flex-direction: column;
+            padding: 25px;
+            box-sizing: border-box;
+            border-top: 6px solid var(--azul-mariano);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .card.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h1 { font-family: 'Cinzel', serif; color: var(--azul-mariano); font-size: 1.4rem; margin: 10px 0; text-align: center; }
+        h2 { font-family: 'Cinzel', serif; color: var(--dourado); font-size: 0.9rem; margin: 0; text-align: center; }
+
+        .citacao-biblica {
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--texto);
+            border-left: 3px solid var(--azul-claro);
+            padding-left: 10px;
+            margin: 15px 0;
+            line-height: 1.4;
+        }
+
+        .pce-box {
+            background-color: #f9fbfd;
+            border: 1px dashed var(--azul-mariano);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: auto;
+        }
+
+        .pce-titulo {
+            font-family: 'Cinzel', serif;
+            color: var(--azul-mariano);
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .pce-meditacao {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #444;
+        }
+
+        /* Áreas de navegação para Celular e Desktop */
+        .nav-area {
+            position: absolute;
+            top: 0;
+            width: 30%;
+            height: 100%;
+            z-index: 100;
+            cursor: pointer;
+        }
+        .nav-left { left: 0; }
+        .nav-right { right: 0; }
+
+        .footer-info {
+            position: absolute;
+            bottom: -30px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--azul-mariano);
+            font-family: 'Cinzel', serif;
+        }
+
+        .scroll-content {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 5px;
+            margin-bottom: 10px;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--dourado); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="nav-area nav-left" onclick="changeCard(-1)"></div>
+        <div class="nav-area nav-right" onclick="changeCard(1)"></div>
+
+        <div class="card active">
+            <div style="text-align: center; margin-top: 50px;">
+                <img src="https://img.icons8.com/ios/100/1e4d8c/virgin-mary.png" style="width: 70px;">
+                <h1>Santo Terço</h1>
+                <h2>Mistérios Gozosos</h2>
+            </div>
+            <div class="scroll-content" style="text-align: center; margin-top: 30px;">
+                <p>Caminhando com Maria através dos Pontos Concretos de Esforço.</p>
+                <p style="font-size: 0.8rem; color: #888;">(Toque nas laterais para navegar)</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>I Mistério</h2>
+            <h1>A Anunciação</h1>
+            <div class="scroll-content">
+                <div class="citacao-biblica">
+                    "O anjo Gabriel foi enviado por Deus... a uma virgem chamada Maria." (Lc 1, 26-27)
+                </div>
+                <div class="pce-box">
+                    <span class="pce-titulo">Escuta da Palavra</span>
+                    <p class="pce-meditacao">Como Maria, somos chamados a ouvir a voz de Deus. A Escuta da Palavra não é apenas leitura, mas um acolhimento do projeto de Deus para nossa família, deixando que Sua vontade fecunde nossa vida.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>II Mistério</h2>
+            <h1>A Visitação</h1>
+            <div class="scroll-content">
+                <div class="citacao-biblica">
+                    "Maria partiu apressadamente... Isabel ficou cheia do Espírito Santo." (Lc 1, 39-42)
+                </div>
+                <div class="pce-box">
+                    <span class="pce-titulo">Oração Conjugal</span>
+                    <p class="pce-meditacao">O encontro de Maria e Isabel transborda em louvor. Na Oração Conjugal, o casal se visita em espírito, partilhando as alegrias e dificuldades diante de Deus, tornando-se "um só coração" na presença do Senhor.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>III Mistério</h2>
+            <h1>O Nascimento</h1>
+            <div class="scroll-content">
+                <div class="citacao-biblica">
+                    "Maria deu à luz o seu filho primogênito e o colocou na manjedoura." (Lc 2, 1-7)
+                </div>
+                <div class="pce-box">
+                    <span class="pce-titulo">Regra de Vida</span>
+                    <p class="pce-meditacao">O presépio é a simplicidade da Regra de Vida. É no cotidiano, nas pequenas escolhas de amor e despojamento, que permitimos que Jesus nasça e cresça em nossos hábitos e atitudes como casal.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>IV Mistério</h2>
+            <h1>A Apresentação</h1>
+            <div class="scroll-content">
+                <div class="citacao-biblica">
+                    "Levaram o menino a Jerusalém para apresentá-lo ao Senhor." (Lc 2, 21-24)
+                </div>
+                <div class="pce-box">
+                    <span class="pce-titulo">Dever de Sentar-se</span>
+                    <p class="pce-meditacao">Apresentar a vida ao Senhor exige pausa e discernimento. O Dever de Sentar-se é o nosso momento de "apresentação" mútua: onde revisamos nossa caminhada sob o olhar de Deus para ajustar nossos passos.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>V Mistério</h2>
+            <h1>Perda e Encontro</h1>
+            <div class="scroll-content">
+                <div class="citacao-biblica">
+                    "Encontraram-no no Templo sentado no meio dos mestres." (Lc 2, 41-47)
+                </div>
+                <div class="pce-box">
+                    <span class="pce-titulo">Meditação e Retiro</span>
+                    <p class="pce-meditacao">Para encontrar Jesus, é preciso buscá-Lo no silêncio do Templo interior. A Meditação diária e o Retiro Anual são o nosso retorno a Jerusalém para reencontrar o Cristo que às vezes perdemos na correria do mundo.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-info" id="progresso">1 / 6</div>
+    </div>
+
+    <script>
+        let currentCard = 0;
+        const cards = document.querySelectorAll('.card');
+        const indicator = document.getElementById('progresso');
+
+        function changeCard(direction) {
+            cards[currentCard].classList.remove('active');
+            currentCard += direction;
+
+            if (currentCard >= cards.length) currentCard = 0;
+            if (currentCard < 0) currentCard = cards.length - 1;
+
+            cards[currentCard].classList.add('active');
+            indicator.innerText = `${currentCard + 1} / ${cards.length}`;
+        }
+
+        // Suporte para deslizar o dedo (Swipe) no celular
+        let touchstartX = 0;
+        let touchendX = 0;
+        
+        document.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
+        document.addEventListener('touchend', e => {
+            touchendX = e.changedTouches[0].screenX;
+            handleGesture();
+        });
+
+        function handleGesture() {
+            if (touchendX < touchstartX - 50) changeCard(1);
+            if (touchendX > touchstartX + 50) changeCard(-1);
+        }
+    </script>
+</body>
+</html>
