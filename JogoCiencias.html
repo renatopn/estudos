@@ -3,297 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bio-Explorer JS</title>
+    <title>Bio-Explorer: Missão 30 Questões</title>
     <style>
         :root {
-            --bioma-jardim: #2ecc71;
-            --bioma-selva: #27ae60;
-            --bioma-oceano: #3498db;
-            --bioma-caverna: #34495e;
-            --texto: #2c3e50;
+            --produtor: #4CAF50;
+            --consumidor: #2196F3;
+            --decompositor: #FF9800;
+            --perigo: #f44336;
+            --fundo: #f0f4f8;
         }
 
         body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            background: #ecf0f1;
-            color: var(--texto);
+            background-color: var(--fundo);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
             touch-action: manipulation;
         }
 
-        #game-box {
+        #game-container {
             width: 100%;
-            max-width: 450px;
-            background: white;
+            max-width: 500px;
             min-height: 100vh;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
-        #header {
+        header {
+            background: #e67e22;
+            color: white;
             padding: 20px;
             text-align: center;
-            background: var(--bioma-jardim);
-            color: white;
+            font-size: 1.4rem;
+            font-weight: bold;
             transition: background 0.5s;
         }
 
-        #hud {
+        #status-bar {
             display: flex;
-            justify-content: space-between;
-            padding: 10px 20px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #ddd;
-            font-size: 0.9rem;
+            justify-content: space-around;
+            background: #333;
+            color: white;
+            padding: 12px;
+            font-size: 1rem;
         }
 
         #screen {
             flex-grow: 1;
-            padding: 25px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            text-align: center;
-        }
-
-        .sprite {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            justify-content: flex-start;
         }
 
         .btn {
-            width: 100%;
-            padding: 18px;
-            margin: 10px 0;
+            background: var(--consumidor);
+            color: white;
             border: none;
-            border-radius: 15px;
-            background: #eee;
-            font-size: 1rem;
-            font-weight: bold;
+            padding: 18px 25px;
+            border-radius: 12px;
+            font-size: 1.1rem; /* Fonte maior conforme solicitado */
+            margin: 8px;
+            width: 95%;
             cursor: pointer;
-            box-shadow: 0 4px #ccc;
-            transition: 0.1s;
+            transition: transform 0.1s;
+            box-shadow: 0 5px #1565C0;
         }
 
         .btn:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px #ccc;
+            transform: translateY(4px);
+            box-shadow: 0 0 transparent;
         }
 
-        .btn-option { background: white; border: 2px solid var(--bioma-jardim); }
-        .btn-option:hover { background: #f0fff4; }
-
-        #energy-bar-container {
-            width: 100%;
-            height: 20px;
-            background: #ddd;
-            border-radius: 10px;
-            margin: 15px 0;
-            overflow: hidden;
-        }
-
-        #energy-fill {
-            height: 100%;
-            width: 100%;
-            background: #2ecc71;
-            transition: width 0.5s;
-        }
-
-        #feedback-pop {
+        #feedback {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80%;
             padding: 30px;
-            border-radius: 20px;
-            color: white;
-            text-align: center;
+            border-radius: 15px;
             display: none;
-            z-index: 1000;
+            z-index: 100;
+            text-align: center;
+            width: 85%;
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: white;
+            box-shadow: 0 0 50px rgba(0,0,0,0.3);
         }
+
+        .card {
+            border: 2px solid #eee;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 90%;
+            text-align: center;
+            background: #fafafa;
+        }
+
+        .sprite { font-size: 4rem; margin-bottom: 10px; }
+
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background: #ddd;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--produtor);
+            border-radius: 6px;
+            transition: width 0.3s;
+        }
+
+        h3 { margin: 10px 0; font-size: 1.2rem; }
+        p { font-size: 1.1rem; line-height: 1.4; color: #444; }
+
     </style>
 </head>
 <body>
 
-<div id="game-box">
-    <div id="header">
-        <h2 id="bioma-name">BIOMA: JARDIM</h2>
-    </div>
+<div id="game-container">
+    <header id="header-title">BIO-EXPLORER JR</header>
     
-    <div id="hud">
-        <span>Energia (Glicose):</span>
-        <span id="score">Pontos: 0</span>
+    <div id="status-bar">
+        <span>Missão: <span id="current-mission">1/30</span></span>
+        <span>Pontos: <span id="score">0</span></span>
     </div>
 
     <div id="screen">
-        <div class="sprite">🌱</div>
-        <h3>Bem-vindo, Bio-Explorer João Rafael!</h3>
-        <p>Sua missão é completar o ciclo da vida. Use seus conhecimentos de ciências para sobreviver!</p>
-        <button class="btn" style="background: var(--bioma-jardim); color: white;" onclick="startGame()">INICIAR EXPEDIÇÃO</button>
-    </div>
+        </div>
 
-    <div id="feedback-pop"></div>
+    <div id="feedback"></div>
 </div>
 
 <script>
     const screen = document.getElementById('screen');
-    const header = document.getElementById('header');
-    const biomaName = document.getElementById('bioma-name');
+    const feedback = document.getElementById('feedback');
     const scoreEl = document.getElementById('score');
-    const feedback = document.getElementById('feedback-pop');
-
-    let currentStep = 0;
+    const missionEl = document.getElementById('current-mission');
+    const header = document.getElementById('header-title');
+    
     let score = 0;
-    let energy = 100;
+    let currentMission = 0;
 
-    const missions = [
-        {
-            bioma: "JARDIM DOS PRODUTORES",
-            color: "#2ecc71",
-            icon: "🌻",
-            quest: "O girassol está virando em direção ao Sol para fazer fotossíntese. Como chamamos essa reação ao ambiente?",
-            options: ["Locomoção", "Irritabilidade", "Respiração"],
-            correct: 1,
-            info: "Isso mesmo! Plantas não caminham, mas reagem a estímulos!"
-        },
-        {
-            bioma: "JARDIM DOS PRODUTORES",
-            color: "#2ecc71",
-            icon: "🪴",
-            quest: "As plantas produzem o próprio alimento através da luz. Elas são chamadas de:",
-            options: ["Consumidores", "Produtores (Autótrofos)", "Decompositores"],
-            correct: 1,
-            info: "Perfeito! O alimento delas é a Glicose."
-        },
-        {
-            bioma: "SELVA DOS CONSUMIDORES",
-            color: "#27ae60",
-            icon: "🦗",
-            quest: "Um gafanhoto comeu a folha. Na cadeia alimentar, ele é um:",
-            options: ["Consumidor Primário", "Consumidor Secundário", "Produtor"],
-            correct: 0,
-            info: "Boa! Ele é o primeiro consumidor da fila."
-        },
-        {
-            bioma: "SELVA DOS CONSUMIDORES",
-            color: "#27ae60",
-            icon: "🐍",
-            quest: "A serpente come o rato, que come o gafanhoto. O que acontece se os fungos sumirem?",
-            options: ["Nada acontece", "As plantas crescem mais", "O solo fica sem nutrientes"],
-            correct: 2,
-            info: "Correto! Os decompositores devolvem nutrientes ao solo."
-        },
-        {
-            bioma: "OCEANO DA RESPIRAÇÃO",
-            color: "#3498db",
-            icon: "🐟",
-            quest: "O peixe retira oxigênio da água. Qual o nome desse tipo de respiração?",
-            options: ["Cutânea", "Pulmonar", "Branquial"],
-            correct: 2,
-            info: "As brânquias são como filtros de oxigênio na água!"
-        },
-        {
-            bioma: "OCEANO DA RESPIRAÇÃO",
-            color: "#3498db",
-            icon: "🐸",
-            quest: "O sapo consegue respirar pela pele fina e úmida. Essa é a respiração:",
-            options: ["Traqueal", "Cutânea", "Vegetal"],
-            correct: 1,
-            info: "Isso! Por isso a pele do sapo precisa estar sempre úmida."
-        },
-        {
-            bioma: "CAVERNA DOS SENTIDOS",
-            color: "#34495e",
-            icon: "🦇",
-            quest: "Dentro de uma caverna escura, qual sentido ajuda um animal a não bater nas paredes?",
-            options: ["Visão", "Audição (Som)", "Paladar"],
-            correct: 1,
-            info: "Os morcegos usam o som para 'enxergar' no escuro!"
-        }
+    const gameData = [
+        // LIÇÃO 9: ALIMENTAÇÃO
+        { q: "Os seres vivos precisam de alimento para duas coisas principais: energia e...", a: ["Diversão", "Nutrientes", "Sono"], c: 1, icon: "🍎", info: "Nutrientes servem para o corpo crescer e se renovar!" },
+        { q: "Como são chamados os seres que produzem o próprio alimento?", a: ["Heterótrofos", "Hematófagos", "Autótrofos"], c: 2, icon: "🌱", info: "Auto = próprio. Eles produzem glicose!" },
+        { q: "Qual o nome do processo que as plantas usam para fabricar alimento?", a: ["Respiração", "Fotossíntese", "Digestão"], c: 1, icon: "☀️", info: "Luz solar + Água + Ar = Alimento!" },
+        { q: "Os animais que comem somente plantas são os:", a: ["Herbívoros", "Carnívoros", "Onívoros"], c: 0, icon: "🐄", info: "Ex: Vacas, coelhos e capivaras." },
+        { q: "O ser humano, que come carne e plantas, é um ser:", a: ["Herbívoro", "Onívoro", "Hematófago"], c: 1, icon: "🍱", info: "Onívoro come de tudo!" },
+        { q: "O mosquito e o piolho se alimentam de sangue. Eles são:", a: ["Necrófagos", "Detritívoros", "Hematófagos"], c: 2, icon: "🦟", info: "Hemato significa sangue!" },
+        { q: "Urubus e hienas comem animais mortos. Eles são chamados de:", a: ["Necrófagos", "Produtores", "Herbívoros"], c: 0, icon: "🦅", info: "Também podem ser chamados de detritívoros." },
+        { q: "Quem são os seres que absorvem nutrientes de restos e devolvem ao solo?", a: ["Consumidores", "Decompositores", "Predadores"], c: 1, icon: "🍄", info: "Fungos e micro-organismos!" },
+        { q: "Os cogumelos são heterótrofos por...", a: ["Ingestão (comem)", "Absorção", "Fotossíntese"], c: 1, icon: "🍄", info: "Eles não têm boca, eles absorvem o alimento!" },
+        { q: "Na cadeia alimentar, a GRAMA é sempre um:", a: ["Consumidor", "Produtor", "Decompositor"], c: 1, icon: "🌿", info: "A planta é a base da cadeia!" },
+        { q: "Se um rato come a grama, ele é um consumidor de qual ordem?", a: ["Primário", "Secundário", "Terciário"], c: 0, icon: "🐭", info: "Ele é o primeiro a consumir!" },
+        { q: "O conjunto de várias cadeias alimentares juntas chama-se:", a: ["Nível trófico", "Teia alimentar", "Fotossíntese"], c: 1, icon: "🕸️", info: "Na natureza, as cadeias se misturam." },
+        
+        // LIÇÃO 9: RESPIRAÇÃO
+        { q: "Para o corpo usar a energia do alimento, ele precisa de:", a: ["Água", "Oxigênio", "Luz"], c: 1, icon: "🌬️", info: "É por isso que os seres vivos respiram!" },
+        { q: "Os humanos respiram pelos pulmões. Que tipo de respiração é essa?", a: ["Branquial", "Traqueal", "Pulmonar"], c: 2, icon: "🫁", info: "Usamos o nariz e os pulmões." },
+        { q: "Os peixes retiram o oxigênio da água usando as...", a: ["Brânquias", "Traqueias", "Nadadeiras"], c: 0, icon: "🐟", info: "Também chamadas de guelras." },
+        { q: "Insetos, como o gafanhoto, respiram por buraquinhos chamados:", a: ["Pulmões", "Traqueias", "Estômatos"], c: 1, icon: "🦗", info: "Ficam nas laterais do corpo do inseto." },
+        { q: "Sapos e minhocas respiram pela pele úmida. É a respiração:", a: ["Pulmonar", "Branquial", "Cutânea"], c: 2, icon: "🪱", info: "Cútis significa pele!" },
+        { q: "As plantas também respiram! Elas usam buraquinhos nas folhas chamados:", a: ["Estômatos", "Cílios", "Raízes"], c: 0, icon: "🍃", info: "Elas trocam gases com o ar por ali." },
+        
+        // LIÇÃO 10: PERCEPÇÃO E MOVIMENTO
+        { q: "A capacidade de perceber o ambiente e reagir chama-se:", a: ["Locomoção", "Irritabilidade", "Crescimento"], c: 1, icon: "⚡", info: "É vital para a sobrevivência!" },
+        { q: "As plantas não têm olhos, mas percebem a...", a: ["Música", "Luz", "Conversa"], c: 1, icon: "🌻", info: "Elas crescem em direção à luz (fototropismo)." },
+        { q: "As raízes das plantas crescem em direção à:", a: ["Luz solar", "Água", "Lua"], c: 1, icon: "🪴", info: "As raízes buscam água e nutrientes." },
+        { q: "A planta 'dormideira' fecha as folhas ao ser tocada. Isso é:", a: ["Sono", "Irritabilidade", "Locomoção"], c: 1, icon: "🌿", info: "Ela reage ao toque!" },
+        { q: "As 'molinhas' que algumas plantas usam para subir em suportes são:", a: ["Gavinhas", "Espinhos", "Flores"], c: 0, icon: "🎋", info: "Ex: chuchu e parreiras de uva." },
+        { q: "Qual a diferença entre plantas e animais sobre movimento?", a: ["Plantas não se movem", "Animais se locomovem (saem do lugar)", "São iguais"], c: 1, icon: "🏃", info: "Plantas se movem, mas não mudam de lugar sozinhas." },
+        { q: "A tartaruga marinha tem patas em formato de:", a: ["Nadadeira", "Cilíndrica", "Garra"], c: 0, icon: "🐢", info: "O formato depende do ambiente onde vivem." },
+        { q: "Micro-organismos como a ameba usam 'falsos pés' chamados:", a: ["Cílios", "Flagelos", "Pseudópodes"], c: 2, icon: "🦠", info: "Pseudo = falso / Podes = pés." },
+        { q: "A Euglena usa um 'rabinho' longo para nadar, chamado:", a: ["Cílio", "Flagelo", "Nadadeira"], c: 1, icon: "🧪", info: "É como um chicote para se mover." },
+        { q: "O Paramecium usa pelinhos curtos para se mover, chamados:", a: ["Cílios", "Gavinhas", "Tentáculos"], c: 0, icon: "🧬", info: "São milhares de pequenos cílios." },
+        { q: "Plantas carnívoras comem insetos porque o solo é...", a: ["Muito rico", "Pobre em nutrientes", "Muito seco"], c: 1, icon: "🪴", info: "Elas fazem fotossíntese, mas precisam de 'suplemento'!" },
+        { q: "Quantos sentidos os animais usam para perceber o perigo?", a: ["Somente a visão", "Os cinco sentidos", "Apenas o tato"], c: 1, icon: "👂", info: "Visão, audição, olfato, tato e paladar!" }
     ];
 
-    function startGame() {
-        currentStep = 0;
-        score = 0;
-        energy = 100;
-        renderMission();
-    }
-
-    function renderMission() {
-        if (currentStep >= missions.length) {
+    function loadMission() {
+        if (currentMission >= gameData.length) {
             showVictory();
             return;
         }
 
-        const m = missions[currentStep];
-        header.style.background = m.color;
-        biomaName.innerText = `BIOMA: ${m.bioma}`;
-        
+        const data = gameData[currentMission];
+        missionEl.innerText = `${currentMission + 1}/${gameData.length}`;
+        updateHeaderColor();
+
         screen.innerHTML = `
-            <div id="energy-bar-container"><div id="energy-fill" style="width: ${energy}%"></div></div>
-            <div class="sprite">${m.icon}</div>
-            <p style="font-size: 1.1rem;">${m.quest}</p>
-            ${m.options.map((opt, i) => `
-                <button class="btn btn-option" onclick="handleChoice(${i})">${opt.text || opt}</button>
+            <div class="card">
+                <div class="sprite">${data.icon}</div>
+                <p>${data.q}</p>
+            </div>
+            ${data.a.map((opt, i) => `
+                <button class="btn" onclick="checkAnswer(${i})">${opt}</button>
             `).join('')}
+            <div class="progress-container">
+                <div id="progress-bar" style="width: ${(currentMission/gameData.length)*100}%"></div>
+            </div>
         `;
     }
 
-    window.handleChoice = function(choice) {
-        const m = missions[currentStep];
-        if (choice === m.correct) {
-            score += 20;
-            showFeedback(true, m.info);
-            currentStep++;
-            setTimeout(renderMission, 2500);
+    window.checkAnswer = function(index) {
+        const data = gameData[currentMission];
+        const isCorrect = (index === data.c);
+        
+        feedback.style.display = 'block';
+        if (isCorrect) {
+            feedback.style.backgroundColor = 'var(--produtor)';
+            feedback.innerHTML = "🌟 CORRETO! 🌟<br><small>" + data.info + "</small>";
+            score += 10;
         } else {
-            energy -= 20;
-            showFeedback(false, "Ops! Tente analisar o conteúdo de novo.");
-            if (energy <= 0) {
-                setTimeout(showGameOver, 2000);
-            }
+            feedback.style.backgroundColor = 'var(--perigo)';
+            feedback.innerHTML = "❌ QUASE... ❌<br><small>Tente lembrar do livro!</small>";
         }
-        scoreEl.innerText = `Pontos: ${score}`;
+
+        setTimeout(() => {
+            feedback.style.display = 'none';
+            if (isCorrect) {
+                currentMission++;
+                scoreEl.innerText = score;
+                loadMission();
+            }
+        }, 2500);
     };
 
-    function showFeedback(win, msg) {
-        feedback.style.display = 'block';
-        feedback.style.background = win ? '#27ae60' : '#e74c3c';
-        feedback.innerHTML = `<h2>${win ? 'MUITO BEM!' : 'ATENÇÃO!'}</h2><p>${msg}</p>`;
-        setTimeout(() => feedback.style.display = 'none', 2300);
+    function updateHeaderColor() {
+        if (currentMission < 12) header.style.background = "#2ecc71"; // Cadeia Alimentar
+        else if (currentMission < 18) header.style.background = "#3498db"; // Respiração
+        else header.style.background = "#9b59b6"; // Percepção
     }
 
     function showVictory() {
         header.style.background = "#f1c40f";
-        biomaName.innerText = "EXPEDIÇÃO CONCLUÍDA!";
+        header.innerText = "MISSÃO CUMPRIDA!";
         screen.innerHTML = `
-            <div class="sprite">🏆</div>
-            <h2>PARABÉNS, JOÃO RAFAEL!</h2>
-            <p>Você é um Mestre da Natureza!</p>
-            <h3>Total: ${score} Pontos</h3>
-            <button class="btn" onclick="startGame()">RECOMEÇAR</button>
+            <div class="card">
+                <div class="sprite">🏆</div>
+                <h2>PARABÉNS, JOÃO RAFAEL!</h2>
+                <p>Você revisou todo o conteúdo das Lições 9 e 10!</p>
+                <h1 style="color: #e67e22">${score} PONTOS</h1>
+                <button class="btn" onclick="location.reload()">JOGAR DE NOVO</button>
+            </div>
         `;
     }
 
-    function showGameOver() {
-        biomaName.innerText = "MISSÃO FALHOU";
-        screen.innerHTML = `
-            <div class="sprite">😵</div>
-            <h2>A ENERGIA ACABOU!</h2>
-            <p>Vamos revisar o livro e tentar de novo?</p>
-            <button class="btn" onclick="startGame()">TENTAR NOVAMENTE</button>
-        `;
-    }
+    loadMission();
 </script>
 </body>
 </html>
