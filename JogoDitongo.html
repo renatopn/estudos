@@ -220,13 +220,13 @@
 
     function runTimer() {
         clearInterval(timer);
-        timeLeft = 100;
+        timeLeft = 500;
         const bar = document.getElementById('timer-bar');
         timer = setInterval(() => {
             timeLeft -= 1.43; 
             bar.style.width = timeLeft + "%";
             if(timeLeft <= 0) { clearInterval(timer); check(null, null); }
-        }, 100);
+        }, 500);
     }
 
     function check(choice, btn) {
