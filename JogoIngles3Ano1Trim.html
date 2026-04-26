@@ -20,7 +20,8 @@
             margin: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+            padding-top: 10px;
             height: 100vh;
             overflow: hidden;
         }
@@ -34,7 +35,7 @@
             padding: 20px;
             box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
             text-align: center;
-            position: relative;
+            position: absolute;
         }
 
         /* Telas */
@@ -291,7 +292,7 @@
             document.getElementById('feedback-popup').classList.remove('show');
         }
     }
-    
+
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
