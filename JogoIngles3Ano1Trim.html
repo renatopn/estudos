@@ -303,10 +303,10 @@
 
     function loadQuestion() {
         const q = quizData[currentIdx];
-        document.getElementById('phase-title').innerText = `FASE ${q.fase} - QUESTÃO ${currentIdx + 1}/25`;
+        document.getElementById('phase-title').innerText = `FASE ${q.fase} - QUESTÃO ${currentIdx + 1}/${quizData.length}`;
         document.getElementById('q-text').innerText = q.q;
         document.getElementById('q-image').src = q.img || "https://via.placeholder.com/400x200?text=Dragon+Ball+Training";
-        document.getElementById('ki-fill').style.width = `${(currentIdx / 25) * 100}%`;
+        document.getElementById('ki-fill').style.width = `${(currentIdx / quizData.length) * 100}%`;
 
         if(q.tipo === "choice") {
             showChoice(q);
