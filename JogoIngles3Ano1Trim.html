@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dragon Ball English Training - JR Edition</title>
+    <style>
+        :root {
+            --db-orange: #FF8C00;
+            --db-blue: #00008B;
+            --db-yellow: #FFD700;
+            --db-red: #B22222;
+            --db-white: #f0f0f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: var(--db-white);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: 95%;
+            max-width: 800px;
+            background: linear-gradient(135deg, #333, #000);
+            border: 4px solid var(--db-orange);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
+            text-align: center;
+            position: relative;
+        }
+
+        /* Telas */
+        .screen { display: none; }
+        .active { display: block; }
+
+        /* Botões Estilo DBZ */
+        .btn {
+            background-color: var(--db-orange);
+            color: white;
+            border: 2px solid var(--db-yellow);
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 10px;
+            transition: transform 0.2s, background 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background-color: #ff7b00;
+        }
+
+        /* Configuração (JSON Area) */
+        #config-area {
+            width: 100%;
+            height: 300px;
+            background: #222;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        /* Barra de Ki */
+        .ki-bar-container {
+            width: 100%;
+            height: 20px;
+            background: #444;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        #ki-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #00ffff, #0000ff);
+            transition: width 0.5s;
+        }
+
+        /* Questões */
+        .question-img {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #555;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* Nuvem de Palavras */
+        .word-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .word-btn {
+            background: #444;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            border: 1px solid var(--db-yellow);
+        }
+
+        .answer-slot {
+            min-height: 40px;
+            border-bottom: 2px dashed var(--db-orange);
+            margin: 20px 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .phase-header {
+            font-size: 0.9rem;
+            color: var(--db-yellow);
+            letter-spacing: 2px;
+        }
+
+        /* Animação para o Popup */
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        #feedback-popup.show {
+            display: block !important;
+            animation: popIn 0.3s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+        }
+
+        .success-text { color: var(--db-yellow); text-shadow: 2px 2px #000; }
+        .error-text { color: var(--db-red); text-shadow: 2px 2px #000; }
+
+        /* Barra de tempo que diminui no topo do popup */
+        #feedback-popup::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--db-yellow);
+            width: 0%;
+        }
+
+        #feedback-popup.show::after {
+            animation: timerBar 2s linear forwards;
+        }
+
+        @keyframes timerBar {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+
+        .success-msg { color: #0f0; }
+        .error-msg { color: #f00; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="home-screen" class="screen active">
+        <h1 style="color: var(--db-orange);">DRAGON BALL ENGLISH</h1>
+        <p>João Rafael, treine seu Ki e seu Inglês!</p>
+        <button class="btn" onclick="startGame()">Iniciar Treinamento</button><br>
+        <button class="btn" style="font-size: 0.8rem;" onclick="showScreen('config-screen')">⚙ Configurações</button>
+    </div>
+
+    <div id="config-screen" class="screen">
+        <h3>Configuração do Torneio (JSON)</h3>
+        <textarea id="config-area"></textarea>
+        <br>
+        <button class="btn" onclick="saveConfig()">Salvar e Voltar</button>
+        <button class="btn" onclick="copyConfig()">Copiar Backup</button>
+    </div>
+    <div id="feedback-popup" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); z-index:100; width:80%; background:rgba(0,0,0,0.95); border:3px solid var(--db-yellow); border-radius:15px; padding:20px; box-shadow: 0 0 30px var(--db-orange);">
+        <h2 id="feedback-title" style="margin-top:0;"></h2>
+        <p id="feedback-msg" style="font-size:1.2rem; font-style:italic;"></p>
+        <button class="btn" id="feedback-btn" onclick="closeFeedback()">CONTINUAR</button>
+    </div>
+
+    <div id="game-screen" class="screen">
+        <div class="phase-header" id="phase-title">FASE 1</div>
+        <div class="ki-bar-container"><div id="ki-fill"></div></div>
+        
+        <div id="question-content">
+            <img id="q-image" src="" class="question-img">
+            <h3 id="q-text">Pergunta aqui?</h3>
+            
+            <div id="choice-area" class="options-grid"></div>
+
+            <div id="cloud-container" style="display:none;">
+                <div class="answer-slot" id="answer-slots"></div>
+                <div class="word-cloud" id="word-pool"></div>
+                <button class="btn" style="font-size: 0.7rem; background: #666;" onclick="clearCloud()">Limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h2 id="final-msg">PARABÉNS!</h2>
+        <p>Você completou o treinamento!</p>
+        <button class="btn" onclick="location.reload()">Jogar Novamente</button>
+    </div>
+</div>
+
+<script>
+    // JSON Inicial Baseado nas Imagens Fornecidas
+    const defaultData = [
+        // FASE 1: Unit 1 - School Items (Choice)
+        { id: 1, fase: 1, tipo: "choice", q: "What is this item?", img: "https://dictionary.cambridge.org/pt/images/thumb/feltti_noun_002_13617.jpg?version=6.0.73", options: ["A notebook", "A marker", "Glue", "A book", "Eraser",  "Scissors", "Paintbrush", "Pencil"], ans: "A marker" },
+        { id: 2, fase: 1, tipo: "choice", q: "What is this item?", img: "https://cdn.schoolspecialty.com/acc8656d-708a-49f2-b9d7-b0f100b401a4/372701_JPG%20Output.jpg",options: ["A notebook", "A marker", "Glue", "A book", "Eraser",  "Scissors", "Paintbrush", "Pencil"], ans: "Scissors" },
+        { id: 3, fase: 1, tipo: "choice", q: "What is this item?", img: "https://missouripoisoncenter.org/wp-content/uploads/2017/08/shutterstock_156378407.jpg", options: ["A notebook", "A marker", "Glue", "A book", "Eraser",  "Scissors", "Paintbrush", "Pencil"], ans: "Glue" },
+        { id: 4, fase: 1, tipo: "choice", q: "What is this item?", img: "https://www.bellalunatoys.com/cdn/shop/products/waldorf-watercolor-paintbrush_1.png?v=1663824199", options: ["A notebook", "A marker", "Glue", "A book", "Eraser",  "Scissors", "Paintbrush", "Pencil"], ans: "Paintbrush" },
+        { id: 5, fase: 1, tipo: "choice", q: "What is this item?", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKjmYBdag9eIgHfP0TKB9lqSexqHrCl4wccg&s", options: ["A notebook", "A marker", "Glue", "A book", "Eraser",  "Scissors", "Paintbrush", "Pencil"], ans: "A notebook" },
+        { id: 6, fase: 1, tipo: "choice", q: "What is this item?", img: "https://www.collinsdictionary.com/images/full/eraser_135124940.jpg", options: ["A notebook", "A marker", "Glue", "A book", "Eraser",  "Scissors", "Paintbrush", "Pencil"], ans: "Eraser" },
+        { id: 7, fase: 1, tipo: "choice", q: "What is this item?", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMiK1cAL0XtABNqEy5Mxqe-LyGe_gDgzbLJw&s", options: ["A notebook", "A marker", "Glue", "A book", "Eraser",  "Scissors", "Paintbrush", "Pencil"], ans: "Pencil" },
+        { id: 8, fase: 1, tipo: "choice", q: "What is this item?", img: "https://martinsfontespaulista.vteximg.com.br/arquivos/ids/1517334-1000-1000/1022159.jpg", options: ["A notebook", "A marker", "Glue", "A book", "Eraser",  "Scissors", "Paintbrush", "Pencil"], ans: "A book" },
+
+
+        // FASE 2: Unit 1 - Actions (Cloud)
+        { id: 9, fase: 2, tipo: "cloud", q: "What are they doing?", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVKtgHRtjkQEIZNbYvsoD1x6RM6--nPrz7LQ&s", options: ["talking", "They're","reading","I'm", "painting","I'm", "writing.","She is", "drawing."], ans: ["They're", "talking"] },
+        { id: 10, fase: 2, tipo: "cloud", q: "Form the sentence:", img: "https://www.learningresources.com/media/wp-content/uploads/2022/crayon_cover.jpg", options: ["counting", "crayons", "We're", "He is", "with", "drawing", "pencil", "marker","I'm"], ans: ["He is", "drawing", "with", "crayons"] },
+        { id: 11, fase: 2, tipo: "cloud", q: "What is he doing?", img: "https://static1.squarespace.com/static/58d09402db29d660e4781a57/58eedd4c9c03e004a692894c/6659efb361ec031821b6a571/1741724013756/Untitled_Artwork.jpg", options: ["painting", "He's", "writing", "reading", "You're", "book", "a", "an", "notebook"], ans: ["He's", "reading", "a", "book"] },
+        { id: 12, fase: 2, tipo: "cloud", q: "What is the girl doing?", img: "https://us.123rf.com/450wm/sergey0506/sergey05062201/sergey0506220100038/181223570-little-girl-draws-with-pencils-on-the-floor-in-her-room.jpg", options: ["painting", "She is", "coloring", "You are", "cutting", "I'm", "gluing", "They're", "writing"], ans: ["She is", "coloring"] },
+        { id: 13, fase: 2, tipo: "cloud", q: "Is he listening to music?", img: "", options: ["Yes,", "she","they", "No,","are", "he","is","isn't", "aren't"], ans: ["Yes,", "he", "is", "listening", "to", "music"] },
+
+        // FASE 3: Unit 2 - Weather (Choice/Cloud)
+        { id: 14, fase: 3, tipo: "choice", q: "What's the weather like?", img: "https://i.ytimg.com/vi/oX8kXn85F9g/hq720.jpg", options: ["It's sunny", "It's rainy", "It's windy", "It's snowy", "It's cloudy"], ans: "It's rainy" },
+        { id: 15, fase: 3, tipo: "choice", q: "It's cold. What do you put on?", img: "https://i.pinimg.com/736x/d4/a0/82/d4a0827e47564b7404bac8443c089b58.jpg", options: ["A bathing suit", "A sweater", "Shorts", "A raincoat"], ans: "A sweater" },
+        { id: 16, fase: 3, tipo: "cloud", q: "It's Tuesday. What's the weather like?", img: "https://cloud.estacaonerd.com/wp-content/uploads/2020/03/26141823/masterroshipower.jpg", options: ["He's", "windy", "It's", "sunny",  "snowy", "cloudy"], ans: ["It's", "sunny"] },
+        { id: 17, fase: 3, tipo: "choice", q: "What do you use when it's rainy?", img: "https://i.ytimg.com/vi/oX8kXn85F9g/hq720.jpg", options: ["A raincoat", "A hat", "Sneakers", "A sweater", "A short"], ans: "A raincoat" },
+        { id: 18, fase: 3, tipo: "cloud", q: "Is it hot?", img: "https://cloud.estacaonerd.com/wp-content/uploads/2020/03/26141823/masterroshipower.jpg", options: ["Yes,", "she","it", "No,", "are", "he", "is", "isn't", "aren't"], ans: ["Yes,", "it", "is"] },
+
+        // FASE 4: Unit 2 - Gramática There is/are
+        { id: 19, fase: 4, tipo: "cloud", q: "Are there any markers?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["Yes,", "there", "are"] },
+        { id: 20, fase: 4, tipo: "cloud", q: "Is there any glue?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["No,", "there", "isn't"] },
+        { id: 21, fase: 4, tipo: "cloud", q: "Are there any pencils?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["No,", "there", "isn't"]  },
+        { id: 22, fase: 4, tipo: "cloud", q: "Is there a eraser?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["Yes", "there", "is"]  },
+        { id: 23, fase: 4, tipo: "cloud", q: "Are there any scissors?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["No,", "there", "aren't"] },
+
+        // FASE 5: Unit 3 - Likes & Activities
+        { id: 24, fase: 5, tipo: "cloud", q: "_______ soccer.", img: "", options: ["Let's", "throw", "bounce", "play", "jump", "watch", "soccer"],  ans: ["Let's", "play", "soccer"] },
+        { id: 25, fase: 5, tipo: "cloud", q: "_______ a game.", img: "", options: ["They", "throw", "like", "bounce", "likes", "to", "play", "jump", "watch", "a game"],  ans: ["Let's", "play", "a game"] },
+        { id: 26, fase: 5, tipo: "cloud", q: "_______ rope.", img: "", options: ["She", "like", "to", "throw", "bounce", "likes", "play", "jump", "watch", "rope"],  ans: ["Let's", "jump", "rope"] },
+        { id: 27, fase: 5, tipo: "cloud", q: "_______ a ball.", img: "", options: ["He", "play", "jump", "like", "to", "bounce", "likes", "play", "jump", "watch", "a ball"],  ans: ["He", "likes", "to", "bounce", "a ball"] },
+        { id: 28, fase: 5, tipo: "cloud", q: "_______ a bike.", img: "", options: ["I","likes","to", "throw", "to", "bounce", "ride", "play", "jump", "watch", "a bike"],  ans: ["I","like", "to", "ride", "a bike"] },
+        { id: 29, fase: 5, tipo: "cloud", q: "_______ hide and seek.", img: "", options: ["We","likes","to", "throw", "like", "bounce", "ride", "play", "jump", "watch", "a bike", "hide and seek"],  ans: ["We","like", "to", "play", "hide and seek"] },
+        { id: 30, fase: 5, tipo: "cloud", q: "_______ a kite.", img: "", options: ["He","likes","to",  "like", "bounce", "ride", "play", "fly", "watch", "a kite"],  ans: ["He","likes", "to", "fly", "a kite"] },
+    ];
+
+    let quizData = [...defaultData];
+    let currentIdx = 0;
+    let cloudAnswer = [];
+
+    // Inicialização
+    document.getElementById('config-area').value = JSON.stringify(defaultData, null, 2);
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function saveConfig() {
+        try {
+            quizData = JSON.parse(document.getElementById('config-area').value);
+            showScreen('home-screen');
+        } catch(e) { alert("Erro no JSON! Verifique as vírgulas e aspas."); }
+    }
+
+    function copyConfig() {
+        const area = document.getElementById('config-area');
+        area.select();
+        document.execCommand('copy');
+        alert("JSON copiado para o backup!");
+    }
+
+    function startGame() {
+        currentIdx = 0;
+        showScreen('game-screen');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = quizData[currentIdx];
+        document.getElementById('phase-title').innerText = `FASE ${q.fase} - QUESTÃO ${currentIdx + 1}/25`;
+        document.getElementById('q-text').innerText = q.q;
+        document.getElementById('q-image').src = q.img || "https://via.placeholder.com/400x200?text=Dragon+Ball+Training";
+        document.getElementById('ki-fill').style.width = `${(currentIdx / 25) * 100}%`;
+
+        if(q.tipo === "choice") {
+            showChoice(q);
+        } else {
+            showCloud(q);
+        }
+    }
+
+    function showChoice(q) {
+        document.getElementById('choice-area').style.display = "grid";
+        document.getElementById('cloud-container').style.display = "none";
+        const area = document.getElementById('choice-area');
+        area.innerHTML = "";
+        q.options.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = "btn";
+            b.innerText = opt;
+            b.onclick = () => checkAnswer(opt);
+            area.appendChild(b);
+        });
+    }
+
+    function showCloud(q) {
+        document.getElementById('choice-area').style.display = "none";
+        document.getElementById('cloud-container').style.display = "block";
+        cloudAnswer = [];
+        updateCloudUI();
+    }
+
+    function updateCloudUI() {
+        const q = quizData[currentIdx];
+        const pool = document.getElementById('word-pool');
+        const slots = document.getElementById('answer-slots');
+        
+        slots.innerHTML = cloudAnswer.map(w => `<span class="word-btn" style="background:var(--db-orange)">${w}</span>`).join("");
+        pool.innerHTML = "";
+        
+        q.options.forEach(word => {
+            const span = document.createElement('span');
+            span.className = "word-btn";
+            span.innerText = word;
+            span.onclick = () => {
+                cloudAnswer.push(word);
+                updateCloudUI();
+                if(cloudAnswer.length === q.ans.length) checkAnswer(cloudAnswer);
+            };
+            pool.appendChild(span);
+        });
+    }
+
+    function clearCloud() {
+        cloudAnswer = [];
+        updateCloudUI();
+    }
+
+    const successMessages = [
+        { title: "INCRÍVEL!", msg: "Seu Ki aumentou drasticamente! Continue assim!" },
+        { title: "EXCELENTE!", msg: "Até o Vegeta ficou impressionado com seu inglês!" },
+        { title: "KAMEHAMEHA!", msg: "Você acertou em cheio! A próxima esfera está perto." },
+        { title: "SUPER SAIYAJIN!", msg: "Sinto uma energia poderosa vindo de você!" },
+        { title: "BOA, JOÃO!", msg: "O Mestre Kame disse que você é um aluno brilhante!" }
+    ];
+
+    const errorMessages = [
+        { title: "OPS!", msg: "Não desista! Treine mais um pouco e tente de novo." },
+        { title: "NÃO FOI DESSA VEZ!", msg: "Lembre-se: o fracasso é o combustível para a vitória!" },
+        { title: "KAI-O-KEN!", msg: "Você precisa de mais concentração. Tente novamente!" },
+        { title: "ATENÇÃO!", msg: "Sua guarda está baixa! Revise a questão com cuidado." },
+        { title: "FORÇA!", msg: "Coma uma Semente dos Deuses e tente outra vez!" }
+    ];
+
+    let isCorrectMove = false;
+
+    function checkAnswer(userAns) {
+        const q = quizData[currentIdx];
+        let correct = false;
+
+        if(q.tipo === "choice") {
+            correct = (userAns === q.ans);
+        } else {
+            correct = (JSON.stringify(userAns) === JSON.stringify(q.ans));
+        }
+
+        const popup = document.getElementById('feedback-popup');
+        const title = document.getElementById('feedback-title');
+        const msg = document.getElementById('feedback-msg');
+        const btn = document.getElementById('feedback-btn');
+
+        if(correct) {
+            const random = successMessages[Math.floor(Math.random() * successMessages.length)];
+            title.innerText = random.title;
+            title.className = "success-text";
+            msg.innerText = random.msg;
+            btn.innerText = "CARREGANDO..."; // Indica que vai mudar sozinho
+            isCorrectMove = true;
+        } else {
+            const random = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+            title.innerText = random.title;
+            title.className = "error-text";
+            msg.innerText = random.msg;
+            btn.innerText = "TENTANDO NOVAMENTE...";
+            isCorrectMove = false;
+        }
+        
+        popup.classList.add('show');
+
+        // TEMPORIZADOR: Fecha sozinho após 3 segundos (3000ms)
+        setTimeout(() => {
+            if (popup.classList.contains('show')) {
+                closeFeedback();
+            }
+        }, 2000);
+    }
+
+    function closeFeedback() {
+        const popup = document.getElementById('feedback-popup');
+        popup.classList.remove('show');
+        
+        if(isCorrectMove) {
+            currentIdx++;
+            if(currentIdx < quizData.length) {
+                loadQuestion();
+            } else {
+                showScreen('result-screen');
+            }
+        } else {
+            clearCloud(); // Se errou a nuvem, limpa para tentar de novo
+        }
+    }
+</script>
+</body>
+</html>
