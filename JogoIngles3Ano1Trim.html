@@ -200,6 +200,10 @@
     </div>
 
     <div id="game-screen" class="screen">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <button class="btn" style="font-size: 0.7rem; padding: 5px 15px;" onclick="navQuestion(-1)">◀ Anterior</button>
+            <button class="btn" style="font-size: 0.7rem; padding: 5px 15px;" onclick="navQuestion(1)">Próxima ▶</button>
+        </div>
         <div class="phase-header" id="phase-title">FASE 1</div>
         <div class="ki-bar-container"><div id="ki-fill"></div></div>
         
@@ -255,8 +259,8 @@
         // FASE 4: Unit 2 - Gramática There is/are
         { id: 19, fase: 4, tipo: "cloud", q: "Are there any markers?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["Yes,", "there", "are"] },
         { id: 20, fase: 4, tipo: "cloud", q: "Is there any glue?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["No,", "there", "isn't"] },
-        { id: 21, fase: 4, tipo: "cloud", q: "Are there any pencils?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["No,", "there", "isn't"]  },
-        { id: 22, fase: 4, tipo: "cloud", q: "Is there a eraser?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["Yes", "there", "is"]  },
+        { id: 21, fase: 4, tipo: "cloud", q: "Are there any pencils?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["No,", "there", "aren't"]  },
+        { id: 22, fase: 4, tipo: "cloud", q: "Is there a eraser?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["Yes,", "there", "is"]  },
         { id: 23, fase: 4, tipo: "cloud", q: "Are there any scissors?", img: "https://blog.grafittiartes.com.br/storage/site_antigo/uploads/2024/02/Grafitti_Blog_fev_15.02-1.jpg", options: ["Yes,", "No,","there","are","aren't","is","isn't"],  ans: ["No,", "there", "aren't"] },
 
         // FASE 5: Unit 3 - Likes & Activities
@@ -276,6 +280,18 @@
     // Inicialização
     document.getElementById('config-area').value = JSON.stringify(defaultData, null, 2);
 
+    function navQuestion(step) {
+        // Calcula o novo índice garantindo que fique dentro do array (0 a 24)
+        let nextIdx = currentIdx + step;
+        
+        if (nextIdx >= 0 && nextIdx < quizData.length) {
+            currentIdx = nextIdx;
+            loadQuestion();
+            // Esconde o popup caso ele mude de questão enquanto o feedback está aberto
+            document.getElementById('feedback-popup').classList.remove('show');
+        }
+    }
+    
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
