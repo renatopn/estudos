@@ -52,6 +52,11 @@
             font-size: 2em;
         }
 
+        h2 {
+            color: var(--amarelo-alerta);
+            margin-bottom: 10px;
+        }
+
         /* --- Estilos do Jogo Principal (Tabuada) --- */
         
         #jogo-tabuada {
@@ -237,7 +242,7 @@
         }
         
         .card-back {
-            background: repeating-linear-gradient(45deg, var(--branco-teia), var(--branco-teia) 10px, var(--azul-aranha) 10px, var(--azul-aranha) 20px);
+            background: repeating-linear-gradient(45deg, var(--vermelho-aranha), var(--branco-teia) 10px, var(--azul-aranha) 10px, var(--azul-aranha) 20px);
             color: var(--preto-sombra);
             font-size: 3em;
         }
@@ -266,6 +271,7 @@
                 <span>⏱️ Tempo: <span id="tempo">7.0</span>s</span>
             </div>
 
+            <h2>Qual é o coletivo de:</h2>
             <div id="pergunta-box">
                 <p id="pergunta">Clique em Iniciar Missão para começar!</p>
             </div>
@@ -498,7 +504,7 @@
             const colecaoPrincipal = itemAleatorio.s.split('/')[0];
             
             // Define a pergunta e a resposta correta
-            elPergunta.textContent = `Qual é o coletivo de ${colecaoPrincipal}?`;
+            elPergunta.textContent = `${colecaoPrincipal}?`;
             respostaCorreta = coletivoPrincipal;
             gerarOpcoes(coletivoPrincipal);
         }
