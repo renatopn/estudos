@@ -580,10 +580,9 @@
                 
                 // Mensagem aleatória de erro / tempo esgotado, mostrando a resposta correta
                 let msgIndex = getRandomInt(0, MENSAGENS_ERRO.length - 1);
-                let msg = MENSAGENS_ERRO[msgIndex] + respostaCorreta;
-
+                let msg = MENSAGENS_ERRO[msgIndex]  + " ✨ " + respostaCorreta + " ✨";
                 if (respostaDoJogador === null) {
-                    msg = "😭 Tempo Esgotado! A resposta correta era: " + respostaCorreta;
+                    msg = "😭 Tempo Esgotado! A resposta correta era: ✨ " + respostaCorreta + " ✨";
                 }
                 
                 exibirFeedback(msg, 'erro');
