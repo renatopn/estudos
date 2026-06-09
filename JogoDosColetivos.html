@@ -239,6 +239,11 @@
             border-radius: 8px;
             padding: 5px;
             box-sizing: border-box;
+            /* permitir quebra automática de linha para melhor leitura */
+            white-space: normal;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
         }
         
         .card-back {
@@ -268,7 +273,7 @@
             <div id="placar">
                 <span>⭐ Acertos Total: <span id="pontuacao">0</span></span>
                 <span class="contador-bonus">🎯 Próximo Bônus: <span id="acertos-rodada">0</span>/10</span>
-                <span>⏱️ Tempo: <span id="tempo">7.0</span>s</span>
+                <span>⏱️ Tempo: <span id="tempo">15.0</span>s</span>
             </div>
 
             <h2>Qual é o coletivo de:</h2>
