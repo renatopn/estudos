@@ -136,11 +136,47 @@
   .opt-btn.correct{background:#a4e8a0;border-color:#2e7d32;}
   .opt-btn.wrong{background:#f5a3a3;border-color:#b71c1c;}
   .opt-btn:disabled{cursor:default;}
-  .flash-msg{
-    text-align:center;font-size:11px;padding:8px;margin-top:10px;border-radius:8px;display:none;
+  /* Correct-answer Pokéball celebration effect */
+  .pokeball{
+    width:74px;height:74px;border-radius:50%;
+    background:linear-gradient(180deg, var(--pk-red) 0%, var(--pk-red) 46%, var(--pk-dark) 46%, var(--pk-dark) 54%, #fff 54%, #fff 100%);
+    border:4px solid var(--pk-dark);
+    box-shadow:0 6px 14px rgba(0,0,0,0.45);
+    position:relative;
+    margin:0 auto 10px;
   }
-  .flash-msg.show{display:block;}
-  .flash-msg.ok{background:#a4e8a0;color:#1b5e20;border:3px solid #2e7d32;}
+  .pokeball::after{
+    content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:22px;height:22px;background:#fff;border:4px solid var(--pk-dark);border-radius:50%;
+  }
+  #correct-effect{
+    display:none;position:fixed;inset:0;z-index:110;
+    align-items:center;justify-content:center;pointer-events:none;
+    background:radial-gradient(circle, rgba(255,203,5,0.35) 0%, rgba(255,203,5,0) 65%);
+  }
+  #correct-effect.show{display:flex;}
+  #correct-effect.show .pokeball{animation:pokeballPop 2s ease-out forwards;}
+  #correct-effect.show #correct-effect-msg{animation:msgPop 2s ease-out forwards;}
+  .correct-effect-inner{text-align:center;}
+  #correct-effect-msg{
+    font-size:11px;color:#fff;text-shadow:2px 2px 0 var(--pk-red-dark), -1px -1px 0 var(--pk-dark);
+    opacity:0;
+  }
+  @keyframes pokeballPop{
+    0%{transform:scale(0.2) rotate(-25deg);opacity:0;}
+    18%{transform:scale(1.2) rotate(12deg);opacity:1;}
+    30%{transform:scale(0.92) rotate(-6deg);}
+    42%{transform:scale(1.05) rotate(0deg);}
+    55%{transform:scale(1) rotate(0deg);opacity:1;}
+    85%{transform:scale(1) rotate(0deg);opacity:1;}
+    100%{transform:scale(1.25) rotate(0deg);opacity:0;}
+  }
+  @keyframes msgPop{
+    0%{opacity:0;transform:translateY(8px);}
+    20%{opacity:1;transform:translateY(0);}
+    82%{opacity:1;transform:translateY(0);}
+    100%{opacity:0;transform:translateY(-6px);}
+  }
 
   /* Fullscreen review popup */
   #review-overlay{
@@ -182,7 +218,22 @@
   #bonus-timerbar{height:100%;background:var(--pk-blue);width:100%;}
   .drop-emoji, .bullet-emoji, .pop-emoji{position:absolute;font-size:26px;pointer-events:none;user-select:none;line-height:1;}
   .bullet-emoji{font-size:18px;}
-  .ship-emoji{position:absolute;font-size:34px;pointer-events:none;user-select:none;transform:translate(-50%,-50%);z-index:5;}
+  .ship-emoji{position:absolute;font-size:34px;pointer-events:none;user-select:none;transform:translate(-50%,-50%) rotate(-45deg);z-index:5;}
+  #bonus-progress{font-size:7px;color:#cfe8ff;text-align:center;margin-bottom:4px;min-height:9px;text-shadow:1px 1px 0 #000;}
+  #bonus-stats{font-size:8px;text-align:center;color:var(--pk-dark);margin-bottom:6px;}
+  #bonus-record-banner{
+    display:none;text-align:center;font-size:9px;color:#7a1f00;
+    background:var(--pk-yellow);border:3px solid var(--pk-red-dark);border-radius:8px;
+    padding:6px;margin-bottom:6px;
+  }
+  #bonus-record-banner.show{display:block;animation:pulse .6s ease-in-out infinite alternate;}
+  @keyframes pulse{from{transform:scale(1);}to{transform:scale(1.04);}}
+  .bonus-result{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:20px;
+  }
+  .bonus-result .emo{font-size:32px;margin-bottom:10px;}
+  .bonus-result p{font-size:11px;color:#fff;line-height:1.9;text-shadow:2px 2px 0 var(--pk-red-dark);}
 
   /* End screen */
   .stat-line{font-size:9px;line-height:2.4;background:#fff;border:3px solid var(--pk-dark);border-radius:10px;padding:12px;margin-bottom:14px;}
@@ -239,7 +290,6 @@
       <div id="question-num">Pergunta Nº 001</div>
       <div id="question-text">Carregando...</div>
       <div id="options"></div>
-      <div class="flash-msg ok" id="flash-ok">✅ Correto! O Professor Carvalho ficou orgulhoso!</div>
     </div>
   </section>
 
@@ -250,7 +300,10 @@
       <div class="header-title">FASE BÔNUS<small>Reforço de Conteúdo</small></div>
     </header>
     <div class="screen-body" id="bonus-screen">
+      <div id="bonus-progress"></div>
       <div id="bonus-header"></div>
+      <div id="bonus-stats">🎯 Acertos: <span id="bonus-hit-count">0</span> &nbsp; 🏆 Recorde: <span id="bonus-record-count">0</span></div>
+      <div id="bonus-record-banner"></div>
       <div id="bonus-area"></div>
       <div id="bonus-timerwrap"><div id="bonus-timerbar"></div></div>
       <p class="lead" style="margin-top:8px;">Arraste o dedo (ou o mouse) para mover a nave! 🚀</p>
@@ -282,6 +335,14 @@
     <p id="review-text"></p>
     <div class="timer-wrap"><div class="timer-bar" id="review-timer-bar"></div></div>
     <div class="countdown" id="review-countdown">Nova tentativa em 7s...</div>
+  </div>
+</div>
+
+<!-- CORRECT-ANSWER POKÉBALL CELEBRATION -->
+<div id="correct-effect">
+  <div class="correct-effect-inner">
+    <div class="pokeball"></div>
+    <div id="correct-effect-msg"></div>
   </div>
 </div>
 
@@ -466,6 +527,7 @@
   let bonusPool = [];
   let bonusPoolIdx = 0;
   let partnerEmoji = "⚡";
+  let bonusBestRecord = parseInt(localStorage.getItem('pokedexBonusRecord') || '0', 10) || 0;
 
   function shuffle(arr){
     const a = arr.slice();
@@ -539,7 +601,6 @@
     currentOptMap = shuffle(qData.options.map((_,i)=>i));
     const optWrap = document.getElementById('options');
     optWrap.innerHTML = '';
-    document.getElementById('flash-ok').classList.remove('show');
 
     currentOptMap.forEach((origIdx, dispIdx)=>{
       const btn = document.createElement('button');
@@ -556,38 +617,59 @@
 
     if(selectedOrigIdx === qData.correct){
       btnEl.classList.add('correct');
-      const flash = document.getElementById('flash-ok');
-      flash.classList.add('show');
+      showCorrectEffect();
       correctTotal++;
       bonusCombo++;
       updateBonusBalls();
 
       setTimeout(()=>{
-        if(bonusCombo >= 10){
+        pos++;
+        updateOverallBar();
+        if(pos >= queue.length){
           bonusCombo = 0;
           updateBonusBalls();
-          pos++;
-          updateOverallBar();
-          if(pos >= queue.length){
-            startBonus(true);
-          } else {
-            startBonus(false);
-          }
-        } else {
-          pos++;
-          updateOverallBar();
-          if(pos >= queue.length){
-            showEndScreen();
-          } else {
+          startFinalMarathon();
+        } else if(bonusCombo >= 10){
+          bonusCombo = 0;
+          updateBonusBalls();
+          const set = nextBonusSet();
+          runBonusRound(set, 20000, null, ()=>{
+            showScreen('screen-quiz');
             renderQuestion();
-          }
+          });
+        } else {
+          renderQuestion();
         }
-      }, 850);
+      }, 2000);
     } else {
       btnEl.classList.add('wrong');
       totalErrors++;
       showReviewPopup(qData);
     }
+  }
+
+  // ---------- CORRECT-ANSWER POKÉBALL CELEBRATION (max 2s) ----------
+  const CORRECT_MESSAGES = [
+    "Isso aí, Treinador!",
+    "Muito bem! Continue assim!",
+    "Uau! Resposta perfeita!",
+    "Você é o Mestre Pokémon do conhecimento!",
+    "Incrível! Registrado na Pokédex!",
+    "Show de bola!",
+    "Excelente captura de conhecimento!",
+    "Mandou bem demais!",
+    "Essa você acertou na mosca!",
+    "Treinador nível avançado!"
+  ];
+
+  function showCorrectEffect(){
+    const overlay = document.getElementById('correct-effect');
+    const msgEl = document.getElementById('correct-effect-msg');
+    msgEl.textContent = CORRECT_MESSAGES[Math.floor(Math.random()*CORRECT_MESSAGES.length)];
+    overlay.classList.remove('show');
+    void overlay.offsetWidth; // restart CSS animation
+    overlay.classList.add('show');
+    setTimeout(()=> overlay.classList.remove('show'), 2000);
   }
 
   // ---------- REVIEW POPUP (7s forced read, then re-ask same question) ----------
@@ -636,11 +718,7 @@
     showScreen('screen-start');
   });
 
-  // ---------- BONUS MINIGAME ----------
-  let bonusTimers = [];
-  let bonusRAF = null;
-  let bonusEndsQuizAfter = false;
-
+  // ---------- BONUS MINIGAME (reusable) ----------
   function nextBonusSet(){
     if(bonusPoolIdx >= bonusPool.length){
       bonusPool = shuffle(BONUS_SETS);
@@ -649,21 +727,39 @@
     return bonusPool[bonusPoolIdx++];
   }
 
-  function startBonus(isFinalQuestion){
-    bonusEndsQuizAfter = isFinalQuestion;
+  function runBonusRound(set, durationMs, progressLabel, onComplete){
     bonusRoundsPlayed++;
-    const set = nextBonusSet();
+    showScreen('screen-bonus');
 
+    document.getElementById('bonus-progress').textContent = progressLabel || '';
     document.getElementById('bonus-header').innerHTML =
       '<span class="emo">' + set.emoji + '</span><br>Reforce: ' + set.label;
 
-    showScreen('screen-bonus');
+    let hits = 0;
+    const startRecord = bonusBestRecord;
+    document.getElementById('bonus-hit-count').textContent = '0';
+    document.getElementById('bonus-record-count').textContent = String(bonusBestRecord);
+    const banner = document.getElementById('bonus-record-banner');
+    banner.classList.remove('show');
+    banner.textContent = '';
+
+    function registerHit(){
+      hits++;
+      document.getElementById('bonus-hit-count').textContent = String(hits);
+      if(hits > startRecord){
+        bonusBestRecord = hits;
+        localStorage.setItem('pokedexBonusRecord', String(bonusBestRecord));
+        document.getElementById('bonus-record-count').textContent = String(bonusBestRecord);
+        banner.textContent = '🏆 NOVO RECORDE! ' + hits + ' acertos!';
+        banner.classList.add('show');
+      }
+    }
 
     const area = document.getElementById('bonus-area');
     area.innerHTML = '';
     const areaRect = () => area.getBoundingClientRect();
 
-    // Ship
+    // Ship (nose pointing north)
     const ship = document.createElement('div');
     ship.className = 'ship-emoji';
     ship.textContent = '🚀';
@@ -738,6 +834,7 @@
     const dropSpawner = setInterval(spawnDrop, 700);
     spawnDrop();
 
+    let raf = null;
     function frame(){
       const h = area.clientHeight || 420;
       // move bullets
@@ -769,44 +866,58 @@
             popAt(d.x, d.y);
             b.el.remove(); bullets.splice(i,1);
             d.el.remove(); drops.splice(j,1);
+            registerHit();
             break;
           }
         }
       }
-      bonusRAF = requestAnimationFrame(frame);
+      raf = requestAnimationFrame(frame);
     }
-    bonusRAF = requestAnimationFrame(frame);
+    raf = requestAnimationFrame(frame);
 
-    // Timer bar 15s
+    // Timer bar
     const timerBar = document.getElementById('bonus-timerbar');
     timerBar.style.transition = 'none';
     timerBar.style.width = '100%';
     requestAnimationFrame(()=>{
-      timerBar.style.transition = 'width 15s linear';
+      timerBar.style.transition = 'width ' + (durationMs/1000) + 's linear';
       timerBar.style.width = '0%';
     });
 
-    const endTimeout = setTimeout(()=>{
-      endBonus(area, onMove, bulletSpawner, dropSpawner);
-    }, 15000);
+    setTimeout(()=>{
+      clearInterval(bulletSpawner);
+      clearInterval(dropSpawner);
+      if(raf) cancelAnimationFrame(raf);
+      area.removeEventListener('pointermove', onMove);
+      area.removeEventListener('touchmove', onMove);
+      banner.classList.remove('show');
+      area.innerHTML = '';
 
-    bonusTimers = [bulletSpawner, dropSpawner, endTimeout];
+      const resultEl = document.createElement('div');
+      resultEl.className = 'bonus-result';
+      resultEl.innerHTML = '<div class="emo">🎯</div><p>Você acertou<br><strong>' + hits + '</strong> emoji' + (hits === 1 ? '' : 's') + ' nessa fase bônus!</p>';
+      area.appendChild(resultEl);
+
+      setTimeout(()=>{
+        area.innerHTML = '';
+        if(onComplete) onComplete();
+      }, 2000);
+    }, durationMs);
   }
 
-  function endBonus(area, onMove, bulletSpawner, dropSpawner){
-    clearInterval(bulletSpawner);
-    clearInterval(dropSpawner);
-    if(bonusRAF) cancelAnimationFrame(bonusRAF);
-    area.removeEventListener('pointermove', onMove);
-    area.removeEventListener('touchmove', onMove);
-    area.innerHTML = '';
-
-    if(bonusEndsQuizAfter){
-      showEndScreen();
-    } else {
-      showScreen('screen-quiz');
-      renderQuestion();
+  function startFinalMarathon(){
+    const allSets = shuffle(BONUS_SETS);
+    let idx = 0;
+    function playNext(){
+      if(idx >= allSets.length){
+        showEndScreen();
+        return;
+      }
+      idx++;
+      const set = allSets[idx-1];
+      runBonusRound(set, 10000, 'Revisão Final — ' + idx + '/' + allSets.length, playNext);
     }
+    playNext();
   }
 
 })();
