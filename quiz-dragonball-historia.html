@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Radar do Dragão — História</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  :root{
+    --dbz-orange:#ff7a00;
+    --dbz-orange-dark:#c25100;
+    --dbz-blue:#1565c0;
+    --dbz-blue-dark:#0d47a1;
+    --dbz-yellow:#ffd600;
+    --dbz-red:#d32f2f;
+    --dbz-red-dark:#a01515;
+    --dbz-dark:#241000;
+    --screen-bg:#fff3e0;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    font-family:'Press Start 2P','Comic Sans MS',cursive,sans-serif;
+    background:
+      radial-gradient(circle at 20% 10%, #fff59d 0%, transparent 40%),
+      linear-gradient(180deg,#ffcc80 0%, #ffcc80 52%, #d84315 52%, #6d2c00 100%);
+    background-attachment:fixed;
+    color:var(--dbz-dark);
+    overflow-x:hidden;
+  }
+  #app{
+    max-width:480px;
+    margin:16px auto;
+    min-height:calc(100vh - 32px);
+    background:var(--dbz-orange);
+    border:6px solid var(--dbz-dark);
+    border-radius:18px;
+    box-shadow:0 10px 0 rgba(0,0,0,0.25), 0 0 0 4px var(--dbz-yellow) inset;
+    padding:10px;
+    position:relative;
+  }
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  header.dbz-header{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 10px;
+    background:var(--dbz-red-dark);
+    border:3px solid var(--dbz-dark);
+    border-radius:12px;
+    margin-bottom:10px;
+  }
+  .radar{
+    width:34px;height:34px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #b9f6ca, #2e7d32 60%, #1b5e20 100%);
+    border:3px solid var(--dbz-dark);
+    box-shadow:0 0 6px 2px rgba(255,255,255,0.3) inset;
+    flex-shrink:0;
+    position:relative;
+  }
+  .radar::after{
+    content:"";position:absolute;top:50%;left:50%;width:5px;height:5px;
+    background:#ffeb3b;border-radius:50%;transform:translate(-50%,-50%);
+    box-shadow:0 0 5px 2px rgba(255,235,59,0.9);
+  }
+  .header-title{
+    color:#fff;font-size:10px;line-height:1.6;text-shadow:2px 2px 0 #000;
+    flex:1;
+  }
+  .header-title small{display:block;font-size:7px;color:var(--dbz-yellow);}
+  .partner-badge{font-size:22px;filter:drop-shadow(0 0 4px rgba(255,214,0,0.9));}
+
+  .screen-body{
+    background:var(--screen-bg);
+    border:4px solid var(--dbz-dark);
+    border-radius:12px;
+    padding:14px;
+    min-height:520px;
+    display:flex;flex-direction:column;
+    position:relative;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  h1.title{
+    font-size:13px;color:#fff;text-align:center;text-shadow:2px 2px 0 #000;
+    margin:6px 0 14px;
+  }
+  p.lead{font-size:9px;line-height:1.9;text-align:center;color:var(--dbz-dark);}
+
+  .btn{
+    font-family:inherit;font-size:10px;
+    background:var(--dbz-yellow);
+    border:3px solid var(--dbz-dark);
+    border-radius:8px;
+    padding:12px 10px;
+    cursor:pointer;
+    box-shadow:0 4px 0 #c79b00;
+    color:var(--dbz-dark);
+    transition:transform .05s;
+  }
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 #c79b00;}
+  .btn.primary{background:var(--dbz-blue);color:#fff;box-shadow:0 4px 0 var(--dbz-blue-dark);}
+  .btn:disabled{opacity:.5;cursor:default;}
+
+  /* Start screen */
+  .starters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;}
+  .starter{
+    background:#fff;border:3px solid var(--dbz-dark);border-radius:10px;
+    padding:12px 6px;text-align:center;cursor:pointer;font-size:8px;
+    box-shadow:0 3px 0 rgba(0,0,0,0.3);
+  }
+  .starter.selected{background:var(--dbz-yellow);}
+  .starter .emo{font-size:28px;display:block;margin-bottom:6px;}
+  .center{display:flex;justify-content:center;}
+
+  /* Progress bars */
+  .progress-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:8px;}
+  .balls{display:flex;gap:3px;flex-wrap:wrap;}
+  .dball{width:14px;height:14px;border-radius:50%;background:#eee;border:2px solid var(--dbz-dark);position:relative;flex-shrink:0;}
+  .dball::after{content:"★";position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);font-size:7px;color:#c62828;line-height:1;}
+  .dball.filled{
+    background:radial-gradient(circle at 35% 30%, #ffe082, #ff8f00 60%, #e65100 100%);
+    box-shadow:0 0 4px 1px rgba(255,143,0,0.7);
+  }
+  .hpbar-wrap{flex:1;background:#fff;border:2px solid var(--dbz-dark);border-radius:6px;height:12px;overflow:hidden;}
+  .hpbar{height:100%;background:linear-gradient(90deg,#ffd54f,#ff6f00);width:0%;transition:width .4s;}
+
+  /* Question card */
+  #question-num{font-size:8px;color:var(--dbz-blue-dark);margin-bottom:6px;}
+  #question-text{
+    font-size:10px;line-height:1.9;background:#fff;border:3px solid var(--dbz-dark);
+    border-radius:10px;padding:12px;margin-bottom:14px;min-height:70px;
+  }
+  #options{display:flex;flex-direction:column;gap:8px;flex:1;}
+  .opt-btn{
+    text-align:left;font-family:inherit;font-size:9px;line-height:1.6;
+    background:#fff;border:3px solid var(--dbz-dark);border-radius:8px;
+    padding:10px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,0.25);
+  }
+  .opt-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,0.25);}
+  .opt-btn.correct{background:#a4e8a0;border-color:#2e7d32;}
+  .opt-btn.wrong{background:#f5a3a3;border-color:#b71c1c;}
+  .opt-btn:disabled{cursor:default;}
+
+  /* Correct-answer Dragon Ball celebration effect */
+  .dragonball{
+    width:74px;height:74px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ffe082, #ff8f00 55%, #e65100 100%);
+    border:4px solid #7a1f00;
+    box-shadow:0 6px 14px rgba(0,0,0,0.45), 0 0 26px 6px rgba(255,193,7,0.6);
+    position:relative;
+    margin:0 auto 10px;
+  }
+  .dragonball::after{
+    content:"★";position:absolute;top:50%;left:50%;transform:translate(-50%,-56%);
+    font-size:32px;color:#c62828;text-shadow:1px 1px 0 #7a1f00;
+  }
+  #correct-effect{
+    display:none;position:fixed;inset:0;z-index:110;
+    align-items:center;justify-content:center;pointer-events:none;
+    background:radial-gradient(circle, rgba(255,214,0,0.4) 0%, rgba(255,214,0,0) 65%);
+  }
+  #correct-effect.show{display:flex;}
+  #correct-effect.show .dragonball{animation:dragonballPop 2s ease-out forwards;}
+  #correct-effect.show #correct-effect-msg{animation:msgPop 2s ease-out forwards;}
+  .correct-effect-inner{text-align:center;}
+  #correct-effect-msg{
+    font-size:11px;color:#fff;text-shadow:2px 2px 0 var(--dbz-red-dark), -1px -1px 0 var(--dbz-dark);
+    opacity:0;
+  }
+  @keyframes dragonballPop{
+    0%{transform:scale(0.2) rotate(0deg);opacity:0;}
+    18%{transform:scale(1.2) rotate(180deg);opacity:1;}
+    30%{transform:scale(0.92) rotate(230deg);}
+    45%{transform:scale(1.05) rotate(340deg);}
+    55%{transform:scale(1) rotate(360deg);opacity:1;}
+    85%{transform:scale(1) rotate(360deg);opacity:1;}
+    100%{transform:scale(1.3) rotate(370deg);opacity:0;}
+  }
+  @keyframes msgPop{
+    0%{opacity:0;transform:translateY(8px);}
+    20%{opacity:1;transform:translateY(0);}
+    82%{opacity:1;transform:translateY(0);}
+    100%{opacity:0;transform:translateY(-6px);}
+  }
+
+  /* Fullscreen review popup */
+  #review-overlay{
+    display:none;position:fixed;inset:0;background:rgba(20,8,0,0.92);
+    z-index:100;align-items:center;justify-content:center;padding:18px;
+  }
+  #review-overlay.show{display:flex;}
+  .review-card{
+    background:var(--dbz-yellow);border:5px solid var(--dbz-dark);border-radius:16px;
+    max-width:420px;width:100%;padding:20px;text-align:center;
+    box-shadow:0 8px 0 rgba(0,0,0,0.4);
+  }
+  .review-card .icon{font-size:34px;margin-bottom:8px;}
+  .review-card h2{font-size:11px;color:var(--dbz-red-dark);text-shadow:1px 1px 0 #fff;margin:0 0 12px;}
+  .review-card p{font-size:9px;line-height:2;background:#fff;border:3px solid var(--dbz-dark);border-radius:10px;padding:12px;margin:0 0 14px;text-align:left;}
+  .timer-wrap{background:#fff;border:2px solid var(--dbz-dark);border-radius:6px;height:14px;overflow:hidden;margin-bottom:8px;}
+  .timer-bar{height:100%;background:var(--dbz-orange);width:100%;}
+  .review-card .countdown{font-size:9px;color:var(--dbz-dark);}
+
+  /* Bonus round */
+  #bonus-screen{position:relative;}
+  #bonus-header{text-align:center;font-size:10px;color:var(--dbz-red-dark);margin-bottom:6px;line-height:1.7;}
+  #bonus-header .emo{font-size:22px;}
+  #bonus-area{
+    position:relative;width:100%;height:420px;border:4px solid var(--dbz-dark);border-radius:10px;
+    overflow:hidden;
+    background:
+      radial-gradient(60px 60px at 80% 15%, rgba(255,235,150,0.85), rgba(255,235,150,0) 70%),
+      linear-gradient(180deg,#3e1600 0%, #7a2c00 35%, #c9560a 65%, #ffb300 100%);
+    touch-action:none;
+    cursor:crosshair;
+  }
+  #bonus-timerwrap{background:#fff;border:2px solid var(--dbz-dark);border-radius:6px;height:10px;overflow:hidden;margin-top:8px;}
+  #bonus-timerbar{height:100%;background:var(--dbz-orange);width:100%;}
+  .drop-emoji, .fireball-emoji, .pop-emoji{position:absolute;font-size:26px;pointer-events:none;user-select:none;line-height:1;}
+  .fireball-emoji{font-size:20px;filter:drop-shadow(0 0 4px rgba(255,111,0,0.8));}
+  .fighter-emoji{
+    position:absolute;font-size:34px;pointer-events:none;user-select:none;
+    transform:translate(-50%,-50%);z-index:5;
+    filter:drop-shadow(0 0 8px rgba(255,214,0,0.85));
+  }
+  #bonus-progress{font-size:7px;color:#fff3d6;text-align:center;margin-bottom:4px;min-height:9px;text-shadow:1px 1px 0 #000;}
+  #bonus-stats{font-size:8px;text-align:center;color:var(--dbz-dark);margin-bottom:6px;}
+  #bonus-record-banner{
+    display:none;text-align:center;font-size:9px;color:#7a1f00;
+    background:var(--dbz-yellow);border:3px solid var(--dbz-red-dark);border-radius:8px;
+    padding:6px;margin-bottom:6px;
+  }
+  #bonus-record-banner.show{display:block;animation:pulse .6s ease-in-out infinite alternate;}
+  @keyframes pulse{from{transform:scale(1);}to{transform:scale(1.04);}}
+  .bonus-result{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:20px;
+  }
+  .bonus-result .emo{font-size:32px;margin-bottom:10px;}
+  .bonus-result p{font-size:11px;color:#fff;line-height:1.9;text-shadow:2px 2px 0 var(--dbz-red-dark);}
+
+  /* End screen */
+  .stat-line{font-size:9px;line-height:2.4;background:#fff;border:3px solid var(--dbz-dark);border-radius:10px;padding:12px;margin-bottom:14px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <section id="screen-start" class="screen active">
+    <header class="dbz-header">
+      <div class="radar"></div>
+      <div class="header-title">RADAR DO DRAGÃO<small>História — O Bairro e o Município</small></div>
+    </header>
+    <div class="screen-body">
+      <h1 class="title">🐉 Bem-vindo, Guerreiro Z! 🐉</h1>
+      <p class="lead">Estude sobre O BAIRRO E O MUNICÍPIO respondendo ao quiz. Se errar, o pergaminho de revisão vai te ajudar a entender melhor antes de tentar de novo. A cada 10 acertos, uma fase bônus de treinamento aparece!</p>
+      <p class="lead">Escolha seu guerreiro:</p>
+      <div class="starters" id="starters">
+        <div class="starter" data-emo="🦸">
+          <span class="emo">🦸</span>Goku
+        </div>
+        <div class="starter" data-emo="👑">
+          <span class="emo">👑</span>Vegeta
+        </div>
+        <div class="starter" data-emo="👺">
+          <span class="emo">👺</span>Piccolo
+        </div>
+        <div class="starter" data-emo="🐲">
+          <span class="emo">🐲</span>Shenlong
+        </div>
+      </div>
+      <div class="center">
+        <button class="btn primary" id="btn-start">Iniciar Treinamento!</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ SCREEN -->
+  <section id="screen-quiz" class="screen">
+    <header class="dbz-header">
+      <div class="radar"></div>
+      <div class="header-title">RADAR DO DRAGÃO<small>História — O Bairro e o Município</small></div>
+      <div class="partner-badge" id="partner-badge">🦸</div>
+    </header>
+    <div class="screen-body">
+      <div class="progress-row">
+        <div class="hpbar-wrap"><div class="hpbar" id="overall-bar"></div></div>
+      </div>
+      <div class="progress-row">
+        <span style="font-size:7px;">Combo bônus:</span>
+        <div class="balls" id="bonus-balls"></div>
+      </div>
+      <div id="question-num">Pergunta Nº 001</div>
+      <div id="question-text">Carregando...</div>
+      <div id="options"></div>
+    </div>
+  </section>
+
+  <!-- BONUS SCREEN -->
+  <section id="screen-bonus" class="screen">
+    <header class="dbz-header">
+      <div class="radar"></div>
+      <div class="header-title">FASE BÔNUS<small>Treino de Kamehameha</small></div>
+    </header>
+    <div class="screen-body" id="bonus-screen">
+      <div id="bonus-progress"></div>
+      <div id="bonus-header"></div>
+      <div id="bonus-stats">🔥 Acertos: <span id="bonus-hit-count">0</span> &nbsp; 🐉 Recorde: <span id="bonus-record-count">0</span></div>
+      <div id="bonus-record-banner"></div>
+      <div id="bonus-area"></div>
+      <div id="bonus-timerwrap"><div id="bonus-timerbar"></div></div>
+      <p class="lead" style="margin-top:8px;">Arraste o dedo (ou o mouse) para mover o guerreiro! 🦸</p>
+    </div>
+  </section>
+
+  <!-- END SCREEN -->
+  <section id="screen-end" class="screen">
+    <header class="dbz-header">
+      <div class="radar"></div>
+      <div class="header-title">RADAR DO DRAGÃO<small>Treinamento Concluído!</small></div>
+    </header>
+    <div class="screen-body">
+      <h1 class="title">🏆 Você é o Campeão do Torneio! 🏆</h1>
+      <div class="stat-line" id="end-stats"></div>
+      <div class="center">
+        <button class="btn primary" id="btn-restart">Treinar Novamente</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- FULLSCREEN REVIEW POPUP -->
+<div id="review-overlay">
+  <div class="review-card">
+    <div class="icon">📜</div>
+    <h2 id="review-title">Vamos Revisar!</h2>
+    <p id="review-text"></p>
+    <div class="timer-wrap"><div class="timer-bar" id="review-timer-bar"></div></div>
+    <div class="countdown" id="review-countdown">Nova tentativa em 7s...</div>
+  </div>
+</div>
+
+<!-- CORRECT-ANSWER DRAGON BALL CELEBRATION -->
+<div id="correct-effect">
+  <div class="correct-effect-inner">
+    <div class="dragonball"></div>
+    <div id="correct-effect-msg"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- DATA ----------
+  const QUESTIONS = [
+    {q:"O que é uma comunidade?",
+     options:["Grupo social formado por pessoas com interesses em comum","Um tipo de prédio público","Um imposto cobrado pela prefeitura","Um tipo de rua sem saída"],
+     correct:0,
+     review:"Comunidade é o grupo social formado por pessoas que têm alguns interesses em comum — por exemplo, zelar pela limpeza e pela segurança de uma rua, de um bairro ou de um condomínio."},
+    {q:"Por que a rua é chamada de um \"espaço de todos\"?",
+     options:["Porque nela só passam carros","Porque nela convivemos com vizinhos e com todas as pessoas que circulam por ela","Porque pertence apenas à prefeitura","Porque só os donos das casas podem usá-la"],
+     correct:1,
+     review:"A rua não é apenas o lugar onde moramos ou por onde passamos: ela é um espaço onde convivemos com vizinhos e com todos que circulam por ela, ou seja, é um espaço de todos."},
+    {q:"O que é um bairro?",
+     options:["Um tipo de imposto","Uma capital do Brasil","Um conjunto de ruas ou parte que constitui um município","Um espaço privado"],
+     correct:2,
+     review:"Bairro é o nome dado a um conjunto de ruas ou a cada uma das partes que constituem um município."},
+    {q:"O que significa a palavra \"litoral\"?",
+     options:["Região central de uma cidade","Um tipo de bairro rural","Região que fica à beira do mar; praia","Um espaço público administrado pela prefeitura"],
+     correct:2,
+     review:"Litoral é a região que fica à beira do mar; praia. Alguns bairros e municípios estão localizados no litoral, longe do centro da cidade."},
+    {q:"Quem administra e mantém os espaços públicos de um bairro?",
+     options:["Apenas os moradores da rua","As empresas privadas da região","O governo do país, do estado ou do município, por meio dos impostos","Ninguém, eles não precisam de manutenção"],
+     correct:2,
+     review:"Os espaços públicos são administrados e mantidos pelo governo do país, do estado ou do município por meio dos impostos pagos pelos moradores."},
+    {q:"O que são impostos?",
+     options:["Multas por sujar a rua","Valores pagos apenas por quem tem uma loja","Dinheiro doado voluntariamente à prefeitura","Valores cobrados da população pelos órgãos públicos em razão dos serviços prestados"],
+     correct:3,
+     review:"Impostos são valores cobrados da população pelos órgãos públicos em razão dos serviços prestados por eles."},
+    {q:"Um shopping center é considerado um espaço público?",
+     options:["Não, é um espaço privado, mesmo sendo aberto ao público","Sim, porque qualquer pessoa pode entrar","Sim, porque é mantido pelos impostos","Não, porque ninguém pode visitá-lo"],
+     correct:0,
+     review:"Shopping centers e lojas são espaços privados, pois pertencem a pessoas ou empresas responsáveis por sua manutenção — mesmo sendo abertos à circulação de pessoas em geral."},
+    {q:"De quem é a responsabilidade pela administração dos bairros e pela manutenção dos espaços públicos?",
+     options:["De nenhum órgão específico","Da prefeitura do município","Apenas dos moradores mais ricos","De uma empresa privada contratada pelos moradores"],
+     correct:1,
+     review:"A responsabilidade pela administração dos bairros e pela manutenção dos espaços públicos é da prefeitura do município."},
+    {q:"Além da prefeitura, quem também é responsável por cuidar e conservar os espaços públicos do bairro?",
+     options:["Somente os comerciantes","Somente os turistas","Todos os moradores do bairro","Somente os visitantes estrangeiros"],
+     correct:2,
+     review:"A conservação dos espaços públicos também é responsabilidade de todos os moradores do bairro, que devem utilizá-los de forma adequada e mantê-los sempre limpos."},
+    {q:"O que significa promover a acessibilidade?",
+     options:["Construir rampas apenas nos hospitais","Oferecer transporte gratuito somente aos idosos","Garantir o acesso das pessoas com qualquer tipo de deficiência aos espaços, edifícios, transportes e comunicação","Proibir a entrada de cadeirantes em locais públicos"],
+     correct:2,
+     review:"Promover a acessibilidade é garantir o acesso das pessoas com qualquer tipo de deficiência aos espaços, edifícios, móveis, transportes e equipamentos, inclusive de comunicação."},
+    {q:"Como o território do Brasil foi organizado para ser administrado?",
+     options:["O país foi dividido apenas em cidades","O país foi dividido em bairros","O país foi dividido em estados, e os estados foram divididos em municípios","O país não tem nenhuma divisão administrativa"],
+     correct:2,
+     review:"Para administrar seu grande território, o Brasil foi dividido em estados, e os estados foram divididos em municípios."},
+    {q:"Todo município é formado por quais áreas?",
+     options:["Uma área urbana (cidade) e uma área rural (campo)","Apenas uma área urbana","Apenas uma área rural","Uma capital e um litoral"],
+     correct:0,
+     review:"Todo município é formado por uma área urbana, chamada de cidade, e uma área rural, chamada de campo."},
+    {q:"Qual é o município brasileiro que possui o maior território?",
+     options:["São Paulo, em São Paulo","Salvador, na Bahia","Altamira, no Pará","Rio de Janeiro, no Rio de Janeiro"],
+     correct:2,
+     review:"Altamira, no estado do Pará, é o município brasileiro que possui o maior território."},
+    {q:"Qual é o município mais populoso do Brasil?",
+     options:["Altamira, no Pará","São Paulo, com mais de 11 milhões de habitantes","Brasília, no Distrito Federal","Rio de Janeiro, no Rio de Janeiro"],
+     correct:1,
+     review:"São Paulo, no estado de São Paulo, é o município mais populoso do Brasil, com mais de 11 milhões de habitantes."},
+    {q:"Qual das opções abaixo é um exemplo de serviço essencial de um bairro?",
+     options:["Cinema","Estádio de futebol","Shopping center","Coleta de lixo"],
+     correct:3,
+     review:"Os bairros precisam de serviços essenciais como rede de esgotos, água tratada, coleta de lixo, iluminação de ruas, hospitais e postos de saúde, entre outros."},
+    {q:"Como são chamados os serviços essenciais oferecidos à população, que são um direito de todos os cidadãos?",
+     options:["Serviços públicos","Serviços privados","Impostos","Espaços de convivência"],
+     correct:0,
+     review:"Os serviços essenciais são chamados de serviços públicos e são um direito de todos os cidadãos, garantido pelas prefeituras e outros órgãos públicos."},
+    {q:"Qual é a capital do Brasil atualmente?",
+     options:["Rio de Janeiro","Salvador","Brasília","São Paulo"],
+     correct:2,
+     review:"A capital do Brasil atualmente é Brasília, onde fica a sede do Governo Federal."},
+    {q:"Em que ano Brasília se tornou a capital do Brasil?",
+     options:["1763","1549","1889","1960"],
+     correct:3,
+     review:"Brasília se tornou a capital do Brasil em 1960. Ela está localizada na região central do território brasileiro."},
+    {q:"Quais foram as duas cidades que já foram capital do Brasil antes de Brasília?",
+     options:["Recife e Manaus","Salvador e Rio de Janeiro","São Paulo e Belo Horizonte","Fortaleza e Porto Alegre"],
+     correct:1,
+     review:"Antes de Brasília, o Brasil teve duas capitais: a cidade de Salvador, na Bahia (1549 a 1763), e a cidade do Rio de Janeiro (1763 até a inauguração de Brasília)."},
+    {q:"De 1549 a 1763, qual cidade foi a capital do Brasil?",
+     options:["Rio de Janeiro","Brasília","Salvador","São Paulo"],
+     correct:2,
+     review:"De 1549 a 1763, a capital do Brasil foi a cidade de Salvador, na Bahia."},
+    {q:"Que data é considerada a data de fundação do Brasil como unidade política?",
+     options:["7 de setembro de 1822","29 de março de 1549, desembarque de Thomé de Souza em Salvador","15 de novembro de 1889","21 de abril de 1960"],
+     correct:1,
+     review:"A data do desembarque de Thomé de Souza em Salvador (29 de março de 1549) é considerada a data de fundação da cidade e, ao mesmo tempo, a data de fundação do Brasil como unidade política."},
+    {q:"O que significa dizer que bairros e municípios \"têm história\"?",
+     options:["Que só as pessoas famosas têm história","Que eles mudam com o passar do tempo","Que eles nunca mudam","Que apenas as capitais têm história"],
+     correct:1,
+     review:"Bairros e municípios têm história porque também mudam com o passar do tempo: podem ser abertas novas ruas, casas podem dar lugar a prédios, árvores podem ser derrubadas, entre outras mudanças."},
+    {q:"O que eram os bondes?",
+     options:["Um tipo de imposto antigo","Veículos que trafegavam sobre trilhos, usados no passado","Um tipo de espaço público","Um documento histórico"],
+     correct:1,
+     review:"Bondes eram uma espécie de veículo que trafegava sobre trilhos e circulava pelas ruas antigamente, quando os carros ainda eram raros."},
+    {q:"O que aconteceu com a floresta da Tijuca, no Rio de Janeiro?",
+     options:["Nunca existiu","Foi derrubada para construir um shopping center","Foi reflorestada a mando de dom Pedro II, depois de destruída por plantações de café","É a única floresta do Brasil"],
+     correct:2,
+     review:"A floresta da Tijuca, a maior floresta urbana do mundo, foi reflorestada a mando de dom Pedro II, imperador do Brasil, depois de ter sido parcialmente destruída pelas plantações de café."},
+    {q:"O prédio da Casa da Cultura, no Recife, já teve qual uso no passado?",
+     options:["Foi uma escola","Funcionou como penitenciária","Foi um hospital","Foi uma estação de trem"],
+     correct:1,
+     review:"A Casa da Cultura, no Recife, está instalada em um prédio construído em meados do século 19 que funcionou como penitenciária durante mais de cem anos. Hoje é um espaço de cultura."},
+    {q:"O que torna um prédio um \"prédio histórico\"?",
+     options:["Ele precisa ser derrubado","Ele precisa ser o mais moderno da cidade","Ele nos faz lembrar do passado e da época em que foi construído","Ele não pode ser visitado por ninguém"],
+     correct:2,
+     review:"Um prédio histórico é aquele que nos faz lembrar do passado e de tudo o que acontecia na época em que foi construído — como o Teatro Amazonas, em Manaus, inaugurado em 1896 e preservado até hoje."},
+    {q:"Por que a profissão de acendedor de lampiões deixou de existir?",
+     options:["Porque as ruas deixaram de ter iluminação","Porque a eletricidade substituiu a iluminação a gás","Porque virou proibida por lei","Porque não existiam mais lampiões"],
+     correct:1,
+     review:"Os acendedores de lampiões acendiam e apagavam, todos os dias, os lampiões a gás das ruas. Com a chegada da eletricidade, essa profissão deixou de existir."},
+    {q:"O que os acendedores de lampiões usavam para acender e apagar os lampiões?",
+     options:["Um controle remoto","Uma escada e um isqueiro","Uma vara especial com uma esponja de platina na ponta","Uma lanterna elétrica"],
+     correct:2,
+     review:"Os acendedores de lampiões entravam em cena com uma vara especial dotada de uma esponja de platina na ponta, usada para acender e apagar os lampiões a gás."},
+    {q:"Por que a profissão de vendedor ambulante é um exemplo de \"permanência\" na história das cidades?",
+     options:["Porque só existe em uma cidade do Brasil","Porque foi proibida e depois recriada","Porque é uma das profissões mais antigas e ainda existe hoje","Porque só existiu no século 19"],
+     correct:2,
+     review:"O vendedor ambulante é uma das profissões mais antigas nas cidades brasileiras, e ainda hoje podemos encontrar esses trabalhadores — por isso é um exemplo de permanência."},
+    {q:"O que é a Arqueologia?",
+     options:["Uma ciência que estuda somente os dinossauros","Uma ciência que estuda as sociedades do passado por meio da cultura material, restos orgânicos e indivíduos","Uma ciência que estuda apenas prédios modernos","Uma ciência que estuda somente documentos escritos"],
+     correct:1,
+     review:"A Arqueologia é uma ciência que estuda as sociedades do passado mediante a observação da cultura material, dos restos orgânicos e dos próprios indivíduos, enxergando mudanças através do tempo."},
+    {q:"O que é considerado \"cultura material\" pela Arqueologia?",
+     options:["Apenas fotografias antigas","Apenas livros e documentos","Ferramentas, móveis, adornos, vestimentas, armas, artesanatos e construções","Apenas roupas modernas"],
+     correct:2,
+     review:"Cultura material são as ferramentas, móveis, adornos, vestimentas, armas, artesanatos e construções estudados pela Arqueologia para compreender as sociedades do passado."},
+    {q:"O que foi o Cais do Valongo, no Rio de Janeiro?",
+     options:["Um antigo teatro","Uma antiga escola","Uma área usada para desembarque de africanos escravizados, redescoberta em escavações a partir de 2011","Um prédio do governo federal"],
+     correct:2,
+     review:"O Cais do Valongo foi construído em 1811 e utilizado como área de desembarque de africanos escravizados até 1831. Foi aterrado na década de 1890 e redescoberto após o trabalho de revitalização do porto do Rio de Janeiro, a partir de 2011."},
+    {q:"Que tipo de objetos foram encontrados nas escavações do Cais do Valongo?",
+     options:["Moedas de ouro","Anéis, amuletos e botões feitos de ossos","Armas de fogo","Carros antigos"],
+     correct:1,
+     review:"Nas escavações do Cais do Valongo, arqueólogos encontraram objetos como anéis, amuletos e botões feitos de ossos, muitos deles pertencentes aos africanos que foram trazidos para o país."}
+  ];
+
+  const BONUS_SETS = [
+    {label:"Bairro é um conjunto de ruas", emoji:"🏘️"},
+    {label:"Comunidade: pessoas com interesses em comum", emoji:"🤝"},
+    {label:"Espaços públicos pertencem a todos", emoji:"🌳"},
+    {label:"Impostos mantêm os espaços públicos", emoji:"💰"},
+    {label:"Acessibilidade para todas as pessoas", emoji:"♿"},
+    {label:"Município é formado por cidade e campo", emoji:"🌾"},
+    {label:"Serviços essenciais, como a coleta de lixo", emoji:"🗑️"},
+    {label:"Brasília é a capital do Brasil", emoji:"🏛️"},
+    {label:"Bondes circulavam sobre trilhos", emoji:"🚋"},
+    {label:"Acendedor de lampiões: profissão do passado", emoji:"🏮"},
+    {label:"Vendedor ambulante: profissão que permanece", emoji:"🛒"},
+    {label:"Arqueologia estuda o passado", emoji:"🏺"},
+    {label:"Cais do Valongo, um sítio arqueológico", emoji:"⚓"},
+    {label:"Litoral é a região à beira do mar", emoji:"🏖️"}
+  ];
+
+  // ---------- STATE ----------
+  let queue = [];
+  let pos = 0;
+  let correctTotal = 0;
+  let bonusCombo = 0;
+  let totalErrors = 0;
+  let bonusRoundsPlayed = 0;
+  let bonusPool = [];
+  let bonusPoolIdx = 0;
+  let partnerEmoji = "🦸";
+  let bonusBestRecord = parseInt(localStorage.getItem('dragonballHistoriaBonusRecord') || '0', 10) || 0;
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  // ---------- SCREEN HELPERS ----------
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ---------- START ----------
+  const starters = document.querySelectorAll('.starter');
+  starters.forEach(st=>{
+    st.addEventListener('click', ()=>{
+      starters.forEach(s=>s.classList.remove('selected'));
+      st.classList.add('selected');
+      partnerEmoji = st.getAttribute('data-emo');
+    });
+  });
+  starters[0].classList.add('selected');
+
+  document.getElementById('btn-start').addEventListener('click', startGame);
+
+  function startGame(){
+    document.getElementById('partner-badge').textContent = partnerEmoji;
+    queue = shuffle(QUESTIONS.map((_,i)=>i));
+    pos = 0;
+    correctTotal = 0;
+    bonusCombo = 0;
+    totalErrors = 0;
+    bonusRoundsPlayed = 0;
+    bonusPool = shuffle(BONUS_SETS);
+    bonusPoolIdx = 0;
+    updateOverallBar();
+    updateBonusBalls();
+    showScreen('screen-quiz');
+    renderQuestion();
+  }
+
+  function updateOverallBar(){
+    const pct = Math.round((pos/QUESTIONS.length)*100);
+    document.getElementById('overall-bar').style.width = pct+'%';
+  }
+
+  function updateBonusBalls(){
+    const wrap = document.getElementById('bonus-balls');
+    wrap.innerHTML = '';
+    for(let i=0;i<10;i++){
+      const b = document.createElement('div');
+      b.className = 'dball' + (i < bonusCombo ? ' filled' : '');
+      wrap.appendChild(b);
+    }
+  }
+
+  // ---------- QUIZ RENDER ----------
+  let currentOptMap = []; // maps displayed index -> original option index
+
+  function renderQuestion(){
+    const qIndex = queue[pos];
+    const qData = QUESTIONS[qIndex];
+    document.getElementById('question-num').textContent =
+      'Pergunta Nº ' + String(pos+1).padStart(3,'0') + ' de ' + String(QUESTIONS.length).padStart(3,'0');
+    document.getElementById('question-text').textContent = qData.q;
+
+    currentOptMap = shuffle(qData.options.map((_,i)=>i));
+    const optWrap = document.getElementById('options');
+    optWrap.innerHTML = '';
+
+    currentOptMap.forEach((origIdx, dispIdx)=>{
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.textContent = String.fromCharCode(65+dispIdx) + ') ' + qData.options[origIdx];
+      btn.addEventListener('click', ()=> handleAnswer(origIdx, btn, qData, qIndex));
+      optWrap.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(selectedOrigIdx, btnEl, qData, qIndex){
+    const allBtns = document.querySelectorAll('#options .opt-btn');
+    allBtns.forEach(b=>b.disabled = true);
+
+    if(selectedOrigIdx === qData.correct){
+      btnEl.classList.add('correct');
+      showCorrectEffect();
+      correctTotal++;
+      bonusCombo++;
+      updateBonusBalls();
+
+      setTimeout(()=>{
+        pos++;
+        updateOverallBar();
+        if(pos >= queue.length){
+          bonusCombo = 0;
+          updateBonusBalls();
+          startFinalMarathon();
+        } else if(bonusCombo >= 10){
+          bonusCombo = 0;
+          updateBonusBalls();
+          const set = nextBonusSet();
+          runBonusRound(set, 20000, null, ()=>{
+            showScreen('screen-quiz');
+            renderQuestion();
+          });
+        } else {
+          renderQuestion();
+        }
+      }, 2000);
+    } else {
+      btnEl.classList.add('wrong');
+      totalErrors++;
+      showReviewPopup(qData);
+    }
+  }
+
+  // ---------- CORRECT-ANSWER DRAGON BALL CELEBRATION (max 2s) ----------
+  const CORRECT_MESSAGES = [
+    "Seu poder de luta aumentou!",
+    "Isso mesmo, Guerreiro Z!",
+    "Kamehameha de acerto!",
+    "Você achou uma Esfera do Dragão do conhecimento!",
+    "Mais forte que o Freeza!",
+    "Instinto Superior ativado!",
+    "Você é o Super Saiyajin dos estudos!",
+    "Explosão de sabedoria!",
+    "Continue treinando, Saiyajin!",
+    "Na mosca! Nem o Piccolo faria melhor!"
+  ];
+
+  function showCorrectEffect(){
+    const overlay = document.getElementById('correct-effect');
+    const msgEl = document.getElementById('correct-effect-msg');
+    msgEl.textContent = CORRECT_MESSAGES[Math.floor(Math.random()*CORRECT_MESSAGES.length)];
+    overlay.classList.remove('show');
+    void overlay.offsetWidth; // restart CSS animation
+    overlay.classList.add('show');
+    setTimeout(()=> overlay.classList.remove('show'), 2000);
+  }
+
+  // ---------- REVIEW POPUP (7s forced read, then re-ask same question) ----------
+  function showReviewPopup(qData){
+    const overlay = document.getElementById('review-overlay');
+    document.getElementById('review-text').textContent = qData.review;
+    document.getElementById('review-timer-bar').style.transition = 'none';
+    document.getElementById('review-timer-bar').style.width = '100%';
+    overlay.classList.add('show');
+
+    let remaining = 7;
+    document.getElementById('review-countdown').textContent = 'Nova tentativa em ' + remaining + 's...';
+
+    requestAnimationFrame(()=>{
+      const bar = document.getElementById('review-timer-bar');
+      bar.style.transition = 'width 7s linear';
+      bar.style.width = '0%';
+    });
+
+    const tick = setInterval(()=>{
+      remaining--;
+      if(remaining >= 0){
+        document.getElementById('review-countdown').textContent = 'Nova tentativa em ' + remaining + 's...';
+      }
+      if(remaining <= 0){
+        clearInterval(tick);
+      }
+    }, 1000);
+
+    setTimeout(()=>{
+      overlay.classList.remove('show');
+      renderQuestion(); // re-ask the same question (still at same `pos`)
+    }, 7000);
+  }
+
+  // ---------- END SCREEN ----------
+  function showEndScreen(){
+    document.getElementById('end-stats').innerHTML =
+      'Perguntas dominadas: ' + QUESTIONS.length + '<br>' +
+      'Respostas corretas: ' + correctTotal + '<br>' +
+      'Erros no caminho: ' + totalErrors + '<br>' +
+      'Fases bônus jogadas: ' + bonusRoundsPlayed;
+    showScreen('screen-end');
+  }
+  document.getElementById('btn-restart').addEventListener('click', ()=>{
+    showScreen('screen-start');
+  });
+
+  // ---------- BONUS MINIGAME (reusable) ----------
+  function nextBonusSet(){
+    if(bonusPoolIdx >= bonusPool.length){
+      bonusPool = shuffle(BONUS_SETS);
+      bonusPoolIdx = 0;
+    }
+    return bonusPool[bonusPoolIdx++];
+  }
+
+  function runBonusRound(set, durationMs, progressLabel, onComplete){
+    bonusRoundsPlayed++;
+    showScreen('screen-bonus');
+
+    document.getElementById('bonus-progress').textContent = progressLabel || '';
+    document.getElementById('bonus-header').innerHTML =
+      '<span class="emo">' + set.emoji + '</span><br>Reforce: ' + set.label;
+
+    let hits = 0;
+    const startRecord = bonusBestRecord;
+    document.getElementById('bonus-hit-count').textContent = '0';
+    document.getElementById('bonus-record-count').textContent = String(bonusBestRecord);
+    const banner = document.getElementById('bonus-record-banner');
+    banner.classList.remove('show');
+    banner.textContent = '';
+
+    function registerHit(){
+      hits++;
+      document.getElementById('bonus-hit-count').textContent = String(hits);
+      if(hits > startRecord){
+        bonusBestRecord = hits;
+        localStorage.setItem('dragonballHistoriaBonusRecord', String(bonusBestRecord));
+        document.getElementById('bonus-record-count').textContent = String(bonusBestRecord);
+        banner.textContent = '🐉 NOVO RECORDE! ' + hits + ' acertos!';
+        banner.classList.add('show');
+      }
+    }
+
+    const area = document.getElementById('bonus-area');
+    area.innerHTML = '';
+    const areaRect = () => area.getBoundingClientRect();
+
+    // Fighter (Goku-like), fires fireballs upward
+    const fighter = document.createElement('div');
+    fighter.className = 'fighter-emoji';
+    fighter.textContent = '🦸';
+    area.appendChild(fighter);
+
+    let fighterX = area.clientWidth ? area.clientWidth/2 : 200;
+    const fighterY = 380;
+
+    function setFighterPos(x){
+      const w = area.clientWidth;
+      fighterX = Math.max(20, Math.min(w-20, x));
+      fighter.style.left = fighterX + 'px';
+      fighter.style.top = fighterY + 'px';
+    }
+    setFighterPos(fighterX);
+
+    function pointerToLocalX(e){
+      const r = areaRect();
+      const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+      return clientX - r.left;
+    }
+    function onMove(e){
+      setFighterPos(pointerToLocalX(e));
+    }
+    area.addEventListener('pointermove', onMove);
+    area.addEventListener('touchmove', onMove, {passive:true});
+
+    // Fireballs (sun emoji) & falling concept emojis
+    let fireballs = [];
+    let drops = [];
+
+    function spawnFireball(){
+      const el = document.createElement('div');
+      el.className = 'fireball-emoji';
+      el.textContent = '☀️';
+      area.appendChild(el);
+      const b = {el, x:fighterX, y:fighterY-10};
+      el.style.left = b.x + 'px';
+      el.style.top = b.y + 'px';
+      fireballs.push(b);
+    }
+
+    function spawnDrop(){
+      const w = area.clientWidth || 400;
+      const el = document.createElement('div');
+      el.className = 'drop-emoji';
+      el.textContent = set.emoji;
+      area.appendChild(el);
+      const d = {el, x: 24 + Math.random()*(w-48), y:-20};
+      el.style.left = d.x + 'px';
+      el.style.top = d.y + 'px';
+      drops.push(d);
+    }
+
+    function popAt(x,y){
+      const el = document.createElement('div');
+      el.className = 'pop-emoji';
+      el.textContent = '💥';
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.opacity = '1';
+      el.style.transition = 'opacity .35s, transform .35s';
+      area.appendChild(el);
+      requestAnimationFrame(()=>{
+        el.style.opacity = '0';
+        el.style.transform = 'scale(1.6)';
+      });
+      setTimeout(()=> el.remove(), 380);
+    }
+
+    const fireballSpawner = setInterval(spawnFireball, 260);
+    const dropSpawner = setInterval(spawnDrop, 700);
+    spawnDrop();
+
+    let raf = null;
+    function frame(){
+      const h = area.clientHeight || 420;
+      // move fireballs
+      for(let i=fireballs.length-1;i>=0;i--){
+        const b = fireballs[i];
+        b.y -= 7;
+        b.el.style.top = b.y + 'px';
+        if(b.y < -20){
+          b.el.remove();
+          fireballs.splice(i,1);
+        }
+      }
+      // move drops
+      for(let i=drops.length-1;i>=0;i--){
+        const d = drops[i];
+        d.y += 1.1;
+        d.el.style.top = d.y + 'px';
+        if(d.y > h+20){
+          d.el.remove();
+          drops.splice(i,1);
+        }
+      }
+      // collisions
+      for(let i=fireballs.length-1;i>=0;i--){
+        const b = fireballs[i];
+        for(let j=drops.length-1;j>=0;j--){
+          const d = drops[j];
+          if(Math.abs(b.x-d.x) < 26 && Math.abs(b.y-d.y) < 26){
+            popAt(d.x, d.y);
+            b.el.remove(); fireballs.splice(i,1);
+            d.el.remove(); drops.splice(j,1);
+            registerHit();
+            break;
+          }
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+
+    // Timer bar
+    const timerBar = document.getElementById('bonus-timerbar');
+    timerBar.style.transition = 'none';
+    timerBar.style.width = '100%';
+    requestAnimationFrame(()=>{
+      timerBar.style.transition = 'width ' + (durationMs/1000) + 's linear';
+      timerBar.style.width = '0%';
+    });
+
+    setTimeout(()=>{
+      clearInterval(fireballSpawner);
+      clearInterval(dropSpawner);
+      if(raf) cancelAnimationFrame(raf);
+      area.removeEventListener('pointermove', onMove);
+      area.removeEventListener('touchmove', onMove);
+      banner.classList.remove('show');
+      area.innerHTML = '';
+
+      const resultEl = document.createElement('div');
+      resultEl.className = 'bonus-result';
+      resultEl.innerHTML = '<div class="emo">🔥</div><p>Você acertou<br><strong>' + hits + '</strong> emoji' + (hits === 1 ? '' : 's') + ' com bolas de fogo!</p>';
+      area.appendChild(resultEl);
+
+      setTimeout(()=>{
+        area.innerHTML = '';
+        if(onComplete) onComplete();
+      }, 2000);
+    }, durationMs);
+  }
+
+  function startFinalMarathon(){
+    const allSets = shuffle(BONUS_SETS);
+    let idx = 0;
+    function playNext(){
+      if(idx >= allSets.length){
+        showEndScreen();
+        return;
+      }
+      idx++;
+      const set = allSets[idx-1];
+      runBonusRound(set, 10000, 'Revisão Final — ' + idx + '/' + allSets.length, playNext);
+    }
+    playNext();
+  }
+
+})();
+</script>
+</body>
+</html>
