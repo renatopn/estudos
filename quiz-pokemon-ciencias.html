@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Pokédex de Ciências — As Plantas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  :root{
+    --pk-red:#e3350d;
+    --pk-red-dark:#a8230a;
+    --pk-yellow:#ffcb05;
+    --pk-yellow-dark:#e0a800;
+    --pk-blue:#2a75bb;
+    --pk-blue-dark:#1a4f85;
+    --pk-green:#4caf50;
+    --pk-dark:#222;
+    --screen-bg:#c7e8b0;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    font-family:'Press Start 2P','Comic Sans MS',cursive,sans-serif;
+    background:
+      radial-gradient(circle at 20% 10%, #fff7c2 0%, transparent 40%),
+      linear-gradient(180deg,#7ec8e3 0%, #7ec8e3 55%, #6ab150 55%, #4a9440 100%);
+    background-attachment:fixed;
+    color:var(--pk-dark);
+    overflow-x:hidden;
+  }
+  #app{
+    max-width:480px;
+    margin:16px auto;
+    min-height:calc(100vh - 32px);
+    background:var(--pk-red);
+    border:6px solid var(--pk-dark);
+    border-radius:18px;
+    box-shadow:0 10px 0 rgba(0,0,0,0.25), 0 0 0 4px var(--pk-yellow) inset;
+    padding:10px;
+    position:relative;
+  }
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  header.pokedex-header{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 10px;
+    background:var(--pk-red-dark);
+    border:3px solid var(--pk-dark);
+    border-radius:12px;
+    margin-bottom:10px;
+  }
+  .lens{
+    width:34px;height:34px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #bfe9ff, #2a75bb 60%, #123a5c 100%);
+    border:3px solid var(--pk-dark);
+    box-shadow:0 0 6px 2px rgba(255,255,255,0.5) inset;
+    flex-shrink:0;
+  }
+  .header-title{
+    color:#fff;font-size:10px;line-height:1.6;text-shadow:2px 2px 0 #000;
+    flex:1;
+  }
+  .header-title small{display:block;font-size:7px;color:var(--pk-yellow);}
+  .partner-badge{font-size:22px;filter:drop-shadow(1px 1px 0 #000);}
+
+  .screen-body{
+    background:var(--screen-bg);
+    border:4px solid var(--pk-dark);
+    border-radius:12px;
+    padding:14px;
+    min-height:520px;
+    display:flex;flex-direction:column;
+    position:relative;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  h1.title{
+    font-size:13px;color:#fff;text-align:center;text-shadow:2px 2px 0 #000;
+    margin:6px 0 14px;
+  }
+  p.lead{font-size:9px;line-height:1.9;text-align:center;color:var(--pk-dark);}
+
+  .btn{
+    font-family:inherit;font-size:10px;
+    background:var(--pk-yellow);
+    border:3px solid var(--pk-dark);
+    border-radius:8px;
+    padding:12px 10px;
+    cursor:pointer;
+    box-shadow:0 4px 0 var(--pk-yellow-dark);
+    color:var(--pk-dark);
+    transition:transform .05s;
+  }
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--pk-yellow-dark);}
+  .btn.primary{background:var(--pk-blue);color:#fff;box-shadow:0 4px 0 var(--pk-blue-dark);}
+  .btn:disabled{opacity:.5;cursor:default;}
+
+  /* Start screen */
+  .starters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;}
+  .starter{
+    background:#fff;border:3px solid var(--pk-dark);border-radius:10px;
+    padding:12px 6px;text-align:center;cursor:pointer;font-size:8px;
+    box-shadow:0 3px 0 rgba(0,0,0,0.3);
+  }
+  .starter.selected{background:var(--pk-yellow);}
+  .starter .emo{font-size:28px;display:block;margin-bottom:6px;}
+  .center{display:flex;justify-content:center;}
+
+  /* Progress bars */
+  .progress-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:8px;}
+  .balls{display:flex;gap:3px;flex-wrap:wrap;}
+  .ball{width:14px;height:14px;border-radius:50%;background:#ddd;border:2px solid var(--pk-dark);position:relative;flex-shrink:0;}
+  .ball.filled{background:linear-gradient(180deg, var(--pk-red) 48%, #fff 48%, #fff 52%, #fff 52%);}
+  .ball::after{content:"";position:absolute;top:50%;left:50%;width:4px;height:4px;background:#fff;border:1px solid var(--pk-dark);border-radius:50%;transform:translate(-50%,-50%);}
+  .hpbar-wrap{flex:1;background:#fff;border:2px solid var(--pk-dark);border-radius:6px;height:12px;overflow:hidden;}
+  .hpbar{height:100%;background:linear-gradient(90deg,#8bd35a,#4caf50);width:0%;transition:width .4s;}
+
+  /* Question card */
+  #question-num{font-size:8px;color:var(--pk-blue-dark);margin-bottom:6px;}
+  #question-text{
+    font-size:10px;line-height:1.9;background:#fff;border:3px solid var(--pk-dark);
+    border-radius:10px;padding:12px;margin-bottom:14px;min-height:70px;
+  }
+  #options{display:flex;flex-direction:column;gap:8px;flex:1;}
+  .opt-btn{
+    text-align:left;font-family:inherit;font-size:9px;line-height:1.6;
+    background:#fff;border:3px solid var(--pk-dark);border-radius:8px;
+    padding:10px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,0.25);
+  }
+  .opt-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,0.25);}
+  .opt-btn.correct{background:#a4e8a0;border-color:#2e7d32;}
+  .opt-btn.wrong{background:#f5a3a3;border-color:#b71c1c;}
+  .opt-btn:disabled{cursor:default;}
+  .flash-msg{
+    text-align:center;font-size:11px;padding:8px;margin-top:10px;border-radius:8px;display:none;
+  }
+  .flash-msg.show{display:block;}
+  .flash-msg.ok{background:#a4e8a0;color:#1b5e20;border:3px solid #2e7d32;}
+
+  /* Fullscreen review popup */
+  #review-overlay{
+    display:none;position:fixed;inset:0;background:rgba(10,10,20,0.92);
+    z-index:100;align-items:center;justify-content:center;padding:18px;
+  }
+  #review-overlay.show{display:flex;}
+  .review-card{
+    background:var(--pk-yellow);border:5px solid var(--pk-dark);border-radius:16px;
+    max-width:420px;width:100%;padding:20px;text-align:center;
+    box-shadow:0 8px 0 rgba(0,0,0,0.4);
+  }
+  .review-card .icon{font-size:34px;margin-bottom:8px;}
+  .review-card h2{font-size:11px;color:var(--pk-red-dark);text-shadow:1px 1px 0 #fff;margin:0 0 12px;}
+  .review-card p{font-size:9px;line-height:2;background:#fff;border:3px solid var(--pk-dark);border-radius:10px;padding:12px;margin:0 0 14px;text-align:left;}
+  .timer-wrap{background:#fff;border:2px solid var(--pk-dark);border-radius:6px;height:14px;overflow:hidden;margin-bottom:8px;}
+  .timer-bar{height:100%;background:var(--pk-red);width:100%;}
+  .review-card .countdown{font-size:9px;color:var(--pk-dark);}
+
+  /* Bonus round */
+  #bonus-screen{position:relative;}
+  #bonus-header{text-align:center;font-size:10px;color:var(--pk-red-dark);margin-bottom:6px;line-height:1.7;}
+  #bonus-header .emo{font-size:22px;}
+  #bonus-area{
+    position:relative;width:100%;height:420px;border:4px solid var(--pk-dark);border-radius:10px;
+    overflow:hidden;
+    background:
+      radial-gradient(2px 2px at 20% 30%, #fff 100%, transparent),
+      radial-gradient(2px 2px at 70% 60%, #fff 100%, transparent),
+      radial-gradient(1.5px 1.5px at 40% 80%, #fff 100%, transparent),
+      radial-gradient(1.5px 1.5px at 85% 20%, #fff 100%, transparent),
+      radial-gradient(1.5px 1.5px at 55% 45%, #fff 100%, transparent),
+      radial-gradient(1.5px 1.5px at 10% 65%, #fff 100%, transparent),
+      linear-gradient(180deg,#141033,#2a1a5c 60%,#4b1d6b);
+    touch-action:none;
+    cursor:crosshair;
+  }
+  #bonus-timerwrap{background:#fff;border:2px solid var(--pk-dark);border-radius:6px;height:10px;overflow:hidden;margin-top:8px;}
+  #bonus-timerbar{height:100%;background:var(--pk-blue);width:100%;}
+  .drop-emoji, .bullet-emoji, .pop-emoji{position:absolute;font-size:26px;pointer-events:none;user-select:none;line-height:1;}
+  .bullet-emoji{font-size:18px;}
+  .ship-emoji{position:absolute;font-size:34px;pointer-events:none;user-select:none;transform:translate(-50%,-50%);z-index:5;}
+
+  /* End screen */
+  .stat-line{font-size:9px;line-height:2.4;background:#fff;border:3px solid var(--pk-dark);border-radius:10px;padding:12px;margin-bottom:14px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <section id="screen-start" class="screen active">
+    <header class="pokedex-header">
+      <div class="lens"></div>
+      <div class="header-title">POKÉDEX DE CIÊNCIAS<small>As Plantas — 3º Ano</small></div>
+    </header>
+    <div class="screen-body">
+      <h1 class="title">🌿 Bem-vindo, Treinador! 🌿</h1>
+      <p class="lead">Estude sobre AS PLANTAS respondendo ao quiz. Se errar, um Pokédex de revisão vai te ajudar a entender melhor antes de tentar de novo. A cada 10 acertos, uma fase bônus de nave aparece!</p>
+      <p class="lead">Escolha seu parceiro:</p>
+      <div class="starters" id="starters">
+        <div class="starter" data-emo="⚡">
+          <span class="emo">⚡</span>Pikachu
+        </div>
+        <div class="starter" data-emo="🌱">
+          <span class="emo">🌱</span>Bulbassauro
+        </div>
+        <div class="starter" data-emo="🔥">
+          <span class="emo">🔥</span>Charmander
+        </div>
+        <div class="starter" data-emo="💧">
+          <span class="emo">💧</span>Squirtle
+        </div>
+      </div>
+      <div class="center">
+        <button class="btn primary" id="btn-start">Iniciar Missão!</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ SCREEN -->
+  <section id="screen-quiz" class="screen">
+    <header class="pokedex-header">
+      <div class="lens"></div>
+      <div class="header-title">POKÉDEX DE CIÊNCIAS<small>As Plantas — 3º Ano</small></div>
+      <div class="partner-badge" id="partner-badge">⚡</div>
+    </header>
+    <div class="screen-body">
+      <div class="progress-row">
+        <div class="hpbar-wrap"><div class="hpbar" id="overall-bar"></div></div>
+      </div>
+      <div class="progress-row">
+        <span style="font-size:7px;">Combo bônus:</span>
+        <div class="balls" id="bonus-balls"></div>
+      </div>
+      <div id="question-num">Pergunta Nº 001</div>
+      <div id="question-text">Carregando...</div>
+      <div id="options"></div>
+      <div class="flash-msg ok" id="flash-ok">✅ Correto! O Professor Carvalho ficou orgulhoso!</div>
+    </div>
+  </section>
+
+  <!-- BONUS SCREEN -->
+  <section id="screen-bonus" class="screen">
+    <header class="pokedex-header">
+      <div class="lens"></div>
+      <div class="header-title">FASE BÔNUS<small>Reforço de Conteúdo</small></div>
+    </header>
+    <div class="screen-body" id="bonus-screen">
+      <div id="bonus-header"></div>
+      <div id="bonus-area"></div>
+      <div id="bonus-timerwrap"><div id="bonus-timerbar"></div></div>
+      <p class="lead" style="margin-top:8px;">Arraste o dedo (ou o mouse) para mover a nave! 🚀</p>
+    </div>
+  </section>
+
+  <!-- END SCREEN -->
+  <section id="screen-end" class="screen">
+    <header class="pokedex-header">
+      <div class="lens"></div>
+      <div class="header-title">POKÉDEX DE CIÊNCIAS<small>Missão Concluída!</small></div>
+    </header>
+    <div class="screen-body">
+      <h1 class="title">🏆 Você é o Campeão das Plantas! 🏆</h1>
+      <div class="stat-line" id="end-stats"></div>
+      <div class="center">
+        <button class="btn primary" id="btn-restart">Jogar Novamente</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- FULLSCREEN REVIEW POPUP -->
+<div id="review-overlay">
+  <div class="review-card">
+    <div class="icon">📖</div>
+    <h2 id="review-title">Vamos Revisar!</h2>
+    <p id="review-text"></p>
+    <div class="timer-wrap"><div class="timer-bar" id="review-timer-bar"></div></div>
+    <div class="countdown" id="review-countdown">Nova tentativa em 7s...</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- DATA ----------
+  const QUESTIONS = [
+    {q:"Por que as regiões verdes na Terra têm essa cor quando vistas do espaço?",
+     options:["Presença de clorofila nas plantas","Presença de água nos rios","Presença de oxigênio no ar","Presença de seiva elaborada"],
+     correct:0,
+     review:"A clorofila é a substância presente nas plantas que dá a coloração esverdeada. É por meio dela, e da fotossíntese, que as plantas produzem seu próprio alimento."},
+    {q:"O que as plantas conseguem fazer graças à clorofila, o que as torna seres autótrofos?",
+     options:["Respiração","Fotossíntese","Polinização","Germinação"],
+     correct:1,
+     review:"Fotossíntese é o processo pelo qual as plantas, usando a clorofila, produzem seu próprio alimento. Por isso são chamadas de autótrofos: seres que produzem seu próprio alimento."},
+    {q:"Além da clorofila, quais são os três fatores que a planta precisa para fazer fotossíntese?",
+     options:["Água, gás carbônico e luz do Sol","Água, oxigênio e glicose","Sais minerais, glicose e vapor de água","Oxigênio, glicose e água"],
+     correct:0,
+     review:"Para fazer fotossíntese, a planta precisa de gás carbônico do ar, água (com sais minerais do solo) e luz do Sol. Sem luz, a fotossíntese não ocorre."},
+    {q:"Qual é o alimento produzido pela planta durante a fotossíntese?",
+     options:["Glicose","Sais minerais","Gás carbônico","Vapor de água"],
+     correct:0,
+     review:"A glicose é o alimento produzido na fotossíntese e é a principal fonte de energia usada pelos seres vivos. Como produto secundário, a fotossíntese também libera oxigênio no ar."},
+    {q:"Como se chama a seiva que leva água e sais minerais da raiz até as folhas?",
+     options:["Seiva elaborada","Seiva bruta","Seiva mineral","Seiva glicosada"],
+     correct:1,
+     review:"A seiva bruta é a água e os sais minerais absorvidos pela raiz e transportados pelos canais do caule até as folhas."},
+    {q:"Como se chama a seiva que leva a glicose das folhas para o resto da planta?",
+     options:["Seiva bruta","Seiva elaborada","Seiva vegetal","Seiva mineral"],
+     correct:1,
+     review:"A seiva elaborada é a glicose produzida na fotossíntese, transportada pelos canais do caule para as demais partes da planta: raízes, flores e frutos."},
+    {q:"Por onde o gás carbônico entra nas folhas da planta?",
+     options:["Pelas nervuras","Pelos estômatos","Pelo pecíolo","Pelo limbo"],
+     correct:1,
+     review:"Os estômatos são pequenas aberturas nas folhas por onde o gás carbônico entra e outros gases são absorvidos ou liberados."},
+    {q:"Na respiração vegetal, o que a planta produz a partir da glicose e do oxigênio?",
+     options:["Energia, gás carbônico e água","Glicose e luz do Sol","Clorofila e água","Oxigênio e sais minerais"],
+     correct:0,
+     review:"Na respiração vegetal, a planta usa glicose e oxigênio para gerar energia, liberando gás carbônico e água. Diferente da fotossíntese, a respiração não precisa de luz."},
+    {q:"Nas cadeias alimentares, qual é sempre o papel das plantas?",
+     options:["Consumidoras","Produtoras","Decompositoras","Predadoras"],
+     correct:1,
+     review:"As plantas são sempre as produtoras em uma cadeia alimentar, pois produzem seu próprio alimento (a glicose), que serve de base alimentar para os demais seres vivos."},
+    {q:"Quem é o verdadeiro maior responsável pela maior parte do oxigênio da atmosfera (mais até que as florestas)?",
+     options:["Os musgos","As samambaias","As algas","As coníferas"],
+     correct:2,
+     review:"As algas são as verdadeiras responsáveis pela maior parte (entre 50% e 70%) do oxigênio da atmosfera — mais do que as florestas, mesmo sendo chamadas de 'pulmões do mundo'."},
+    {q:"Além de oxigênio e alimento, como as plantas ajudam a formar as chuvas?",
+     options:["Absorvendo o gás carbônico do ar","Liberando vapor de água pelas folhas","Fazendo sombra no solo","Produzindo sementes"],
+     correct:1,
+     review:"Quando as folhas abrem para trocar gases, também liberam vapor de água no ar, deixando-o mais úmido e contribuindo para a formação das chuvas."},
+    {q:"Como as raízes das plantas ajudam a evitar deslizamentos de terra em montanhas?",
+     options:["Absorvendo toda a chuva do céu","Segurando o solo no lugar","Liberando oxigênio","Fazendo sombra nas encostas"],
+     correct:1,
+     review:"As raízes das plantas ajudam a segurar o solo nas montanhas, o que evita deslizamentos de terra."},
+    {q:"Qual grupo de plantas é formado pelos musgos, muito simples, sem raiz, caule ou folha verdadeiros?",
+     options:["Pteridófitas","Gimnospermas","Briófitas","Angiospermas"],
+     correct:2,
+     review:"Briófitas é o grupo dos musgos: plantas muito simples, sem raiz, caule ou folha verdadeiros (têm rizoides, caulóides e filóides) e se reproduzem por esporos."},
+    {q:"Como se chamam as pequenas estruturas parecidas com raízes que os musgos possuem?",
+     options:["Rizoides","Estolões","Gavinhas","Rizomas"],
+     correct:0,
+     review:"Rizoides são pequenas estruturas parecidas com raízes, presentes nos musgos, por serem plantas muito simples e finas."},
+    {q:"As samambaias (Pteridófitas) se reproduzem por meio de:",
+     options:["Sementes","Flores","Esporos","Frutos"],
+     correct:2,
+     review:"As samambaias, assim como os musgos, não dão flores nem frutos: elas nascem de esporos, que aparecem na parte de baixo de suas folhas."},
+    {q:"Qual grupo de plantas produz sementes em pinhas, sem formar flores ou frutos?",
+     options:["Angiospermas","Gimnospermas (coníferas)","Briófitas","Pteridófitas"],
+     correct:1,
+     review:"As Gimnospermas (coníferas), como pinheiros e araucárias, não produzem flores ou frutos, mas dão sementes em pinhas com formato de cone."},
+    {q:"Como se chamam as sementes da Araucária, muito usadas na alimentação no Sul do Brasil?",
+     options:["Pinhões","Rizomas","Tubérculos","Bulbos"],
+     correct:0,
+     review:"Os pinhões são as sementes da Araucária, muito utilizadas na alimentação, especialmente na região Sul do Brasil."},
+    {q:"Qual é o único grupo de plantas que produz flores e frutos?",
+     options:["Gimnospermas","Pteridófitas","Briófitas","Angiospermas (Plantas Superiores)"],
+     correct:3,
+     review:"As Angiospermas, também chamadas de Plantas Superiores, são o grupo mais conhecido e o único que produz flores e frutos, com grande variedade de tamanhos e formas."},
+    {q:"As algas se parecem com as plantas, mas na verdade:",
+     options:["Não são plantas, formam um grupo à parte","São um quinto grupo de plantas","São iguais aos musgos","Não fazem fotossíntese"],
+     correct:0,
+     review:"As algas fazem fotossíntese e são produtoras nas cadeias alimentares aquáticas, como as plantas, mas não são plantas — formam um grupo à parte."},
+    {q:"Qual parte da planta a prende ao solo e absorve água e sais minerais?",
+     options:["A raiz","O caule","A folha","A flor"],
+     correct:0,
+     review:"A raiz é a parte que prende a planta ao solo e de onde se retira a água e os sais minerais absorvidos."},
+    {q:"Qual parte da planta a sustenta ereta e transporta a seiva bruta e a elaborada?",
+     options:["A raiz","O fruto","O caule","A semente"],
+     correct:2,
+     review:"O caule sustenta a planta na postura ereta, é onde se prendem as folhas, flores e frutos, e transporta a seiva bruta e a seiva elaborada por toda a planta."},
+    {q:"Raízes que crescem com uma parte central mais grossa, de onde saem ramos menores, são chamadas de:",
+     options:["Fasciculadas","Pivotantes ou axiais","Aéreas","Aquáticas"],
+     correct:1,
+     review:"As raízes pivotantes ou axiais crescem com uma parte central mais grossa, de onde saem ramos (raízes) menores."},
+    {q:"Raízes que não formam uma raiz central, mas se espalham pelo solo, são chamadas de:",
+     options:["Pivotantes","Fasciculadas","Aéreas","Tuberosas"],
+     correct:1,
+     review:"As raízes fasciculadas não formam uma raiz central: várias raízes saem e se espalham pelo solo."},
+    {q:"O caule reto e liso, com partes mais duras chamadas de nós — como o do bambu e da cana-de-açúcar — é chamado de:",
+     options:["Tronco","Haste","Colmo","Estipe"],
+     correct:2,
+     review:"Colmo é o caule reto e liso com partes mais duras chamadas de nós. É o tipo de caule do bambu e da cana-de-açúcar."},
+    {q:"O caule flexível, delicado e esverdeado, que também faz fotossíntese, típico das ervas, é chamado de:",
+     options:["Haste","Colmo","Tronco","Estipe"],
+     correct:0,
+     review:"Haste é o caule flexível e delicado, de coloração esverdeada, das ervas. Como também tem clorofila, esse tipo de caule é capaz de fazer fotossíntese."},
+    {q:"O caule subterrâneo que serve de reserva de alimento para a planta, como na batata, é chamado de:",
+     options:["Rizoma","Bulbo","Tubérculo","Estolão"],
+     correct:2,
+     review:"O tubérculo é um tipo de caule subterrâneo que funciona como reserva de alimento para a planta, como acontece com a batata."},
+    {q:"O caule subterrâneo da bananeira, de onde nasce um conjunto de folhas, é chamado de:",
+     options:["Tubérculo","Bulbo","Colmo","Rizoma"],
+     correct:3,
+     review:"O rizoma é o caule subterrâneo da bananeira, do qual se desenvolve um conjunto de folhas. O que parece ser o caule visível da bananeira é, na verdade, um pseudocaule (falso caule) formado pelas folhas."},
+    {q:"As 'veias' da folha, por onde passam as seivas, são chamadas de:",
+     options:["Nervuras","Pecíolo","Limbo","Bainha"],
+     correct:0,
+     review:"As nervuras são os canais por onde são transportadas as seivas dentro da folha."},
+    {q:"O 'cabo' da folha, que a prende ao caule, é chamado de:",
+     options:["Limbo","Nervura","Pecíolo","Bainha"],
+     correct:2,
+     review:"O pecíolo é o cabo da folha que a prende ao caule."},
+    {q:"Plantas que perdem suas folhas em períodos frios ou secos, para evitar perda de água, são chamadas de:",
+     options:["Perenes","Acaules","Caducas (ou caducifólias/decíduas)","Trepadeiras"],
+     correct:2,
+     review:"Plantas caducas, caducifólias ou decíduas perdem suas folhas nos períodos mais frios do ano (outono/inverno) ou de poucas chuvas, para evitar a perda de água."},
+    {q:"Plantas que NÃO perdem as folhas são chamadas de:",
+     options:["Caducas","Perenes","Aquáticas","Rasteiras"],
+     correct:1,
+     review:"As plantas que não perdem folhas são chamadas de perenes."},
+    {q:"Na flor, onde fica armazenado o pólen?",
+     options:["No estigma","No ovário","Na antera (parte do estame)","Na sépala"],
+     correct:2,
+     review:"O estame (ou androceu) é formado pela antera, onde fica o pólen, e pelo filete."},
+    {q:"O movimento do pólen da antera até o estigma de uma flor é chamado de:",
+     options:["Germinação","Polinização","Dispersão","Fotossíntese"],
+     correct:1,
+     review:"Polinização é o movimento do pólen da antera até o estigma, feito pelo vento, pela água ou por animais polinizadores."},
+    {q:"Depois da polinização, o óvulo se transforma em ___ e o ovário se transforma em ___:",
+     options:["Fruto e semente","Flor e fruto","Semente e fruto","Semente e flor"],
+     correct:2,
+     review:"Quando o pólen chega ao óvulo, este se transforma lentamente na semente, e o ovário se transforma no fruto."},
+    {q:"Qual é a função do fruto, segundo a Botânica?",
+     options:["Fazer fotossíntese","Proteger e disseminar as sementes","Absorver água do solo","Atrair apenas polinizadores"],
+     correct:1,
+     review:"Fruto é o termo botânico aplicado ao órgão da planta que tem a função de proteger e disseminar (espalhar) as sementes."},
+    {q:"Frutos secos em forma de vagem, como o feijão e a ervilha, são chamados pelos botânicos de:",
+     options:["Caroços","Tubérculos","Legumes","Bagas"],
+     correct:2,
+     review:"Para os botânicos, legumes são os frutos secos em forma de vagem, como os do feijão e da ervilha."},
+    {q:"As bananeiras cultivadas atualmente (que comemos a fruta) nascem de:",
+     options:["Sementes","Brotos, pois não têm sementes","Esporos","Pinhas"],
+     correct:1,
+     review:"As bananeiras selvagens têm sementes, mas as cultivadas foram selecionadas para ter poucas ou nenhuma semente. Por isso, as bananeiras cultivadas nascem de brotos, e não de sementes."}
+  ];
+
+  const BONUS_SETS = [
+    {label:"Raiz Axial (pivotante) — grossa no centro", emoji:"🥕"},
+    {label:"Fotossíntese precisa de luz do Sol", emoji:"☀️"},
+    {label:"Clorofila deixa as folhas verdes", emoji:"🍃"},
+    {label:"As plantas liberam Oxigênio no ar", emoji:"🌬️"},
+    {label:"Frutos carnosos são sucosos e saborosos", emoji:"🍎"},
+    {label:"Sementes dão origem a novas plantas", emoji:"🌱"},
+    {label:"Coníferas produzem sementes em pinhas (pinhões)", emoji:"🌰"},
+    {label:"Musgos vivem em ambientes bem úmidos", emoji:"💧"},
+    {label:"Legumes são frutos secos em forma de vagem", emoji:"🫘"},
+    {label:"Polinizadores ajudam a formar os frutos", emoji:"🐝"},
+    {label:"Batata é um caule subterrâneo (tubérculo)", emoji:"🥔"},
+    {label:"Cana-de-açúcar tem caule tipo colmo", emoji:"🎋"}
+  ];
+
+  // ---------- STATE ----------
+  let queue = [];
+  let pos = 0;
+  let correctTotal = 0;
+  let bonusCombo = 0;
+  let totalErrors = 0;
+  let bonusRoundsPlayed = 0;
+  let bonusPool = [];
+  let bonusPoolIdx = 0;
+  let partnerEmoji = "⚡";
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  // ---------- SCREEN HELPERS ----------
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ---------- START ----------
+  const starters = document.querySelectorAll('.starter');
+  starters.forEach(st=>{
+    st.addEventListener('click', ()=>{
+      starters.forEach(s=>s.classList.remove('selected'));
+      st.classList.add('selected');
+      partnerEmoji = st.getAttribute('data-emo');
+    });
+  });
+  starters[0].classList.add('selected');
+
+  document.getElementById('btn-start').addEventListener('click', startGame);
+
+  function startGame(){
+    document.getElementById('partner-badge').textContent = partnerEmoji;
+    queue = shuffle(QUESTIONS.map((_,i)=>i));
+    pos = 0;
+    correctTotal = 0;
+    bonusCombo = 0;
+    totalErrors = 0;
+    bonusRoundsPlayed = 0;
+    bonusPool = shuffle(BONUS_SETS);
+    bonusPoolIdx = 0;
+    updateOverallBar();
+    updateBonusBalls();
+    showScreen('screen-quiz');
+    renderQuestion();
+  }
+
+  function updateOverallBar(){
+    const pct = Math.round((pos/QUESTIONS.length)*100);
+    document.getElementById('overall-bar').style.width = pct+'%';
+  }
+
+  function updateBonusBalls(){
+    const wrap = document.getElementById('bonus-balls');
+    wrap.innerHTML = '';
+    for(let i=0;i<10;i++){
+      const b = document.createElement('div');
+      b.className = 'ball' + (i < bonusCombo ? ' filled' : '');
+      wrap.appendChild(b);
+    }
+  }
+
+  // ---------- QUIZ RENDER ----------
+  let currentOptMap = []; // maps displayed index -> original option index
+
+  function renderQuestion(){
+    const qIndex = queue[pos];
+    const qData = QUESTIONS[qIndex];
+    document.getElementById('question-num').textContent =
+      'Pergunta Nº ' + String(pos+1).padStart(3,'0') + ' de ' + String(QUESTIONS.length).padStart(3,'0');
+    document.getElementById('question-text').textContent = qData.q;
+
+    currentOptMap = shuffle(qData.options.map((_,i)=>i));
+    const optWrap = document.getElementById('options');
+    optWrap.innerHTML = '';
+    document.getElementById('flash-ok').classList.remove('show');
+
+    currentOptMap.forEach((origIdx, dispIdx)=>{
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.textContent = String.fromCharCode(65+dispIdx) + ') ' + qData.options[origIdx];
+      btn.addEventListener('click', ()=> handleAnswer(origIdx, btn, qData, qIndex));
+      optWrap.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(selectedOrigIdx, btnEl, qData, qIndex){
+    const allBtns = document.querySelectorAll('#options .opt-btn');
+    allBtns.forEach(b=>b.disabled = true);
+
+    if(selectedOrigIdx === qData.correct){
+      btnEl.classList.add('correct');
+      const flash = document.getElementById('flash-ok');
+      flash.classList.add('show');
+      correctTotal++;
+      bonusCombo++;
+      updateBonusBalls();
+
+      setTimeout(()=>{
+        if(bonusCombo >= 10){
+          bonusCombo = 0;
+          updateBonusBalls();
+          pos++;
+          updateOverallBar();
+          if(pos >= queue.length){
+            startBonus(true);
+          } else {
+            startBonus(false);
+          }
+        } else {
+          pos++;
+          updateOverallBar();
+          if(pos >= queue.length){
+            showEndScreen();
+          } else {
+            renderQuestion();
+          }
+        }
+      }, 850);
+    } else {
+      btnEl.classList.add('wrong');
+      totalErrors++;
+      showReviewPopup(qData);
+    }
+  }
+
+  // ---------- REVIEW POPUP (7s forced read, then re-ask same question) ----------
+  function showReviewPopup(qData){
+    const overlay = document.getElementById('review-overlay');
+    document.getElementById('review-text').textContent = qData.review;
+    document.getElementById('review-timer-bar').style.transition = 'none';
+    document.getElementById('review-timer-bar').style.width = '100%';
+    overlay.classList.add('show');
+
+    let remaining = 7;
+    document.getElementById('review-countdown').textContent = 'Nova tentativa em ' + remaining + 's...';
+
+    requestAnimationFrame(()=>{
+      const bar = document.getElementById('review-timer-bar');
+      bar.style.transition = 'width 7s linear';
+      bar.style.width = '0%';
+    });
+
+    const tick = setInterval(()=>{
+      remaining--;
+      if(remaining >= 0){
+        document.getElementById('review-countdown').textContent = 'Nova tentativa em ' + remaining + 's...';
+      }
+      if(remaining <= 0){
+        clearInterval(tick);
+      }
+    }, 1000);
+
+    setTimeout(()=>{
+      overlay.classList.remove('show');
+      renderQuestion(); // re-ask the same question (still at same `pos`)
+    }, 7000);
+  }
+
+  // ---------- END SCREEN ----------
+  function showEndScreen(){
+    document.getElementById('end-stats').innerHTML =
+      'Perguntas dominadas: ' + QUESTIONS.length + '<br>' +
+      'Respostas corretas: ' + correctTotal + '<br>' +
+      'Erros no caminho: ' + totalErrors + '<br>' +
+      'Fases bônus jogadas: ' + bonusRoundsPlayed;
+    showScreen('screen-end');
+  }
+  document.getElementById('btn-restart').addEventListener('click', ()=>{
+    showScreen('screen-start');
+  });
+
+  // ---------- BONUS MINIGAME ----------
+  let bonusTimers = [];
+  let bonusRAF = null;
+  let bonusEndsQuizAfter = false;
+
+  function nextBonusSet(){
+    if(bonusPoolIdx >= bonusPool.length){
+      bonusPool = shuffle(BONUS_SETS);
+      bonusPoolIdx = 0;
+    }
+    return bonusPool[bonusPoolIdx++];
+  }
+
+  function startBonus(isFinalQuestion){
+    bonusEndsQuizAfter = isFinalQuestion;
+    bonusRoundsPlayed++;
+    const set = nextBonusSet();
+
+    document.getElementById('bonus-header').innerHTML =
+      '<span class="emo">' + set.emoji + '</span><br>Reforce: ' + set.label;
+
+    showScreen('screen-bonus');
+
+    const area = document.getElementById('bonus-area');
+    area.innerHTML = '';
+    const areaRect = () => area.getBoundingClientRect();
+
+    // Ship
+    const ship = document.createElement('div');
+    ship.className = 'ship-emoji';
+    ship.textContent = '🚀';
+    area.appendChild(ship);
+
+    let shipX = area.clientWidth ? area.clientWidth/2 : 200;
+    const shipY = 380;
+
+    function setShipPos(x){
+      const w = area.clientWidth;
+      shipX = Math.max(20, Math.min(w-20, x));
+      ship.style.left = shipX + 'px';
+      ship.style.top = shipY + 'px';
+    }
+    setShipPos(shipX);
+
+    function pointerToLocalX(e){
+      const r = areaRect();
+      const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+      return clientX - r.left;
+    }
+    function onMove(e){
+      setShipPos(pointerToLocalX(e));
+    }
+    area.addEventListener('pointermove', onMove);
+    area.addEventListener('touchmove', onMove, {passive:true});
+
+    // Bullets & drops
+    let bullets = [];
+    let drops = [];
+
+    function spawnBullet(){
+      const el = document.createElement('div');
+      el.className = 'bullet-emoji';
+      el.textContent = '⚡';
+      area.appendChild(el);
+      const b = {el, x:shipX, y:shipY-10};
+      el.style.left = b.x + 'px';
+      el.style.top = b.y + 'px';
+      bullets.push(b);
+    }
+
+    function spawnDrop(){
+      const w = area.clientWidth || 400;
+      const el = document.createElement('div');
+      el.className = 'drop-emoji';
+      el.textContent = set.emoji;
+      area.appendChild(el);
+      const d = {el, x: 24 + Math.random()*(w-48), y:-20};
+      el.style.left = d.x + 'px';
+      el.style.top = d.y + 'px';
+      drops.push(d);
+    }
+
+    function popAt(x,y){
+      const el = document.createElement('div');
+      el.className = 'pop-emoji';
+      el.textContent = '✨';
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.opacity = '1';
+      el.style.transition = 'opacity .35s, transform .35s';
+      area.appendChild(el);
+      requestAnimationFrame(()=>{
+        el.style.opacity = '0';
+        el.style.transform = 'scale(1.6)';
+      });
+      setTimeout(()=> el.remove(), 380);
+    }
+
+    const bulletSpawner = setInterval(spawnBullet, 260);
+    const dropSpawner = setInterval(spawnDrop, 700);
+    spawnDrop();
+
+    function frame(){
+      const h = area.clientHeight || 420;
+      // move bullets
+      for(let i=bullets.length-1;i>=0;i--){
+        const b = bullets[i];
+        b.y -= 7;
+        b.el.style.top = b.y + 'px';
+        if(b.y < -20){
+          b.el.remove();
+          bullets.splice(i,1);
+        }
+      }
+      // move drops
+      for(let i=drops.length-1;i>=0;i--){
+        const d = drops[i];
+        d.y += 1.1;
+        d.el.style.top = d.y + 'px';
+        if(d.y > h+20){
+          d.el.remove();
+          drops.splice(i,1);
+        }
+      }
+      // collisions
+      for(let i=bullets.length-1;i>=0;i--){
+        const b = bullets[i];
+        for(let j=drops.length-1;j>=0;j--){
+          const d = drops[j];
+          if(Math.abs(b.x-d.x) < 26 && Math.abs(b.y-d.y) < 26){
+            popAt(d.x, d.y);
+            b.el.remove(); bullets.splice(i,1);
+            d.el.remove(); drops.splice(j,1);
+            break;
+          }
+        }
+      }
+      bonusRAF = requestAnimationFrame(frame);
+    }
+    bonusRAF = requestAnimationFrame(frame);
+
+    // Timer bar 15s
+    const timerBar = document.getElementById('bonus-timerbar');
+    timerBar.style.transition = 'none';
+    timerBar.style.width = '100%';
+    requestAnimationFrame(()=>{
+      timerBar.style.transition = 'width 15s linear';
+      timerBar.style.width = '0%';
+    });
+
+    const endTimeout = setTimeout(()=>{
+      endBonus(area, onMove, bulletSpawner, dropSpawner);
+    }, 15000);
+
+    bonusTimers = [bulletSpawner, dropSpawner, endTimeout];
+  }
+
+  function endBonus(area, onMove, bulletSpawner, dropSpawner){
+    clearInterval(bulletSpawner);
+    clearInterval(dropSpawner);
+    if(bonusRAF) cancelAnimationFrame(bonusRAF);
+    area.removeEventListener('pointermove', onMove);
+    area.removeEventListener('touchmove', onMove);
+    area.innerHTML = '';
+
+    if(bonusEndsQuizAfter){
+      showEndScreen();
+    } else {
+      showScreen('screen-quiz');
+      renderQuestion();
+    }
+  }
+
+})();
+</script>
+</body>
+</html>
