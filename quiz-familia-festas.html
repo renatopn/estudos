@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Quiz — Árvore Genealógica e Festas Populares</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  :root{
+    --br-green:#009c3b;
+    --br-green-dark:#00702a;
+    --br-yellow:#ffdf00;
+    --br-yellow-dark:#d9bc00;
+    --br-blue:#002776;
+    --br-blue-dark:#001c57;
+    --br-dark:#1a1a1a;
+    --screen-bg:#fffdf2;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    font-family:'Press Start 2P','Comic Sans MS',cursive,sans-serif;
+    background:
+      radial-gradient(circle at 20% 10%, #fff9c4 0%, transparent 40%),
+      linear-gradient(180deg,#bfe9d0 0%, #bfe9d0 100%);
+    background-attachment:fixed;
+    color:var(--br-dark);
+    overflow-x:hidden;
+  }
+  #app{
+    max-width:480px;
+    margin:16px auto;
+    min-height:calc(100vh - 32px);
+    background:var(--br-green);
+    border:6px solid var(--br-dark);
+    border-radius:18px;
+    box-shadow:0 10px 0 rgba(0,0,0,0.25), 0 0 0 4px var(--br-yellow) inset;
+    padding:10px;
+    position:relative;
+  }
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  header.app-header{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 10px;
+    background:var(--br-blue);
+    border:3px solid var(--br-dark);
+    border-radius:12px;
+    margin-bottom:10px;
+  }
+  .badge{font-size:26px;flex-shrink:0;}
+  .header-title{
+    color:#fff;font-size:10px;line-height:1.6;text-shadow:2px 2px 0 #000;
+    flex:1;
+  }
+  .header-title small{display:block;font-size:7px;color:var(--br-yellow);}
+
+  .screen-body{
+    background:var(--screen-bg);
+    border:4px solid var(--br-dark);
+    border-radius:12px;
+    padding:14px;
+    min-height:500px;
+    display:flex;flex-direction:column;
+    position:relative;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size:16px 16px;
+  }
+
+  h1.title{
+    font-size:13px;color:#fff;text-align:center;text-shadow:2px 2px 0 #000;
+    margin:6px 0 14px;
+  }
+  p.lead{font-size:9px;line-height:1.9;text-align:center;color:var(--br-dark);}
+
+  .btn{
+    font-family:inherit;font-size:10px;
+    background:var(--br-yellow);
+    border:3px solid var(--br-dark);
+    border-radius:8px;
+    padding:12px 10px;
+    cursor:pointer;
+    box-shadow:0 4px 0 var(--br-yellow-dark);
+    color:var(--br-dark);
+    transition:transform .05s;
+  }
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--br-yellow-dark);}
+  .btn.primary{background:var(--br-blue);color:#fff;box-shadow:0 4px 0 var(--br-blue-dark);}
+  .btn:disabled{opacity:.5;cursor:default;}
+  .center{display:flex;justify-content:center;margin-top:10px;}
+
+  /* Progress bar */
+  .progress-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:8px;}
+  .hpbar-wrap{flex:1;background:#fff;border:2px solid var(--br-dark);border-radius:6px;height:12px;overflow:hidden;}
+  .hpbar{height:100%;background:linear-gradient(90deg,#ffe066,var(--br-yellow));width:0%;transition:width .4s;}
+
+  /* Question card */
+  #question-num{font-size:8px;color:var(--br-blue-dark);margin-bottom:6px;}
+  #question-text{
+    font-size:10px;line-height:1.9;background:#fff;border:3px solid var(--br-dark);
+    border-radius:10px;padding:12px;margin-bottom:14px;min-height:70px;
+  }
+  #options{display:flex;flex-direction:column;gap:8px;flex:1;}
+  .opt-btn{
+    text-align:left;font-family:inherit;font-size:9px;line-height:1.6;
+    background:#fff;border:3px solid var(--br-dark);border-radius:8px;
+    padding:10px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,0.25);
+  }
+  .opt-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,0.25);}
+  .opt-btn.correct{background:#a4e8a0;border-color:#2e7d32;}
+  .opt-btn.wrong{background:#f5a3a3;border-color:#b71c1c;}
+  .opt-btn:disabled{cursor:default;}
+
+  .flash-msg{
+    text-align:center;font-size:11px;padding:8px;margin-top:10px;border-radius:8px;display:none;
+  }
+  .flash-msg.show{display:block;}
+  .flash-msg.ok{background:#a4e8a0;color:#1b5e20;border:3px solid #2e7d32;}
+
+  /* Fullscreen review popup */
+  #review-overlay{
+    display:none;position:fixed;inset:0;background:rgba(10,20,10,0.92);
+    z-index:100;align-items:center;justify-content:center;padding:18px;
+  }
+  #review-overlay.show{display:flex;}
+  .review-card{
+    background:var(--br-yellow);border:5px solid var(--br-dark);border-radius:16px;
+    max-width:420px;width:100%;padding:20px;text-align:center;
+    box-shadow:0 8px 0 rgba(0,0,0,0.4);
+  }
+  .review-card .icon{font-size:34px;margin-bottom:8px;}
+  .review-card h2{font-size:11px;color:var(--br-blue-dark);text-shadow:1px 1px 0 #fff;margin:0 0 12px;}
+  .review-card p{font-size:9px;line-height:2;background:#fff;border:3px solid var(--br-dark);border-radius:10px;padding:12px;margin:0 0 14px;text-align:left;}
+  .timer-wrap{background:#fff;border:2px solid var(--br-dark);border-radius:6px;height:14px;overflow:hidden;margin-bottom:8px;}
+  .timer-bar{height:100%;background:var(--br-green);width:100%;}
+  .review-card .countdown{font-size:9px;color:var(--br-dark);}
+
+  /* End screen */
+  .stat-line{font-size:9px;line-height:2.4;background:#fff;border:3px solid var(--br-dark);border-radius:10px;padding:12px;margin-bottom:14px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <section id="screen-start" class="screen active">
+    <header class="app-header">
+      <div class="badge">🌳</div>
+      <div class="header-title">QUIZ DA FAMÍLIA<small>Árvore Genealógica e Festas Populares</small></div>
+    </header>
+    <div class="screen-body">
+      <h1 class="title">🇧🇷 Vamos estudar? 🇧🇷</h1>
+      <p class="lead">Responda ao quiz sobre relações familiares, gerações, árvore genealógica, famílias brasileiras e festas populares.</p>
+      <p class="lead">Se você errar, um cartão de revisão vai te ajudar a entender melhor o assunto. Depois de 7 segundos, a mesma pergunta volta para você tentar de novo.</p>
+      <div class="center">
+        <button class="btn primary" id="btn-start">Começar o Quiz!</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ SCREEN -->
+  <section id="screen-quiz" class="screen">
+    <header class="app-header">
+      <div class="badge">🌳</div>
+      <div class="header-title">QUIZ DA FAMÍLIA<small>Árvore Genealógica e Festas Populares</small></div>
+    </header>
+    <div class="screen-body">
+      <div class="progress-row">
+        <div class="hpbar-wrap"><div class="hpbar" id="overall-bar"></div></div>
+      </div>
+      <div id="question-num">Pergunta Nº 001</div>
+      <div id="question-text">Carregando...</div>
+      <div id="options"></div>
+      <div class="flash-msg ok" id="flash-ok">✅ Correto! Muito bem!</div>
+    </div>
+  </section>
+
+  <!-- END SCREEN -->
+  <section id="screen-end" class="screen">
+    <header class="app-header">
+      <div class="badge">🏆</div>
+      <div class="header-title">QUIZ DA FAMÍLIA<small>Quiz concluído!</small></div>
+    </header>
+    <div class="screen-body">
+      <h1 class="title">🎉 Parabéns! 🎉</h1>
+      <div class="stat-line" id="end-stats"></div>
+      <div class="center">
+        <button class="btn primary" id="btn-restart">Jogar Novamente</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- FULLSCREEN REVIEW POPUP -->
+<div id="review-overlay">
+  <div class="review-card">
+    <div class="icon">📖</div>
+    <h2 id="review-title">Vamos Revisar!</h2>
+    <p id="review-text"></p>
+    <div class="timer-wrap"><div class="timer-bar" id="review-timer-bar"></div></div>
+    <div class="countdown" id="review-countdown">Nova tentativa em 7s...</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- DATA ----------
+  const QUESTIONS = [
+    {q:"O que são os parentes?",
+     options:["Os membros da nossa família","Os vizinhos da nossa rua","Os colegas de escola","Os professores da escola"],
+     correct:0,
+     review:"Os membros da nossa família são os nossos parentes. As famílias não são formadas apenas por pais e filhos: existem diversas relações familiares, como avós, tios e primos."},
+    {q:"Os pais do seu pai e da sua mãe são seus:",
+     options:["Tios","Avós","Primos","Sobrinhos"],
+     correct:1,
+     review:"Os avós são os pais do seu pai e da sua mãe."},
+    {q:"Os irmãos do seu pai e da sua mãe são seus:",
+     options:["Primos","Avós","Tios","Sobrinhos"],
+     correct:2,
+     review:"Os tios são os irmãos do seu pai e da sua mãe."},
+    {q:"Os filhos dos seus tios são seus:",
+     options:["Primos","Sobrinhos","Irmãos","Avós"],
+     correct:0,
+     review:"Os primos são os filhos dos seus tios."},
+    {q:"O que é uma geração, na organização de uma família?",
+     options:["Um tipo de árvore genealógica","O conjunto de descendentes que ocupa certa posição na linhagem familiar","Um documento de identidade","Uma festa popular brasileira"],
+     correct:1,
+     review:"Uma geração é o conjunto de descendentes que ocupa certa posição na linhagem familiar."},
+    {q:"Você, seus irmãos e seus primos pertencem à mesma:",
+     options:["Casa","Escola","Geração","Cidade"],
+     correct:2,
+     review:"Você, seus irmãos e seus primos pertencem à mesma geração. Já seus pais e seus tios fazem parte da geração anterior."},
+    {q:"Quem são os bisavós?",
+     options:["Os irmãos dos seus avós","Os pais dos seus avós","Os filhos dos seus tios","Os pais do seu pai"],
+     correct:1,
+     review:"Os bisavós são os pais dos seus avós."},
+    {q:"Quem são os tios-avós?",
+     options:["Os pais dos seus avós","Os irmãos dos seus avós","Os filhos dos seus primos","Os avós dos seus primos"],
+     correct:1,
+     review:"Os tios-avós são os irmãos dos seus avós."},
+    {q:"O que é uma árvore genealógica?",
+     options:["Uma árvore plantada no dia do nascimento de uma criança","Uma representação, em formato que lembra os galhos de uma árvore, com os nomes das pessoas das diversas gerações de uma família","Um tipo de documento de identidade","Uma festa popular brasileira"],
+     correct:1,
+     review:"Árvore genealógica é a representação, em um formato que lembra os galhos de uma árvore, que traz os nomes das pessoas das diversas gerações de uma família e ajuda a compreender o parentesco entre elas."},
+    {q:"Além de perguntar aos pais e avós, o que mais pode ser pesquisado para descobrir a origem da própria família?",
+     options:["Apenas fotos recentes","Registros como certidões de casamento, documentos de identificação, cartas e fotos antigas","Somente livros de história geral","Apenas o nome da rua onde mora"],
+     correct:1,
+     review:"Para descobrir quem foram as pessoas que deram origem à família, além de perguntar aos pais e avós, é possível pesquisar registros como certidões de casamento, documentos de identificação, cartas e fotos antigas."},
+    {q:"As famílias brasileiras são formadas por:",
+     options:["Apenas um povo","Diferentes povos que participaram da construção da história do país","Apenas pessoas nascidas no Brasil","Apenas imigrantes recentes"],
+     correct:1,
+     review:"As famílias brasileiras são formadas pelos diferentes povos que participaram da construção da história do país."},
+    {q:"Por que pessoas de diferentes lugares do mundo continuam chegando ao Brasil atualmente?",
+     options:["Por acaso","Apenas a passeio","Em busca de melhores condições de vida","Porque são obrigadas"],
+     correct:2,
+     review:"Hoje em dia, pessoas de diferentes lugares do mundo continuam a chegar ao Brasil, muitas vezes em busca de melhores condições de vida."},
+    {q:"O que as famílias imigrantes trazem consigo ao chegar em um novo país?",
+     options:["Apenas dinheiro","Hábitos, costumes e histórias dos seus lugares de origem","Nada, pois abandonam sua cultura","Apenas roupas"],
+     correct:1,
+     review:"Cada família imigrante traz consigo hábitos, costumes e histórias dos seus lugares de origem."},
+    {q:"O que costuma acontecer com as famílias imigrantes depois de um tempo vivendo no Brasil?",
+     options:["Elas passam a incorporar hábitos e costumes brasileiros também","Elas esquecem completamente sua cultura de origem","Elas voltam sempre para seu país em menos de um ano","Nada muda para elas"],
+     correct:0,
+     review:"Vivendo no Brasil, as famílias imigrantes passam a incorporar hábitos e costumes brasileiros também, além dos que trouxeram de seus lugares de origem."},
+    {q:"Segundo o relato apresentado no material, qual foi a maior dificuldade enfrentada pelo menino Sebastian ao chegar ao Brasil vindo da Venezuela?",
+     options:["A alimentação brasileira","A diferença de idioma, que dificultava a comunicação","O clima frio","A distância da escola"],
+     correct:1,
+     review:"Segundo sua mãe, a adaptação mais difícil para Sebastian foi a diferença de idioma: ele não entendia nada e não conseguia se fazer entender, o que durou cerca de três meses até ele aprender português."},
+    {q:"Que tipo de costumes os diferentes povos trouxeram para o Brasil, contribuindo para a formação da cultura do país?",
+     options:["Apenas roupas","Religião, culinária, artes, artesanato e modos de vida","Apenas música","Nenhum costume, só idiomas"],
+     correct:1,
+     review:"Os diversos povos que vieram para o Brasil trouxeram com eles suas tradições e costumes — religião, culinária, artes, artesanato, modos de vida, etc. — contribuindo para a formação da rica cultura do país."},
+    {q:"O que são as festas populares?",
+     options:["Festas que só acontecem em um único lugar do Brasil","Manifestações da diversidade cultural que caracteriza o país","Comemorações exclusivas de um só povo","Eventos proibidos por lei"],
+     correct:1,
+     review:"As festas populares estão entre os costumes trazidos pelos diversos povos. Em muitas cidades brasileiras, essas comemorações são verdadeiras manifestações da diversidade cultural que caracteriza o país."},
+    {q:"Qual é a origem das festas juninas?",
+     options:["Uma criação totalmente brasileira, sem influência estrangeira","A celebração de santos católicos, trazida pelos portugueses","Uma tradição vinda do Japão","Uma festa criada no século 21"],
+     correct:1,
+     review:"As festas juninas têm origem na celebração de santos católicos e foram trazidas para o Brasil pelos portugueses."},
+    {q:"O que aconteceu com a alimentação das festas juninas a partir do contato com os povos indígenas?",
+     options:["Foram introduzidos pratos feitos com alimentos típicos desses povos","A comida deixou de existir nas festas","Passou a ser proibido comer nas festas","Nada mudou"],
+     correct:0,
+     review:"A partir do contato com os indígenas, foram introduzidos nas festas juninas pratos feitos com alimentos típicos desses povos."},
+    {q:"As festas juninas costumam refletir o estilo de vida de qual ambiente?",
+     options:["Urbano e litorâneo","Apenas industrial","Rural","Apenas marítimo"],
+     correct:2,
+     review:"As comemorações das festas juninas costumam refletir o estilo de vida rural, além de terem características próprias em cada canto do país."},
+    {q:"As festas juninas têm as mesmas características em todo o Brasil?",
+     options:["Sim, são idênticas em todos os lugares","Não, elas têm características próprias em cada canto do país","Sim, pois seguem uma lei federal","Não, pois só existem em Minas Gerais"],
+     correct:1,
+     review:"As festas juninas são muito populares em todo o Brasil, mas têm características próprias em cada canto do país."}
+  ];
+
+  // ---------- STATE ----------
+  let queue = [];
+  let pos = 0;
+  let correctTotal = 0;
+  let totalErrors = 0;
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  // ---------- SCREEN HELPERS ----------
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  document.getElementById('btn-start').addEventListener('click', startGame);
+  document.getElementById('btn-restart').addEventListener('click', startGame);
+
+  function startGame(){
+    queue = shuffle(QUESTIONS.map((_,i)=>i));
+    pos = 0;
+    correctTotal = 0;
+    totalErrors = 0;
+    updateOverallBar();
+    showScreen('screen-quiz');
+    renderQuestion();
+  }
+
+  function updateOverallBar(){
+    const pct = Math.round((pos/QUESTIONS.length)*100);
+    document.getElementById('overall-bar').style.width = pct+'%';
+  }
+
+  // ---------- QUIZ RENDER ----------
+  function renderQuestion(){
+    const qIndex = queue[pos];
+    const qData = QUESTIONS[qIndex];
+    document.getElementById('question-num').textContent =
+      'Pergunta Nº ' + String(pos+1).padStart(3,'0') + ' de ' + String(QUESTIONS.length).padStart(3,'0');
+    document.getElementById('question-text').textContent = qData.q;
+
+    const optMap = shuffle(qData.options.map((_,i)=>i));
+    const optWrap = document.getElementById('options');
+    optWrap.innerHTML = '';
+    document.getElementById('flash-ok').classList.remove('show');
+
+    optMap.forEach((origIdx, dispIdx)=>{
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.textContent = String.fromCharCode(65+dispIdx) + ') ' + qData.options[origIdx];
+      btn.addEventListener('click', ()=> handleAnswer(origIdx, btn, qData));
+      optWrap.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(selectedOrigIdx, btnEl, qData){
+    const allBtns = document.querySelectorAll('#options .opt-btn');
+    allBtns.forEach(b=>b.disabled = true);
+
+    if(selectedOrigIdx === qData.correct){
+      btnEl.classList.add('correct');
+      document.getElementById('flash-ok').classList.add('show');
+      correctTotal++;
+
+      setTimeout(()=>{
+        pos++;
+        updateOverallBar();
+        if(pos >= queue.length){
+          showEndScreen();
+        } else {
+          renderQuestion();
+        }
+      }, 900);
+    } else {
+      btnEl.classList.add('wrong');
+      totalErrors++;
+      showReviewPopup(qData);
+    }
+  }
+
+  // ---------- REVIEW POPUP (7s forced read, then re-ask same question) ----------
+  function showReviewPopup(qData){
+    const overlay = document.getElementById('review-overlay');
+    document.getElementById('review-text').textContent = qData.review;
+    document.getElementById('review-timer-bar').style.transition = 'none';
+    document.getElementById('review-timer-bar').style.width = '100%';
+    overlay.classList.add('show');
+
+    let remaining = 7;
+    document.getElementById('review-countdown').textContent = 'Nova tentativa em ' + remaining + 's...';
+
+    requestAnimationFrame(()=>{
+      const bar = document.getElementById('review-timer-bar');
+      bar.style.transition = 'width 7s linear';
+      bar.style.width = '0%';
+    });
+
+    const tick = setInterval(()=>{
+      remaining--;
+      if(remaining >= 0){
+        document.getElementById('review-countdown').textContent = 'Nova tentativa em ' + remaining + 's...';
+      }
+      if(remaining <= 0){
+        clearInterval(tick);
+      }
+    }, 1000);
+
+    setTimeout(()=>{
+      overlay.classList.remove('show');
+      renderQuestion(); // re-ask the same question (still at same `pos`)
+    }, 7000);
+  }
+
+  // ---------- END SCREEN ----------
+  function showEndScreen(){
+    document.getElementById('end-stats').innerHTML =
+      'Perguntas dominadas: ' + QUESTIONS.length + '<br>' +
+      'Respostas corretas: ' + correctTotal + '<br>' +
+      'Erros no caminho: ' + totalErrors;
+    showScreen('screen-end');
+  }
+
+})();
+</script>
+</body>
+</html>
