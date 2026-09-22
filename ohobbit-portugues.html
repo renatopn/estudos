@@ -1,0 +1,1542 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>O Hobbit e o Tesouro do Português</title>
+<style>
+:root{
+  --ink:#2B2013; --ink-soft:#6B5A3E; --paper:#F3E9D2; --paper-deep:#E4D3A8;
+  --card:#FFFDF6; --card-border:#D8C48A; --primary:#3F6B3F; --primary-dark:#2C4B2C;
+  --accent:#D9A441; --navy:#35607A; --success:#3F7D3F; --success-bg:#E4F0DE;
+  --danger:#A23B2E; --danger-bg:#F7E3DE; --shadow:rgba(43,32,19,0.18);
+  --overlay:rgba(20,14,4,0.6); --locked:#B9AE8D; --dragon:#A23B2E; --dragon-dark:#7A2E22;
+  --biome-shire:#CFE7B0; --biome-road:#C9B183; --biome-rivendell:#AEDBCB; --biome-misty:#C7CDD6;
+  --biome-sky:#D9E6F2; --biome-beorn:#E3D79B; --biome-mirkwood:#4E5C42; --biome-lake:#9FC9DE; --biome-erebor:#7A4A38;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --ink:#F0E6CE; --ink-soft:#C9BA95; --paper:#171208; --paper-deep:#0E0B05;
+    --card:#241C10; --card-border:#4A3B22; --primary:#6FA96F; --primary-dark:#3F6B3F;
+    --accent:#F2C165; --navy:#4D7996; --success:#7FC77F; --success-bg:#1C3320;
+    --danger:#E38A73; --danger-bg:#3A1E17; --shadow:rgba(0,0,0,0.5);
+    --overlay:rgba(8,6,2,0.72); --locked:#3E3620; --dragon:#C24A36; --dragon-dark:#8C3323;
+    --biome-shire:#2E3F22; --biome-road:#3B2E1C; --biome-rivendell:#1E3A34; --biome-misty:#33383F;
+    --biome-sky:#25313D; --biome-beorn:#4A3E1C; --biome-mirkwood:#12160E; --biome-lake:#1B3340; --biome-erebor:#3A211A;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#F0E6CE; --ink-soft:#C9BA95; --paper:#171208; --paper-deep:#0E0B05;
+  --card:#241C10; --card-border:#4A3B22; --primary:#6FA96F; --primary-dark:#3F6B3F;
+  --accent:#F2C165; --navy:#4D7996; --success:#7FC77F; --success-bg:#1C3320;
+  --danger:#E38A73; --danger-bg:#3A1E17; --shadow:rgba(0,0,0,0.5);
+  --overlay:rgba(8,6,2,0.72); --locked:#3E3620; --dragon:#C24A36; --dragon-dark:#8C3323;
+  --biome-shire:#2E3F22; --biome-road:#3B2E1C; --biome-rivendell:#1E3A34; --biome-misty:#33383F;
+  --biome-sky:#25313D; --biome-beorn:#4A3E1C; --biome-mirkwood:#12160E; --biome-lake:#1B3340; --biome-erebor:#3A211A;
+}
+:root[data-theme="light"]{
+  --ink:#2B2013; --ink-soft:#6B5A3E; --paper:#F3E9D2; --paper-deep:#E4D3A8;
+  --card:#FFFDF6; --card-border:#D8C48A; --primary:#3F6B3F; --primary-dark:#2C4B2C;
+  --accent:#D9A441; --navy:#35607A; --success:#3F7D3F; --success-bg:#E4F0DE;
+  --danger:#A23B2E; --danger-bg:#F7E3DE; --shadow:rgba(43,32,19,0.18);
+  --overlay:rgba(20,14,4,0.6); --locked:#B9AE8D; --dragon:#A23B2E; --dragon-dark:#7A2E22;
+  --biome-shire:#CFE7B0; --biome-road:#C9B183; --biome-rivendell:#AEDBCB; --biome-misty:#C7CDD6;
+  --biome-sky:#D9E6F2; --biome-beorn:#E3D79B; --biome-mirkwood:#4E5C42; --biome-lake:#9FC9DE; --biome-erebor:#7A4A38;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:radial-gradient(ellipse 900px 500px at 50% -10%, var(--paper-deep), transparent), var(--paper);
+  color:var(--ink); font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  min-height:100vh; overflow-x:hidden; -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;}
+h1,h2,h3{font-weight:900; text-wrap:balance; margin:0;}
+p{margin:0; line-height:1.55;}
+.eyebrow{font-weight:800; font-size:.72rem; letter-spacing:.09em; text-transform:uppercase; color:var(--primary);}
+:focus-visible{outline:3px solid var(--accent); outline-offset:3px; border-radius:6px;}
+@media (prefers-reduced-motion: reduce){ *{animation-duration:.01ms !important; transition-duration:.01ms !important;} }
+
+#app{max-width:640px; margin:0 auto; padding:1.1rem .85rem 4rem; position:relative;}
+.topbar{display:flex; align-items:center; justify-content:space-between; gap:.6rem; padding:.4rem .1rem 1.1rem; flex-wrap:wrap;}
+.topbar-title h1{font-size:clamp(1.25rem,5.2vw,1.75rem); color:var(--primary); line-height:1.05;}
+.topbar-title span{font-size:.8rem; color:var(--ink-soft); font-weight:700;}
+.topbar-actions{display:flex; align-items:center; gap:.45rem;}
+.icon-btn{
+  width:2.5rem; height:2.5rem; border-radius:50%; border:2px solid var(--card-border);
+  background:var(--card); color:var(--ink); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:0 2px 0 var(--card-border); font-size:1.15rem; padding:0;
+}
+.icon-btn:active{transform:translateY(1px); box-shadow:none;}
+.stars-total{
+  display:flex; align-items:center; gap:.35rem; background:var(--card); border:2px solid var(--card-border);
+  border-radius:999px; padding:.4rem .75rem; font-weight:800; color:var(--accent); box-shadow:0 2px 0 var(--card-border);
+  font-size:.95rem;
+}
+
+/* ===== MAP (replaces the old straight trail) ===== */
+.map-wrap{position:relative; margin:.9rem 0 0; border-radius:1.4rem; overflow:hidden; border:3px solid var(--card-border); box-shadow:0 10px 30px var(--shadow);}
+#map{position:relative; width:100%; height:1900px;}
+.map-terrain{
+  position:absolute; inset:0; z-index:0;
+  background:linear-gradient(to bottom,
+    var(--biome-shire) 0%, var(--biome-shire) 11%,
+    var(--biome-road) 11%, var(--biome-road) 22%,
+    var(--biome-rivendell) 22%, var(--biome-rivendell) 33%,
+    var(--biome-misty) 33%, var(--biome-misty) 45%,
+    var(--biome-sky) 45%, var(--biome-sky) 55%,
+    var(--biome-beorn) 55%, var(--biome-beorn) 65%,
+    var(--biome-mirkwood) 65%, var(--biome-mirkwood) 77%,
+    var(--biome-lake) 77%, var(--biome-lake) 89%,
+    var(--biome-erebor) 89%, var(--biome-erebor) 100%);
+}
+.map-decor{position:absolute; z-index:1; font-size:1.7rem; opacity:.5; pointer-events:none; filter:drop-shadow(0 2px 2px rgba(0,0,0,.25)); transform:translate(-50%,-50%);}
+#map-path-svg{position:absolute; inset:0; z-index:1; width:100%; height:100%; pointer-events:none;}
+#map-path-svg path{fill:none; stroke:var(--accent); stroke-width:4; stroke-dasharray:2 14; stroke-linecap:round; opacity:.85;}
+.map-node{position:absolute; z-index:2; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:.3rem; background:none; border:none; cursor:pointer; width:6.6rem; padding:0;}
+.map-node[disabled]{cursor:default;}
+.badge{
+  width:clamp(56px,15vw,72px); height:clamp(56px,15vw,72px); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:clamp(26px,7vw,34px);
+  border:4px solid var(--card); box-shadow:0 5px 0 rgba(0,0,0,.18), 0 6px 14px var(--shadow); position:relative;
+}
+.badge.locked{background:var(--locked) !important; box-shadow:0 5px 0 var(--card-border); filter:grayscale(.4);}
+.node-tag{background:var(--card); border:1px solid var(--card-border); border-radius:.7rem; padding:.2rem .5rem; box-shadow:0 2px 0 var(--card-border); display:flex; flex-direction:column; align-items:center; gap:.1rem;}
+.node-place{font-size:.6rem; font-weight:700; color:var(--ink-soft); text-align:center; text-transform:uppercase; letter-spacing:.03em;}
+.node-label{font-weight:800; font-size:.74rem; text-align:center; color:var(--ink); line-height:1.15;}
+.node-stars{display:flex; gap:.1rem; font-size:.74rem;}
+.star-fill{color:var(--accent);}
+.star-empty{color:var(--card-border);}
+.map-node.final .badge{
+  width:clamp(78px,20vw,96px); height:clamp(78px,20vw,96px); font-size:clamp(32px,8vw,40px);
+  background:radial-gradient(circle at 35% 30%, #E28769, var(--dragon));
+  box-shadow:0 0 0 6px var(--card), 0 8px 22px rgba(122,46,34,.5);
+}
+.map-node.final .node-label{font-size:.86rem;}
+
+.overlay{
+  position:fixed; inset:0; background:var(--overlay); display:flex; align-items:flex-end; justify-content:center;
+  z-index:50; opacity:0; pointer-events:none; transition:opacity .18s ease;
+}
+.overlay.open{opacity:1; pointer-events:auto;}
+@media (min-width:640px){ .overlay{align-items:center; padding:1.2rem;} }
+.sheet{
+  background:var(--paper); width:100%; max-width:640px; max-height:94vh; overflow-y:auto;
+  border-radius:1.5rem 1.5rem 0 0; box-shadow:0 -8px 40px var(--shadow); padding:1.3rem 1.05rem 1.8rem;
+  transform:translateY(24px); transition:transform .2s ease;
+}
+.overlay.open .sheet{transform:translateY(0);}
+@media (min-width:640px){ .sheet{border-radius:1.5rem; box-shadow:0 20px 60px var(--shadow);} }
+.sheet-close{display:block; margin:0 0 .6rem auto; background:none; border:none; color:var(--ink-soft); font-weight:700; cursor:pointer; font-size:.88rem; padding:.3rem .55rem;}
+
+.intro-badge{width:4.6rem; height:4.6rem; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.3rem; margin:0 auto .8rem;}
+#intro-title{text-align:center; font-size:1.4rem; color:var(--ink); margin-bottom:.15rem;}
+#intro-place{text-align:center; display:block; margin-bottom:.6rem; color:var(--ink-soft); font-weight:700; font-size:.8rem;}
+#intro-hero{text-align:center; display:block; margin-bottom:.3rem;}
+.tip-box{background:var(--card); border:2px solid var(--card-border); border-radius:1rem; padding:.85rem 1rem; font-size:.95rem; color:var(--ink-soft); margin-bottom:.7rem;}
+.tip-box b{color:var(--ink);}
+.howto-box{background:var(--success-bg); border:2px dashed var(--success); border-radius:1rem; padding:.75rem .9rem; font-size:.86rem; color:var(--ink); margin-bottom:1.2rem; font-weight:600;}
+
+.btn{font-weight:800; font-size:1rem; border-radius:999px; padding:.8rem 1.5rem; border:none; cursor:pointer; width:100%; text-align:center;}
+.btn:active{transform:translateY(2px);}
+.btn-primary{background:var(--primary); color:#fff; box-shadow:0 4px 0 var(--primary-dark);}
+.btn-secondary{background:var(--card); color:var(--ink); border:2px solid var(--card-border); box-shadow:0 4px 0 var(--card-border);}
+.btn-row{display:flex; flex-direction:column; gap:.6rem;}
+
+.quest-head{display:flex; align-items:center; gap:.7rem; margin-bottom:.9rem;}
+.back-btn{background:none; border:none; color:var(--ink-soft); cursor:pointer; padding:.3rem; font-size:1.3rem; line-height:1;}
+.dots{display:flex; gap:.28rem; flex:1;}
+.dot{flex:1; height:.38rem; border-radius:999px; background:var(--card-border);}
+.dot.filled{background:var(--primary);}
+.dot.current{background:var(--accent);}
+.passage{background:var(--card); border:2px solid var(--card-border); border-radius:1rem; padding:.9rem 1rem; font-size:.94rem; line-height:1.55; margin-bottom:.9rem; color:var(--ink);}
+.prompt{font-size:1.1rem; font-weight:800; margin-bottom:1rem; color:var(--ink); line-height:1.4;}
+.options{display:grid; grid-template-columns:1fr; gap:.6rem; margin-bottom:.9rem;}
+.options .opt{background:var(--card); border:2px solid var(--card-border); border-radius:1rem; padding:.8rem .95rem; text-align:left;}
+.opt{font-weight:700; font-size:.98rem; color:var(--ink); cursor:pointer; box-shadow:0 3px 0 var(--card-border); min-height:44px;}
+.opt:disabled{cursor:default;}
+.opt.correct{background:var(--success-bg); border-color:var(--success); color:var(--success);}
+.opt.wrong{background:var(--danger-bg); border-color:var(--danger); color:var(--danger);}
+.opt.dim{opacity:.5;}
+.feedback{border-radius:1rem; padding:.9rem 1rem; margin-bottom:.9rem; display:none;}
+.feedback.show{display:block;}
+.feedback.ok{background:var(--success-bg); color:var(--success);}
+.feedback.no{background:var(--danger-bg); color:var(--danger);}
+.feedback-title{font-weight:800; font-size:1rem; margin-bottom:.25rem;}
+.feedback-text{color:var(--ink); font-weight:600; font-size:.92rem;}
+
+.mem-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; margin-bottom:.9rem;}
+.mem-card{
+  aspect-ratio:1; border-radius:.85rem; border:2px solid var(--card-border); background:var(--card);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; padding:.3rem;
+  font-weight:800; font-size:clamp(.6rem,3.2vw,.78rem); text-align:center; color:var(--card);
+  min-height:56px; line-height:1.15; word-break:break-word;
+}
+.mem-card.back{background:var(--navy); color:#fff; font-size:1.6rem;}
+.mem-card.matched{background:var(--success-bg); border-color:var(--success); color:var(--success); opacity:.75; cursor:default;}
+.mem-card.flipped:not(.matched){background:var(--card); color:var(--ink);}
+.mem-status{text-align:center; font-weight:700; color:var(--ink-soft); font-size:.85rem; margin-bottom:.7rem;}
+
+.ws-wrap{margin-bottom:.9rem;}
+.ws-grid{
+  display:grid; margin:0 auto; max-width:380px; aspect-ratio:1; border-radius:.9rem; overflow:hidden;
+  border:2px solid var(--card-border); touch-action:none; user-select:none; background:var(--card);
+}
+.ws-cell{display:flex; align-items:center; justify-content:center; font-weight:800; font-size:clamp(.68rem,3.4vw,.96rem); color:var(--ink);}
+.ws-cell.sel{background:var(--accent); color:#3a2a00;}
+.ws-cell.found{background:var(--success-bg); color:var(--success);}
+.ws-wordlist{display:flex; flex-wrap:wrap; gap:.4rem; justify-content:center; margin-top:.75rem;}
+.ws-word{visibility:hidden; background:var(--card); border:2px solid var(--card-border); border-radius:999px; padding:.35rem .8rem; font-weight:700; font-size:.8rem; color:var(--ink);}
+.ws-word.found{visibility:visible; background:var(--success-bg); border-color:var(--success); color:var(--success); text-decoration:line-through;}
+
+.genius-word-box{text-align:center; background:var(--card); border:2px solid var(--card-border); border-radius:1rem; padding:1.1rem; margin-bottom:1rem; min-height:6.5rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.35rem;}
+.genius-emoji{font-size:3rem; line-height:1; min-height:3.4rem; display:flex; align-items:center; justify-content:center;}
+.genius-msg{font-size:.8rem; font-weight:800; color:var(--ink-soft); letter-spacing:.04em; text-transform:uppercase;}
+.genius-tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin-bottom:.9rem;}
+.genius-tile{
+  min-height:60px; border-radius:.9rem; border:3px solid var(--card-border); background:var(--card);
+  color:var(--ink); font-weight:800; font-size:clamp(.6rem,2.6vw,.76rem); cursor:pointer; padding:.4rem; line-height:1.15; word-break:break-word;
+}
+.genius-tile.picked{background:var(--success-bg); border-color:var(--success); color:var(--success);}
+.genius-tile.bad{background:var(--danger-bg); border-color:var(--danger); color:var(--danger);}
+.genius-tile:disabled{opacity:.55; cursor:default;}
+.genius-status{text-align:center; font-weight:700; color:var(--ink-soft); font-size:.85rem; margin-bottom:.7rem;}
+
+.dodger-hud{display:flex; align-items:center; justify-content:space-between; margin-bottom:.6rem; font-weight:800;}
+.dodger-lives{font-size:1.1rem; letter-spacing:.15rem;}
+.dodger-progress{font-size:.85rem; color:var(--ink-soft);}
+.dodger-question{text-align:center; font-weight:800; font-size:1rem; margin-bottom:.4rem; min-height:1.8em; display:flex; align-items:center; justify-content:center; color:var(--ink); flex:0 0 auto;}
+.dodger-canvas-wrap{position:relative; border-radius:1rem; overflow:hidden; border:2px solid var(--card-border); touch-action:none; flex:1 1 auto; min-height:0;}
+#dodger-canvas{display:block; width:100%; height:100%;}
+.dodger-controls-hint{text-align:center; font-size:.72rem; color:var(--ink-soft); margin:.4rem 0 0; font-weight:600; flex:0 0 auto;}
+.dodger-overlay-msg{
+  position:absolute; inset:0; display:none; align-items:center; justify-content:center; flex-direction:column; gap:.4rem;
+  background:rgba(10,12,26,.72); color:#fff; text-align:center; padding:1rem;
+}
+.dodger-overlay-msg.show{display:flex;}
+.dodger-overlay-msg b{font-size:1.3rem;}
+#overlay-dodger{align-items:stretch; padding:.5rem;}
+#overlay-dodger .sheet{
+  display:flex; flex-direction:column; width:100%; max-width:640px; margin:0 auto;
+  height:calc(100vh - 1rem); max-height:calc(100vh - 1rem); border-radius:1rem;
+  padding:.6rem .6rem .5rem; overflow:hidden;
+}
+#overlay-dodger .quest-head{margin-bottom:.5rem; flex:0 0 auto;}
+#overlay-dodger .dodger-hud{margin-bottom:.4rem; flex:0 0 auto;}
+#overlay-dodger .btn-row{flex:0 0 auto; margin-top:.5rem;}
+@media (min-width:640px){ #overlay-dodger{padding:1rem;} }
+
+.result-stars{display:flex; justify-content:center; gap:.45rem; margin:.5rem 0 1rem; font-size:2.2rem;}
+.result-score{text-align:center; font-size:2.2rem; color:var(--primary); font-weight:900;}
+.result-msg{text-align:center; color:var(--ink-soft); font-weight:600; margin:.4rem 0 1.3rem;}
+#trophy-canvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none;}
+.trophy-sheet{position:relative; overflow:hidden;}
+.trophy-icon{font-size:4.2rem; text-align:center; margin:0 auto .4rem;}
+
+.toast{
+  position:fixed; left:50%; bottom:1.4rem; transform:translate(-50%,140%); z-index:60; background:var(--navy);
+  color:#fff; font-weight:700; padding:.75rem 1.2rem; border-radius:999px; box-shadow:0 8px 24px var(--shadow);
+  transition:transform .25s ease; max-width:90vw; text-align:center; font-size:.9rem;
+}
+.toast.show{transform:translate(-50%,0);}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-title">
+      <h1>O Hobbit e o Tesouro do Português</h1>
+      <span>Mapa de estudo — Português, 3º ano</span>
+    </div>
+    <div class="topbar-actions">
+      <div class="stars-total" id="stars-total"></div>
+      <button class="icon-btn" id="theme-toggle" aria-label="Alternar tema" title="Alternar tema">🌓</button>
+      <button class="icon-btn" id="reset-btn" aria-label="Reiniciar progresso" title="Reiniciar progresso">↺</button>
+    </div>
+  </div>
+  <div class="map-wrap">
+    <div id="map">
+      <div class="map-terrain"></div>
+      <svg id="map-path-svg"><path id="map-path" d=""></path></svg>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-intro">
+  <div class="sheet">
+    <button class="sheet-close" id="intro-close">Fechar ✕</button>
+    <div class="intro-badge" id="intro-badge"></div>
+    <span class="eyebrow" id="intro-place"></span>
+    <span class="eyebrow" id="intro-hero"></span>
+    <h2 id="intro-title"></h2>
+    <div style="height:.8rem"></div>
+    <div class="tip-box" id="intro-tip"></div>
+    <div class="howto-box" id="intro-howto"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="intro-start">Começar</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-quiz">
+  <div class="sheet">
+    <div class="quest-head">
+      <button class="back-btn" id="quiz-back" aria-label="Voltar ao mapa">←</button>
+      <div class="dots" id="quiz-dots"></div>
+    </div>
+    <div class="passage" id="quiz-passage" style="display:none;"></div>
+    <div class="btn-row" id="quiz-readgate" style="display:none;">
+      <button class="btn btn-primary" id="quiz-read-btn"></button>
+    </div>
+    <div class="prompt" id="quiz-prompt" style="display:none;"></div>
+    <div class="options" id="quiz-options"></div>
+    <div class="feedback" id="quiz-feedback">
+      <div class="feedback-title" id="quiz-feedback-title"></div>
+      <div class="feedback-text" id="quiz-feedback-text"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="quiz-continue" style="display:none;">Continuar</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-memory">
+  <div class="sheet">
+    <div class="quest-head">
+      <button class="back-btn" id="mem-back" aria-label="Voltar ao mapa">←</button>
+      <div class="dots" id="mem-dots"></div>
+    </div>
+    <div class="mem-status" id="mem-status"></div>
+    <div class="mem-grid" id="mem-grid"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-ws">
+  <div class="sheet">
+    <div class="quest-head">
+      <button class="back-btn" id="ws-back" aria-label="Voltar ao mapa">←</button>
+      <div class="dots" id="ws-dots"></div>
+    </div>
+    <div class="mem-status" id="ws-status"></div>
+    <div class="ws-wrap">
+      <div class="ws-grid" id="ws-grid"></div>
+      <div class="ws-wordlist" id="ws-wordlist"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-genius">
+  <div class="sheet">
+    <div class="quest-head">
+      <button class="back-btn" id="genius-back" aria-label="Voltar ao mapa">←</button>
+      <div class="dots" id="genius-dots"></div>
+    </div>
+    <div class="genius-status" id="genius-status"></div>
+    <div class="genius-word-box">
+      <span class="genius-emoji" id="genius-emoji"></span>
+      <span class="genius-msg" id="genius-msg"></span>
+    </div>
+    <div class="genius-tiles" id="genius-tiles"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-dodger">
+  <div class="sheet">
+    <div class="quest-head">
+      <button class="back-btn" id="dodger-back" aria-label="Voltar ao mapa">←</button>
+      <div class="dodger-progress" id="dodger-progress"></div>
+    </div>
+    <div class="dodger-hud">
+      <span>Vidas: <span class="dodger-lives" id="dodger-lives"></span></span>
+      <span id="dodger-score"></span>
+    </div>
+    <div class="dodger-question" id="dodger-question"></div>
+    <div class="dodger-canvas-wrap">
+      <canvas id="dodger-canvas"></canvas>
+      <div class="dodger-overlay-msg" id="dodger-msg">
+        <b id="dodger-msg-title"></b>
+        <span id="dodger-msg-text"></span>
+      </div>
+    </div>
+    <div class="dodger-controls-hint">Arraste o dedo no jogo (ou use ← →) para mover o herói</div>
+    <div class="btn-row" id="dodger-endbuttons" style="display:none;">
+      <button class="btn btn-primary" id="dodger-retry">Jogar novamente</button>
+      <button class="btn btn-secondary" id="dodger-map">Voltar ao mapa</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-result">
+  <div class="sheet">
+    <span class="eyebrow" style="display:block; text-align:center;" id="result-hero"></span>
+    <h2 style="text-align:center;" id="result-title"></h2>
+    <div class="result-stars" id="result-stars"></div>
+    <div class="result-score" id="result-score"></div>
+    <div class="result-msg" id="result-msg"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="result-retry">Jogar novamente</button>
+      <button class="btn btn-secondary" id="result-map">Voltar ao mapa</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay-trophy">
+  <div class="sheet trophy-sheet">
+    <canvas id="trophy-canvas"></canvas>
+    <div style="position:relative;">
+      <div class="trophy-icon" id="trophy-icon"></div>
+      <h2 style="text-align:center;" id="trophy-title"></h2>
+      <p style="text-align:center; color:var(--ink-soft); font-weight:600; margin-top:.5rem;" id="trophy-text"></p>
+      <div class="result-stars" id="trophy-stars"></div>
+      <div class="result-score" id="trophy-score"></div>
+      <div class="btn-row" style="margin-top:1.1rem;">
+        <button class="btn btn-primary" id="trophy-retry">Jogar novamente</button>
+        <button class="btn btn-secondary" id="trophy-map">Voltar ao mapa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ================= DATA BANKS ================= */
+const GENERO_PAIRS = [
+  ['MENINO','MENINA'],['ANÃO','ANÃ'],['HOMEM','MULHER'],['REI','RAINHA'],['HERÓI','HEROÍNA'],['ATOR','ATRIZ'],
+  ['LOBO','LOBA'],['CAVALO','ÉGUA'],['BOI','VACA'],['GALO','GALINHA'],['PAI','MÃE'],['IRMÃO','IRMÃ'],
+  ['PRÍNCIPE','PRINCESA'],['CONDE','CONDESSA'],['BARÃO','BARONESA'],['POETA','POETISA'],['ALEMÃO','ALEMÃ'],
+  ['CIDADÃO','CIDADÃ'],['PATRÃO','PATROA'],['LADRÃO','LADRA'],['JUIZ','JUÍZA'],['DEUS','DEUSA'],
+  ['CAÇADOR','CAÇADORA'],['VIZINHO','VIZINHA']
+];
+const ARTIGO_DEF = [
+  ['ANEL','O ANEL'],['TOCA','A TOCA'],['MAPA','O MAPA'],['FLORESTA','A FLORESTA'],
+  ['CAMINHO','O CAMINHO'],['CAVERNA','A CAVERNA'],['LOBO','O LOBO'],['ÁGUIA','A ÁGUIA'],
+  ['REINO','O REINO'],['ELMO','O ELMO'],['DRAGÃO','O DRAGÃO'],['MONTANHA','A MONTANHA']
+];
+const ARTIGO_INDEF = [
+  ['TESOURO','UM TESOURO'],['CHAVE','UMA CHAVE'],['CAVALO','UM CAVALO'],['ESPADA','UMA ESPADA'],
+  ['ANÃO','UM ANÃO'],['PONTE','UMA PONTE'],['ESCUDO','UM ESCUDO'],['TORRE','UMA TORRE'],
+  ['BARRIL','UM BARRIL'],['FLECHA','UMA FLECHA'],['PEDRA','UMA PEDRA'],['JOIA','UMA JOIA']
+];
+const ARTIGO_PAIRS = [...ARTIGO_DEF, ...ARTIGO_INDEF];
+const RLETRA_WORDS = ['RATO','RIO','ROCHA','RUA','CARRO','TERRA','FERRO','GUERRA','BURACO','PORTA','CARTA','LIVRO','PEDRA','TESOURO','FLORESTA','ESPADA','TREM','PRATO','GRUTA','CAVERNA','FOGUEIRA','BARRIL'];
+const NONR_WORDS = ['GELO','NEVE','LUA','SOL','MOEDA','FOLHA','NUVEM','VENTO','ILHA','ONDA'];
+const NUMERAIS_WORDS = ['UM','DOIS','TRES','QUATRO','CINCO','SEIS','SETE','OITO','NOVE','DEZ','ONZE','DOZE','TREZE','PRIMEIRO','SEGUNDO','TERCEIRO','QUARTO','QUINTO','SEXTO','DUZIA','VINTE','CEM'];
+const DISTRACT_COMMON = ['CASA','LUA','GATO','FOLHA','NUVEM','PONTE','CHAVE','LIVRO'];
+const ADJETIVO_ITEMS = [
+  {c:'GIGANTE',e:'🐉'},{c:'VELOZ',e:'🦅'},{c:'FORTE',e:'🐻'},{c:'SÁBIO',e:'🧙'},{c:'CORAJOSO',e:'🗡️'},
+  {c:'ASSUSTADOR',e:'👹'},{c:'BRILHANTE',e:'💍'},{c:'ANTIGO',e:'🏰'},{c:'PERIGOSO',e:'🕷️'}
+];
+const ADJ_WRONG_NOUNS = ['DRAGÃO','ANEL','CAVALO','PONTE','FLORESTA','CASTELO','ESCUDO','TESOURO'];
+const GRAU_ITEMS = [
+  {c:'CASINHA',kind:'dim',e:'🏠'},{c:'PORTÃO',kind:'aum',e:'🚪'},{c:'ESPADÃO',kind:'aum',e:'⚔️'},
+  {c:'LIVRINHO',kind:'dim',e:'📖'},{c:'CASTELÃO',kind:'aum',e:'🏰'},{c:'CHAVEZINHA',kind:'dim',e:'🔑'},
+  {c:'DRAGÃOZINHO',kind:'dim',e:'🐲'},{c:'HOMENZARRÃO',kind:'aum',e:'🧔'},{c:'PEDRINHA',kind:'dim',e:'🪨'}
+];
+const ACENT_MONO = [
+  {wrong:'PA',correct:'PÁ'},{wrong:'PE',correct:'PÉ'},{wrong:'DO',correct:'DÓ'},{wrong:'NOS',correct:'NÓS'},
+  {wrong:'VOS',correct:'VÓS'},{wrong:'JA',correct:'JÁ'},{wrong:'MA',correct:'MÁ'},{wrong:'CHA',correct:'CHÁ'},
+  {wrong:'DA',correct:'DÁ'},{wrong:'SO',correct:'SÓ'}
+];
+const ACENT_OXI = [
+  {wrong:'SOFA',correct:'SOFÁ'},{wrong:'CAFE',correct:'CAFÉ'},{wrong:'VOCE',correct:'VOCÊ'},{wrong:'TAMBEM',correct:'TAMBÉM'},
+  {wrong:'ALGUEM',correct:'ALGUÉM'},{wrong:'PARABENS',correct:'PARABÉNS'},{wrong:'SABIA',correct:'SABIÁ'},{wrong:'JACARE',correct:'JACARÉ'},
+  {wrong:'BEBE',correct:'BEBÊ'},{wrong:'CIPO',correct:'CIPÓ'}
+];
+
+/* ================= DODGER CATEGORY BUILDERS ================= */
+function buildGenero(kind){
+  const picks = shuffle(GENERO_PAIRS).slice(0,4);
+  return picks.map(pair=>{
+    const correct = kind==='masc' ? pair[0] : pair[1];
+    const wrongPool = GENERO_PAIRS.filter(p=>p!==pair).map(p=> kind==='masc' ? p[1] : p[0]);
+    return {correct, wrong: shuffle(wrongPool).slice(0,2)};
+  });
+}
+function buildArtigo(kind){
+  const pool = kind==='def' ? ARTIGO_DEF : ARTIGO_INDEF;
+  const otherPool = (kind==='def' ? ARTIGO_INDEF : ARTIGO_DEF).map(p=>p[1]);
+  const picks = shuffle(pool).slice(0,4);
+  return picks.map(p=>({correct:p[1], wrong: shuffle(otherPool).slice(0,2)}));
+}
+function buildLetraR(){
+  const correct = shuffle(RLETRA_WORDS).slice(0,4);
+  return correct.map(w=>({correct:w, wrong: shuffle(NONR_WORDS).slice(0,2)}));
+}
+function buildNumeral(){
+  const correct = shuffle(NUMERAIS_WORDS).slice(0,4);
+  return correct.map(w=>({correct:w, wrong: shuffle(DISTRACT_COMMON).slice(0,2)}));
+}
+function buildAdjetivo(){
+  const correct = shuffle(ADJETIVO_ITEMS.map(i=>i.c)).slice(0,4);
+  return correct.map(w=>({correct:w, wrong: shuffle(ADJ_WRONG_NOUNS).slice(0,2)}));
+}
+function buildGrau(kind){
+  const pool = GRAU_ITEMS.filter(i=>i.kind===kind).map(i=>i.c);
+  const otherPool = GRAU_ITEMS.filter(i=>i.kind!==kind).map(i=>i.c);
+  const correct = shuffle(pool).slice(0,4);
+  return correct.map(w=>({correct:w, wrong: shuffle(otherPool).slice(0,2)}));
+}
+function buildAcentMono(){
+  const picks = shuffle(ACENT_MONO).slice(0,4);
+  return picks.map(pair=>{
+    const wrongPool = ACENT_MONO.filter(p=>p!==pair).map(p=>p.wrong);
+    return {correct:pair.correct, wrong:[pair.wrong, ...shuffle(wrongPool).slice(0,1)]};
+  });
+}
+function buildAcentOxi(){
+  const picks = shuffle(ACENT_OXI).slice(0,4);
+  return picks.map(pair=>{
+    const wrongPool = ACENT_OXI.filter(p=>p!==pair).map(p=>p.wrong);
+    return {correct:pair.correct, wrong:[pair.wrong, ...shuffle(wrongPool).slice(0,1)]};
+  });
+}
+const CAT_MONO = {id:'mono', label:'Monossílabo Tônico', bubbles:3, build:buildAcentMono};
+const CAT_OXI = {id:'oxi', label:'Oxítona', bubbles:3, build:buildAcentOxi};
+
+/* ================= STATIONS (map, top to bottom) ================= */
+const STATIONS = [
+{id:'genero', hero:'Bilbo Bolseiro', place:'A Bolsão', icon:'🎒', color:'#4C7A3F', type:'memory', need:8,
+ mapX:26, mapY:6,
+ tip:'O substantivo pode variar em <b>gênero</b>: masculino ou feminino. Às vezes só troca a terminação (menino/menina), mas alguns pares mudam a palavra inteira — são os <b>heterônimos</b> (homem/mulher, boi/vaca).',
+ howto:'Toque em duas cartas para virá-las. Se formarem o par certo — a palavra e sua forma no outro gênero — elas ficam viradas para sempre!',
+ pairs: GENERO_PAIRS},
+{id:'letrar', hero:'Thorin Escudo de Carvalho', place:'Covil dos Trolls', icon:'⛏️', color:'#6B4A2B', type:'wordsearch', need:8,
+ mapX:70, mapY:16,
+ tip:'O <b>R</b> tem som forte no início da palavra ou quando dobrado (<b>RR</b>) entre vogais. Já depois de outra consoante, na mesma sílaba, o som é mais suave (PRATO, TREM).',
+ howto:'Arraste o dedo (ou o mouse) em linha reta sobre as letras para encontrar as palavras escondidas.',
+ words: RLETRA_WORDS},
+{id:'artigo', hero:'Elrond', place:'Valfenda', icon:'📜', color:'#3E7A6B', type:'memory', need:8,
+ mapX:22, mapY:27,
+ tip:'O <b>artigo</b> vem antes do substantivo e indica gênero e número. <b>Definido</b> (o, a, os, as) fala de algo já conhecido; <b>indefinido</b> (um, uma, uns, umas) fala de algo não específico.',
+ howto:'Toque em duas cartas para virá-las. Se formarem o par certo — o substantivo e ele mesmo com o artigo correto — elas ficam viradas para sempre!',
+ pairs: ARTIGO_PAIRS},
+{id:'interpretacao', hero:'Gollum', place:'Montanhas Nevoentas', icon:'🐸', color:'#55684A', type:'quiz', retryOnWrong:true, needPassages:3,
+ mapX:72, mapY:39,
+ tip:'Leia cada trecho da jornada de Bilbo com calma e procure a resposta com as palavras do próprio texto.',
+ howto:'Leia o texto, depois toque em "Responder" para ver as perguntas. Se errar, você volta ao texto para reler antes de tentar de novo!',
+ passages:[
+  {p:'Bilbo Bolseiro era um hobbit tranquilo que vivia em uma casa confortável chamada Bolsão. Certa manhã, o mago Gandalf bateu à sua porta e, pouco depois, treze anões chegaram para o chá. Eles contaram sobre um tesouro guardado por um dragão terrível chamado Smaug. No dia seguinte, Bilbo decidiu sair de casa para viver essa grande aventura.',
+   qs:[
+    {q:'Como se chamava a casa de Bilbo?', o:['Bolsão','Valfenda','Erebor','Esgaroth'], c:0, e:'O texto diz que ele vivia em "uma casa confortável chamada Bolsão".'},
+    {q:'Quantos anões foram à casa de Bilbo?', o:['Sete','Dez','Treze','Vinte'], c:2, e:'O texto diz que "treze anões chegaram para o chá".'},
+    {q:'Quem guardava o tesouro, segundo o texto?', o:['Um gigante','Um dragão chamado Smaug','Um rei elfo','Um troll'], c:1, e:'O texto diz que o tesouro era "guardado por um dragão terrível chamado Smaug".'}
+   ]},
+  {p:'Na estrada, a Companhia foi surpreendida por três trolls enormes e barulhentos. Os trolls queriam assar os anões para o jantar! Bilbo tentou ajudar, mas foi pego sem conseguir avisar os outros. Foi Gandalf quem salvou todos: ele imitou as vozes dos trolls e os manteve discutindo até o sol nascer. Quando a luz do dia chegou, os trolls viraram pedra.',
+   qs:[
+    {q:'O que os trolls queriam fazer com os anões?', o:['Levá-los para passear','Assá-los para o jantar','Ensiná-los a cozinhar','Trocá-los por ouro'], c:1, e:'O texto diz que "os trolls queriam assar os anões para o jantar".'},
+    {q:'Como Gandalf enganou os trolls?', o:['Fugindo com os anões','Imitando as vozes deles','Lançando fogo','Oferecendo comida'], c:1, e:'O texto diz que "ele imitou as vozes dos trolls e os manteve discutindo".'},
+    {q:'O que aconteceu com os trolls quando o sol nasceu?', o:['Fugiram para a floresta','Foram embora tristes','Viraram pedra','Adormeceram'], c:2, e:'O texto diz que "os trolls viraram pedra" com a luz do dia.'}
+   ]},
+  {p:'A Companhia chegou a Valfenda, um vale escondido entre montanhas, cheio de jardins e cachoeiras. Lá viviam os elfos, liderados pelo sábio Elrond. Ele leu o mapa antigo dos anões e descobriu uma mensagem secreta escrita com tinta lunar: só aparecia sob a luz da lua, no mesmo dia e formato em que havia sido escrita.',
+   qs:[
+    {q:'Onde ficava Valfenda?', o:['No topo de uma montanha','Um vale escondido entre montanhas','Dentro de uma caverna','Perto do mar'], c:1, e:'O texto diz que era "um vale escondido entre montanhas".'},
+    {q:'Quem liderava os elfos de Valfenda?', o:['Gandalf','Thorin','Elrond','Bardo'], c:2, e:'O texto diz que os elfos eram "liderados pelo sábio Elrond".'},
+    {q:'Como era a mensagem secreta no mapa?', o:['Escrita em outro idioma','Escondida sob uma pedra','Escrita com tinta lunar','Desenhada em código'], c:2, e:'O texto diz que estava "escrita com tinta lunar" e só aparecia sob a luz da lua.'}
+   ]},
+  {p:'Perdido nos túneis escuros das Montanhas Nevoentas, Bilbo encontrou um estranho ser chamado Gollum, que vivia sozinho perto de um lago subterrâneo. Para decidir se mostraria o caminho de saída, Gollum propôs um jogo de enigmas. Bilbo venceu por sorte, com uma pergunta que nem era um enigma de verdade: perguntou o que havia em seu bolso.',
+   qs:[
+    {q:'Onde Bilbo encontrou Gollum?', o:['Em uma floresta','Nos túneis das Montanhas Nevoentas','Na Cidade do Lago','Em Valfenda'], c:1, e:'O texto diz que foi "nos túneis escuros das Montanhas Nevoentas".'},
+    {q:'O que Gollum propôs para decidir se mostraria a saída?', o:['Uma corrida','Um jogo de enigmas','Uma troca de tesouros','Uma disputa de força'], c:1, e:'O texto diz que "Gollum propôs um jogo de enigmas".'},
+    {q:'Qual foi a pergunta que Bilbo usou para vencer?', o:['Qual era o nome de Gollum','O que havia em seu bolso','Onde ficava a saída','Quantos anos Gollum tinha'], c:1, e:'O texto diz que ele "perguntou o que havia em seu bolso".'}
+   ]},
+  {p:'Depois de escapar dos goblins, o grupo chegou à casa de Beorn, um homem forte que também podia se transformar em urso. Beorn não gostava de visitas, mas ofereceu comida, camas e conselhos sobre a perigosa Floresta das Trevas, que eles precisariam atravessar para chegar à Montanha Solitária.',
+   qs:[
+    {q:'Em que animal Beorn conseguia se transformar?', o:['Um lobo','Um urso','Uma águia','Um cavalo'], c:1, e:'O texto diz que ele "também podia se transformar em urso".'},
+    {q:'O que Beorn ofereceu ao grupo, além de conselhos?', o:['Armas e cavalos','Comida e camas','Mapas e moedas','Barcos e velas'], c:1, e:'O texto diz que ele "ofereceu comida, camas e conselhos".'},
+    {q:'Qual floresta perigosa eles precisariam atravessar?', o:['A Floresta das Trevas','A Floresta Encantada','O Bosque Dourado','A Mata Fechada'], c:0, e:'O texto diz que era preciso atravessar "a perigosa Floresta das Trevas".'}
+   ]},
+  {p:'A Companhia chegou a Esgaroth, a Cidade do Lago, construída sobre estacas de madeira na água. Os moradores ficaram assustados ao saber que os viajantes iam até a Montanha Solitária acordar o dragão Smaug. Mesmo assim, o Mestre da cidade ofereceu barcos e mantimentos para a última parte da jornada.',
+   qs:[
+    {q:'Sobre o que a Cidade do Lago foi construída?', o:['Rochas à beira-mar','Estacas de madeira na água','Uma ilha de gelo','Um campo verde'], c:1, e:'O texto diz que era "construída sobre estacas de madeira na água".'},
+    {q:'Por que os moradores ficaram assustados?', o:['Porque ia chover muito','Porque os viajantes iam acordar o dragão Smaug','Porque o lago ia secar','Porque os anões eram perigosos'], c:1, e:'O texto diz que temiam que fossem "acordar o dragão Smaug".'},
+    {q:'O que o Mestre da cidade ofereceu?', o:['Espadas e escudos','Barcos e mantimentos','Cavalos e carroças','Um exército'], c:1, e:'O texto diz que ele "ofereceu barcos e mantimentos".'}
+   ]}
+ ]},
+{id:'numerais', hero:'Águias Gigantes', place:'Céu das Águias', icon:'🦅', color:'#6E8FB0', type:'wordsearch', need:8,
+ mapX:28, mapY:50,
+ tip:'Os <b>numerais</b> indicam quantidade (<b>cardinais</b>: um, dois, três...) ou posição/ordem (<b>ordinais</b>: primeiro, segundo, terceiro...).',
+ howto:'Arraste o dedo (ou o mouse) em linha reta sobre as letras para encontrar os numerais escondidos.',
+ words: NUMERAIS_WORDS},
+{id:'adjetivo', hero:'Beorn', place:'Casa de Beorn', icon:'🐻', color:'#8A5A2B', type:'genius',
+ mapX:68, mapY:60,
+ tip:'O <b>adjetivo</b> é a palavra que dá uma característica ao substantivo: como ele é, do que parece, que qualidade tem.',
+ howto:'Decore a sequência de emojis, um de cada vez, depois toque nos adjetivos certos na mesma ordem. Se errar, sem problema: a rodada recomeça!',
+ items: ADJETIVO_ITEMS},
+{id:'grau', hero:'Gandalf, o Cinzento', place:'Trevamata', icon:'🧙', color:'#6B6B6B', type:'genius',
+ mapX:24, mapY:71,
+ tip:'O substantivo pode variar em <b>grau</b>: <b>aumentativo</b> (torna algo maior ou mais intenso, como CASTELÃO) ou <b>diminutivo</b> (torna algo menor ou mais afetuoso, como CASINHA).',
+ howto:'Decore a sequência de emojis, um de cada vez, depois toque nas palavras certas na mesma ordem. Se errar, sem problema: a rodada recomeça!',
+ items: GRAU_ITEMS},
+{id:'acentuacao', hero:'Bardo, o Arqueiro', place:'Cidade do Lago', icon:'🏹', color:'#35607A', type:'dodger', needCategories:2,
+ mapX:70, mapY:83,
+ tip:'Os <b>monossílabos tônicos</b> terminados em A, E, O (+S) recebem acento (PÁ, PÉ, DÓ, NÓS). As <b>oxítonas</b> com essas mesmas terminações, ou em EM/ENS, também são acentuadas (CAFÉ, VOCÊ, PARABÉNS).',
+ howto:'Arraste o dedo no jogo (ou use ← →) para mover o herói. Leia a dica no topo e pegue só as palavras que combinam com ela.',
+ categories:[CAT_MONO, CAT_OXI]}
+];
+
+const FINAL = {id:'final', hero:'Smaug, o Dragão', place:'Montanha Solitária', icon:'🐉', color:'var(--dragon)', type:'dodger', needCategories:6,
+ mapX:50, mapY:94,
+ tip:'Este é o desafio final: uma dica aparece no topo e chovem palavras — pegue só as que combinam com a dica e desvie das demais. A cada rodada, a dica muda!',
+ howto:'Arraste o dedo (ou use as setas ← →) para mover o herói. Leia a dica no topo e pegue só as palavras que combinam com ela.',
+ categories:[
+   {id:'masc', label:'Masculino', bubbles:3, build:()=>buildGenero('masc')},
+   {id:'fem', label:'Feminino', bubbles:3, build:()=>buildGenero('fem')},
+   {id:'artdef', label:'Artigo Definido', bubbles:3, build:()=>buildArtigo('def')},
+   {id:'artindef', label:'Artigo Indefinido', bubbles:3, build:()=>buildArtigo('indef')},
+   {id:'letrar', label:'Palavra com R', bubbles:3, build:buildLetraR},
+   {id:'numeral', label:'Numeral', bubbles:3, build:buildNumeral},
+   {id:'adjetivo', label:'Adjetivo', bubbles:3, build:buildAdjetivo},
+   {id:'aumentativo', label:'Aumentativo', bubbles:3, build:()=>buildGrau('aum')},
+   {id:'diminutivo', label:'Diminutivo', bubbles:3, build:()=>buildGrau('dim')},
+   CAT_MONO, CAT_OXI
+ ]};
+
+const STORE_KEY = 'ohobbitPortuguesV1';
+const MAX_STARS = STATIONS.length*3 + 3;
+const STAR_FILL='★', STAR_EMPTY='☆';
+/* ================= STATE ================= */
+function loadState(){
+  try{ const raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return {progress:{}, theme:'auto'};
+}
+function saveState(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+let state = loadState();
+let current = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+/* ================= THEME / TOAST / RESET ================= */
+function applyTheme(){
+  const t = state.theme || 'auto';
+  if(t==='auto') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', t);
+}
+document.getElementById('theme-toggle').addEventListener('click', ()=>{
+  const order = ['auto','light','dark'];
+  const cur = order.indexOf(state.theme||'auto');
+  state.theme = order[(cur+1)%order.length];
+  saveState(); applyTheme();
+  showToast('Tema: ' + ({auto:'automático', light:'claro', dark:'escuro'}[state.theme]));
+});
+
+let toastTimer;
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2400);
+}
+
+const resetBtn = document.getElementById('reset-btn');
+let resetArmed = false, resetTimer;
+resetBtn.addEventListener('click', ()=>{
+  if(!resetArmed){
+    resetArmed = true;
+    resetBtn.style.background = 'var(--danger-bg)';
+    resetBtn.style.borderColor = 'var(--danger)';
+    showToast('Toque de novo para reiniciar todo o progresso');
+    resetTimer = setTimeout(()=>{ resetArmed=false; resetBtn.style.background=''; resetBtn.style.borderColor=''; }, 3000);
+  } else {
+    clearTimeout(resetTimer);
+    state = {progress:{}, theme: state.theme};
+    saveState();
+    resetArmed = false;
+    resetBtn.style.background=''; resetBtn.style.borderColor='';
+    renderMap();
+    showToast('Progresso reiniciado');
+  }
+});
+
+/* ================= PROGRESS HELPERS ================= */
+function getProgress(id){ return state.progress[id] || {stars:0, completed:false}; }
+function allStationsDone(){ return STATIONS.every(s=>getProgress(s.id).completed); }
+function findStation(id){ return id==='final' ? FINAL : STATIONS.find(s=>s.id===id); }
+function starsRow(n){
+  let h='';
+  for(let i=0;i<3;i++) h += '<span class="'+(i<n?'star-fill':'star-empty')+'">'+(i<n?STAR_FILL:STAR_EMPTY)+'</span>';
+  return h;
+}
+function setStationStars(id, stars){
+  const prevBest = getProgress(id).stars;
+  state.progress[id] = {stars: Math.max(stars, prevBest), completed:true};
+  saveState();
+  return Math.max(stars, prevBest);
+}
+function finishStation(id, score, total){
+  const pct = total>0 ? score/total : 0;
+  const stars = pct>=0.9?3:pct>=0.7?2:pct>=0.4?1:0;
+  return setStationStars(id, stars);
+}
+
+/* ================= MAP ================= */
+const MAP_DECOR = [
+  {e:'🌳', x:8, y:3}, {e:'🌻', x:85, y:8}, {e:'🌲', x:12, y:17},
+  {e:'💧', x:82, y:28}, {e:'⛰️', x:15, y:38}, {e:'☁️', x:78, y:48},
+  {e:'🐾', x:14, y:58}, {e:'🕸️', x:84, y:70}, {e:'🌊', x:18, y:80}, {e:'🔥', x:78, y:92}
+];
+const TYPE_LABELS = {memory:'Jogo da Memória', wordsearch:'Caça-palavras', genius:'Genius', dodger:'Dodger', quiz:'Quiz de Leitura'};
+
+function renderMap(){
+  const map = document.getElementById('map');
+  map.querySelectorAll('.map-node, .map-decor').forEach(el=>el.remove());
+  MAP_DECOR.forEach(d=>{
+    const s = document.createElement('span');
+    s.className='map-decor';
+    s.textContent=d.e;
+    s.style.left=d.x+'%'; s.style.top=d.y+'%';
+    map.appendChild(s);
+  });
+  let totalStars=0;
+  STATIONS.forEach(st=>{
+    const prog = getProgress(st.id);
+    totalStars += prog.stars;
+    const btn = document.createElement('button');
+    btn.className='map-node';
+    btn.dataset.id = st.id;
+    btn.style.left = st.mapX+'%'; btn.style.top = st.mapY+'%';
+    btn.innerHTML = `
+      <span class="badge" style="background:${st.color}">${st.icon}</span>
+      <span class="node-tag">
+        <span class="node-place">${st.place}</span>
+        <span class="node-label">${st.hero}</span>
+        <span class="node-stars">${starsRow(prog.stars)}</span>
+      </span>`;
+    map.appendChild(btn);
+  });
+  totalStars += getProgress('final').stars;
+  const unlocked = allStationsDone();
+  const fprog = getProgress('final');
+  const fbtn = document.createElement('button');
+  fbtn.className='map-node final';
+  fbtn.dataset.id='final';
+  fbtn.style.left = FINAL.mapX+'%'; fbtn.style.top = FINAL.mapY+'%';
+  if(!unlocked) fbtn.disabled = true;
+  fbtn.innerHTML = `
+    <span class="badge ${unlocked?'':'locked'}" style="background:${unlocked?FINAL.color:''}">${unlocked?FINAL.icon:'🔒'}</span>
+    <span class="node-tag">
+      <span class="node-place">${unlocked?FINAL.place:'???'}</span>
+      <span class="node-label">${unlocked?'A Companhia vs. Smaug':'Complete as 8 estações'}</span>
+      <span class="node-stars">${unlocked?starsRow(fprog.stars):''}</span>
+    </span>`;
+  map.appendChild(fbtn);
+
+  document.getElementById('stars-total').innerHTML = '★ ' + totalStars + ' / ' + MAX_STARS;
+
+  map.querySelectorAll('.map-node').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ if(btn.disabled) return; openIntro(btn.dataset.id); });
+  });
+  requestAnimationFrame(renderMapPath);
+}
+function renderMapPath(){
+  const map = document.getElementById('map');
+  const svg = document.getElementById('map-path-svg');
+  const path = document.getElementById('map-path');
+  const rect = map.getBoundingClientRect();
+  if(rect.width===0 || rect.height===0) return;
+  svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
+  const pts = [...map.querySelectorAll('.map-node')].map(n=>{
+    const r = n.querySelector('.badge').getBoundingClientRect();
+    return {x: r.left-rect.left+r.width/2, y: r.top-rect.top+r.height/2};
+  });
+  if(pts.length<2){ path.setAttribute('d',''); return; }
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  for(let i=1;i<pts.length;i++) d += ` L ${pts[i].x} ${pts[i].y}`;
+  path.setAttribute('d', d);
+}
+window.addEventListener('resize', ()=>renderMapPath());
+
+/* ================= OVERLAYS ================= */
+function openOverlay(id){ document.getElementById(id).classList.add('open'); }
+function closeOverlay(id){ document.getElementById(id).classList.remove('open'); }
+
+function openIntro(id){
+  current = findStation(id);
+  document.getElementById('intro-badge').style.background = current.color;
+  document.getElementById('intro-badge').textContent = current.icon;
+  document.getElementById('intro-hero').textContent = TYPE_LABELS[current.type] || '';
+  document.getElementById('intro-place').textContent = '📍 ' + current.place;
+  document.getElementById('intro-title').textContent = id==='final' ? 'A Companhia vs. Smaug' : current.hero;
+  document.getElementById('intro-tip').innerHTML = current.tip;
+  document.getElementById('intro-howto').textContent = '🎮 ' + current.howto;
+  openOverlay('overlay-intro');
+}
+document.getElementById('intro-close').addEventListener('click', ()=>closeOverlay('overlay-intro'));
+document.getElementById('intro-start').addEventListener('click', ()=>{
+  closeOverlay('overlay-intro');
+  startStation(current);
+});
+
+function startStation(station){
+  current = station;
+  switch(station.type){
+    case 'quiz': startQuiz(station); break;
+    case 'memory': startMemory(station); break;
+    case 'wordsearch': startWordSearch(station); break;
+    case 'genius': startGenius(station); break;
+    case 'dodger': startDodger(station); break;
+  }
+}
+
+function starsHTML(n){ return starsRow(n); }
+
+function showResult(station, score, total, stars){
+  document.getElementById('result-hero').textContent = station.hero;
+  document.getElementById('result-title').textContent = station.hero;
+  document.getElementById('result-stars').innerHTML = starsHTML(stars);
+  document.getElementById('result-score').textContent = score+' / '+total;
+  const msgs = [
+    'Vamos treinar mais uma vez com esse companheiro?',
+    'Bom trabalho! Mais um pouco de prática e fica perfeito.',
+    'Muito bem! Você domina quase tudo aqui.',
+    'Mandou muito bem! Você dominou este desafio.'
+  ];
+  document.getElementById('result-msg').textContent = msgs[stars];
+  openOverlay('overlay-result');
+  const willUnlock = station.id!=='final' && allStationsDone();
+  if(willUnlock){ setTimeout(()=>showToast('🐉 A Montanha Solitária apareceu no mapa!'), 500); }
+}
+document.getElementById('result-retry').addEventListener('click', ()=>{
+  closeOverlay('overlay-result');
+  startStation(current);
+});
+document.getElementById('result-map').addEventListener('click', ()=>{
+  closeOverlay('overlay-result');
+  renderMap();
+});
+
+function showTrophy(score,total,stars,won){
+  document.getElementById('trophy-icon').textContent = won?'🏆':'🐉';
+  document.getElementById('trophy-title').textContent = won? 'A Companhia venceu!' : 'Smaug escapou...';
+  document.getElementById('trophy-text').textContent = won?
+    'Vocês uniram forças e revisaram tudo o que cai na prova de Português!' :
+    'As vidas acabaram antes do fim da batalha. Toque em "Jogar novamente" para tentar de novo!';
+  document.getElementById('trophy-stars').innerHTML = starsHTML(stars);
+  document.getElementById('trophy-score').textContent = score+' / '+total;
+  openOverlay('overlay-trophy');
+  if(won) runConfetti();
+}
+document.getElementById('trophy-retry').addEventListener('click', ()=>{
+  closeOverlay('overlay-trophy');
+  startStation(FINAL);
+});
+document.getElementById('trophy-map').addEventListener('click', ()=>{
+  closeOverlay('overlay-trophy');
+  renderMap();
+});
+
+function runConfetti(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.getElementById('trophy-canvas');
+  const ctx = canvas.getContext('2d');
+  const sheet = canvas.closest('.sheet');
+  function resize(){ canvas.width = sheet.clientWidth; canvas.height = sheet.clientHeight; }
+  resize();
+  if(reduce) return;
+  const colors = ['#D9A441','#3F6B3F','#6B4A2B','#35607A','#A23B2E'];
+  const pieces = Array.from({length:80}, ()=>({
+    x: Math.random()*canvas.width, y: -20-Math.random()*canvas.height*0.5,
+    r: 4+Math.random()*5, c: colors[Math.floor(Math.random()*colors.length)],
+    vy: 2+Math.random()*3, vx: -1.5+Math.random()*3, rot: Math.random()*Math.PI, vr: -0.15+Math.random()*0.3
+  }));
+  let frames=0;
+  function tick(){
+    if(!document.getElementById('overlay-trophy').classList.contains('open')) return;
+    frames++;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.c; ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6);
+      ctx.restore();
+      if(p.y>canvas.height+20){ p.y=-20; p.x=Math.random()*canvas.width; }
+    });
+    if(frames<260) requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+/* ================= QUIZ ENGINE (interpretação, com releitura) ================= */
+let quizPassages=[], quizPassageIdx=0, quizQIdx=0, quizWrongTotal=0, quizTotalQuestions=0;
+function startQuiz(station){
+  const chosen = shuffle(station.passages).slice(0, station.needPassages || station.passages.length);
+  quizPassages = chosen.map(p=>({p:p.p, qs:p.qs, order:shuffle(p.qs.map((_,i)=>i))}));
+  quizPassageIdx=0; quizQIdx=0; quizWrongTotal=0;
+  quizTotalQuestions = quizPassages.reduce((s,p)=>s+p.qs.length,0);
+  openOverlay('overlay-quiz');
+  showPassageRead(false);
+}
+function renderQuizDots(){
+  const wrap = document.getElementById('quiz-dots');
+  wrap.innerHTML='';
+  let doneCount=0;
+  for(let i=0;i<quizPassageIdx;i++) doneCount += quizPassages[i].qs.length;
+  doneCount += quizQIdx;
+  for(let i=0;i<quizTotalQuestions;i++){
+    const d = document.createElement('span');
+    d.className='dot'+(i<doneCount?' filled':(i===doneCount?' current':''));
+    wrap.appendChild(d);
+  }
+}
+function showPassageRead(isRetry){
+  renderQuizDots();
+  const passage = quizPassages[quizPassageIdx];
+  document.getElementById('quiz-passage').style.display='block';
+  document.getElementById('quiz-passage').textContent = passage.p;
+  document.getElementById('quiz-prompt').style.display='none';
+  document.getElementById('quiz-options').innerHTML='';
+  document.getElementById('quiz-feedback').className='feedback';
+  document.getElementById('quiz-continue').style.display='none';
+  document.getElementById('quiz-readgate').style.display='block';
+  const btn = document.getElementById('quiz-read-btn');
+  btn.textContent = isRetry ? 'Reler o texto e responder de novo' : ('Já li! Responder pergunta '+(quizQIdx+1)+' de '+passage.qs.length);
+  btn.onclick = ()=>showQuestion();
+}
+function showQuestion(){
+  document.getElementById('quiz-readgate').style.display='none';
+  document.getElementById('quiz-passage').style.display='none';
+  const passage = quizPassages[quizPassageIdx];
+  const q = passage.qs[passage.order[quizQIdx]];
+  document.getElementById('quiz-prompt').style.display='block';
+  document.getElementById('quiz-prompt').textContent = q.q;
+  const optOrder = shuffle(q.o.map((_,i)=>i));
+  const optsWrap = document.getElementById('quiz-options');
+  optsWrap.innerHTML='';
+  optOrder.forEach((origIdx,i)=>{
+    const b = document.createElement('button');
+    b.className='opt';
+    b.textContent = q.o[origIdx];
+    b.addEventListener('click', ()=>selectQuizOption(i, origIdx, q, optOrder));
+    optsWrap.appendChild(b);
+  });
+  document.getElementById('quiz-feedback').className='feedback';
+  document.getElementById('quiz-continue').style.display='none';
+}
+function selectQuizOption(i, origIdx, q, optOrder){
+  const buttons = document.querySelectorAll('#quiz-options .opt');
+  if(buttons[0] && buttons[0].disabled) return;
+  const correct = origIdx===q.c;
+  buttons.forEach((b,idx)=>{
+    b.disabled=true;
+    if(optOrder[idx]===q.c) b.classList.add('correct');
+    else if(idx===i) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+  const fb = document.getElementById('quiz-feedback');
+  fb.className = 'feedback show ' + (correct?'ok':'no');
+  document.getElementById('quiz-feedback-title').textContent = correct? 'Certinho! 🌟' : 'Quase! A resposta certa é: "'+q.o[q.c]+'"';
+  document.getElementById('quiz-feedback-text').textContent = q.e;
+  const cont = document.getElementById('quiz-continue');
+  cont.style.display='block';
+  if(correct){
+    cont.textContent = 'Continuar';
+    cont.onclick = ()=>advanceQuestion();
+  } else {
+    quizWrongTotal++;
+    cont.textContent = 'Reler o texto 📖';
+    cont.onclick = ()=>showPassageRead(true);
+  }
+}
+function advanceQuestion(){
+  const passage = quizPassages[quizPassageIdx];
+  quizQIdx++;
+  if(quizQIdx>=passage.qs.length){
+    quizPassageIdx++;
+    quizQIdx=0;
+    if(quizPassageIdx>=quizPassages.length){ finishQuiz(); return; }
+    showPassageRead(false);
+  } else {
+    showQuestion();
+  }
+}
+function finishQuiz(){
+  const stars = quizWrongTotal===0 ? 3 : quizWrongTotal<=2 ? 2 : quizWrongTotal<=5 ? 1 : 0;
+  closeOverlay('overlay-quiz');
+  const finalStars = setStationStars(current.id, stars);
+  showResult(current, quizTotalQuestions, quizTotalQuestions, finalStars);
+}
+document.getElementById('quiz-back').addEventListener('click', ()=>closeOverlay('overlay-quiz'));
+/* ================= MEMORY ENGINE ================= */
+let memCards=[], memFlipped=[], memMatched=0, memWrong=0, memLocked=false, memPairsTotal=0;
+function startMemory(station){
+  const need = station.need || station.pairs.length;
+  const idxs = shuffle(station.pairs.map((_,i)=>i)).slice(0, need);
+  const pairs = idxs.map(i=>station.pairs[i]);
+  memPairsTotal = pairs.length;
+  const raw = [];
+  pairs.forEach((pair,i)=>{ raw.push({pid:i,text:pair[0]}); raw.push({pid:i,text:pair[1]}); });
+  memCards = shuffle(raw);
+  memFlipped=[]; memMatched=0; memWrong=0; memLocked=false;
+  openOverlay('overlay-memory');
+  renderMemStatus();
+  renderMemGrid(station);
+}
+function renderMemStatus(){
+  document.getElementById('mem-status').textContent = 'Pares encontrados: '+memMatched+' / '+memPairsTotal+(memWrong?(' · tentativas erradas: '+memWrong):'');
+}
+function renderMemGrid(station){
+  const grid = document.getElementById('mem-grid');
+  grid.innerHTML='';
+  memCards.forEach((card,idx)=>{
+    const b = document.createElement('button');
+    b.className='mem-card back';
+    b.textContent = station.icon;
+    b.dataset.idx = idx;
+    b.addEventListener('click', ()=>flipMemCard(idx, station));
+    grid.appendChild(b);
+  });
+}
+function flipMemCard(idx, station){
+  if(memLocked) return;
+  const cells = document.querySelectorAll('#mem-grid .mem-card');
+  const cell = cells[idx];
+  if(cell.classList.contains('matched') || cell.classList.contains('flipped')) return;
+  if(memFlipped.length>=2) return;
+  cell.classList.remove('back');
+  cell.classList.add('flipped');
+  cell.textContent = memCards[idx].text;
+  memFlipped.push(idx);
+  if(memFlipped.length===2){
+    memLocked=true;
+    const [a,b] = memFlipped;
+    if(memCards[a].pid===memCards[b].pid){
+      cells[a].classList.add('matched'); cells[b].classList.add('matched');
+      memMatched++;
+      memFlipped=[]; memLocked=false;
+      renderMemStatus();
+      if(memMatched===memPairsTotal){
+        closeOverlay('overlay-memory');
+        const stars = finishStation(station.id, memPairsTotal, memPairsTotal);
+        showResult(station, memPairsTotal, memPairsTotal, stars);
+      }
+    } else {
+      memWrong++;
+      renderMemStatus();
+      setTimeout(()=>{
+        cells[a].classList.remove('flipped'); cells[a].classList.add('back'); cells[a].textContent = station.icon;
+        cells[b].classList.remove('flipped'); cells[b].classList.add('back'); cells[b].textContent = station.icon;
+        memFlipped=[]; memLocked=false;
+      }, 750);
+    }
+  }
+}
+document.getElementById('mem-back').addEventListener('click', ()=>closeOverlay('overlay-memory'));
+
+/* ================= WORD SEARCH ENGINE ================= */
+const WS_GRID = 10;
+let wsLetters=[], wsPlacements={}, wsFound=new Set(), wsWrong=0, wsCellEls=[], wsSessionWords=[];
+let wsSelecting=false, wsStart=null, wsCurPath=[];
+
+function wsCanPlace(letters, word, r0, c0, dr, dc){
+  for(let i=0;i<word.length;i++){
+    const r=r0+dr*i, c=c0+dc*i;
+    if(r<0||r>=WS_GRID||c<0||c>=WS_GRID) return false;
+    const existing = letters[r][c];
+    if(existing && existing!==word[i]) return false;
+  }
+  return true;
+}
+function wsGenerate(words){
+  const dirs = [[0,1],[1,0],[1,1],[-1,1]];
+  const letters = Array.from({length:WS_GRID}, ()=>Array(WS_GRID).fill(''));
+  const placements = {};
+  const sorted = words.slice().sort((a,b)=>b.length-a.length);
+  sorted.forEach(word=>{
+    let placed=false, tries=0;
+    while(!placed && tries<400){
+      tries++;
+      const [dr,dc] = dirs[Math.floor(Math.random()*dirs.length)];
+      const r0 = Math.floor(Math.random()*WS_GRID);
+      const c0 = Math.floor(Math.random()*WS_GRID);
+      if(wsCanPlace(letters, word, r0, c0, dr, dc)){
+        const cells=[];
+        for(let i=0;i<word.length;i++){
+          const r=r0+dr*i, c=c0+dc*i;
+          letters[r][c]=word[i];
+          cells.push({r,c});
+        }
+        placements[word]=cells;
+        placed=true;
+      }
+    }
+  });
+  const AZ='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for(let r=0;r<WS_GRID;r++) for(let c=0;c<WS_GRID;c++){
+    if(!letters[r][c]) letters[r][c]=AZ[Math.floor(Math.random()*AZ.length)];
+  }
+  return {letters, placements};
+}
+function wsPathKey(path){
+  return path.map(p=>p.r+','+p.c).sort().join(';');
+}
+function startWordSearch(station){
+  const need = station.need || station.words.length;
+  wsSessionWords = shuffle(station.words).slice(0, need);
+  const gen = wsGenerate(wsSessionWords);
+  wsLetters = gen.letters; wsPlacements = gen.placements;
+  wsFound = new Set(); wsWrong = 0; wsSelecting=false; wsStart=null; wsCurPath=[];
+  openOverlay('overlay-ws');
+  renderWsStatus(station);
+  renderWsGrid(station);
+  renderWsWordlist(station);
+}
+function renderWsStatus(station){
+  document.getElementById('ws-status').textContent = 'Palavras encontradas: '+wsFound.size+' / '+wsSessionWords.length;
+}
+function renderWsWordlist(station){
+  const wrap = document.getElementById('ws-wordlist');
+  wrap.innerHTML='';
+  wsSessionWords.forEach(w=>{
+    const s = document.createElement('span');
+    s.className='ws-word'+(wsFound.has(w)?' found':'');
+    s.textContent = w;
+    s.dataset.word = w;
+    wrap.appendChild(s);
+  });
+}
+function renderWsGrid(station){
+  const grid = document.getElementById('ws-grid');
+  grid.style.gridTemplateColumns = 'repeat('+WS_GRID+', 1fr)';
+  grid.style.gridTemplateRows = 'repeat('+WS_GRID+', 1fr)';
+  grid.innerHTML='';
+  wsCellEls = [];
+  for(let r=0;r<WS_GRID;r++){
+    const row=[];
+    for(let c=0;c<WS_GRID;c++){
+      const cell = document.createElement('div');
+      cell.className='ws-cell';
+      cell.textContent = wsLetters[r][c];
+      cell.dataset.r=r; cell.dataset.c=c;
+      grid.appendChild(cell);
+      row.push(cell);
+    }
+    wsCellEls.push(row);
+  }
+  grid.onpointerdown = (e)=>wsPointerDown(e, station);
+  grid.onpointermove = (e)=>wsPointerMove(e, station);
+  grid.onpointerup = (e)=>wsPointerUp(e, station);
+  grid.onpointercancel = (e)=>wsPointerUp(e, station);
+}
+function wsPointToCell(clientX, clientY){
+  const grid = document.getElementById('ws-grid');
+  const rect = grid.getBoundingClientRect();
+  const cw = rect.width/WS_GRID, ch = rect.height/WS_GRID;
+  const c = Math.floor((clientX-rect.left)/cw);
+  const r = Math.floor((clientY-rect.top)/ch);
+  if(r<0||r>=WS_GRID||c<0||c>=WS_GRID) return null;
+  return {r,c};
+}
+function wsBuildPath(start, cur){
+  const dr = cur.r-start.r, dc = cur.c-start.c;
+  const sr = Math.sign(dr), sc = Math.sign(dc);
+  const len = Math.max(Math.abs(dr),Math.abs(dc))+1;
+  const path=[];
+  for(let k=0;k<len;k++){
+    const r=start.r+sr*k, c=start.c+sc*k;
+    if(r<0||r>=WS_GRID||c<0||c>=WS_GRID) break;
+    path.push({r,c});
+  }
+  return path;
+}
+function wsClearSel(){
+  wsCurPath.forEach(p=>{ if(!wsCellEls[p.r][p.c].classList.contains('found')) wsCellEls[p.r][p.c].classList.remove('sel'); });
+  wsCurPath=[];
+}
+function wsPointerDown(e, station){
+  const cell = wsPointToCell(e.clientX, e.clientY);
+  if(!cell) return;
+  document.getElementById('ws-grid').setPointerCapture(e.pointerId);
+  wsSelecting=true; wsStart=cell; wsCurPath=[cell];
+  wsCellEls[cell.r][cell.c].classList.add('sel');
+}
+function wsPointerMove(e, station){
+  if(!wsSelecting) return;
+  const cell = wsPointToCell(e.clientX, e.clientY);
+  if(!cell) return;
+  wsClearSel();
+  wsCurPath = wsBuildPath(wsStart, cell);
+  wsCurPath.forEach(p=>{ if(!wsCellEls[p.r][p.c].classList.contains('found')) wsCellEls[p.r][p.c].classList.add('sel'); });
+}
+function wsPointerUp(e, station){
+  if(!wsSelecting) return;
+  wsSelecting=false;
+  if(wsCurPath.length>=2){
+    const key = wsPathKey(wsCurPath);
+    let matchedWord=null;
+    wsSessionWords.forEach(w=>{
+      if(wsFound.has(w)) return;
+      const cells = wsPlacements[w];
+      if(cells && wsPathKey(cells)===key) matchedWord=w;
+    });
+    if(matchedWord){
+      wsFound.add(matchedWord);
+      wsCurPath.forEach(p=>wsCellEls[p.r][p.c].classList.add('found'));
+      wsCurPath.forEach(p=>wsCellEls[p.r][p.c].classList.remove('sel'));
+      wsCurPath=[];
+      renderWsStatus(station);
+      renderWsWordlist(station);
+      if(wsFound.size===wsSessionWords.length){
+        setTimeout(()=>{
+          closeOverlay('overlay-ws');
+          const total = wsSessionWords.length + wsWrong;
+          const stars = finishStation(station.id, wsSessionWords.length, total);
+          showResult(station, wsSessionWords.length, total, stars);
+        }, 300);
+      }
+    } else {
+      wsWrong++;
+      wsClearSel();
+    }
+  } else {
+    wsClearSel();
+  }
+}
+document.getElementById('ws-back').addEventListener('click', ()=>closeOverlay('overlay-ws'));
+
+/* ================= GENIUS ENGINE ================= */
+let geniusSet=[], geniusGridOrder=[], geniusRound=0, geniusRounds=9, geniusInputPos=0, geniusGridEnabled=false, geniusRunToken=0;
+function startGenius(station){
+  const seen = new Set();
+  const uniqueByC = [];
+  shuffle(station.items).forEach(item=>{
+    if(!seen.has(item.c)){ seen.add(item.c); uniqueByC.push(item); }
+  });
+  geniusRounds = Math.min(9, uniqueByC.length);
+  geniusSet = uniqueByC.slice(0, geniusRounds);
+  geniusGridOrder = shuffle(geniusSet.map((_,i)=>i));
+  geniusRound = 0;
+  openOverlay('overlay-genius');
+  renderGeniusGrid();
+  geniusPlayRound(station);
+}
+function renderGeniusGrid(){
+  const wrap = document.getElementById('genius-tiles');
+  wrap.innerHTML='';
+  geniusGridOrder.forEach(idx=>{
+    const b = document.createElement('button');
+    b.className='genius-tile';
+    b.textContent = geniusSet[idx].c;
+    b.dataset.idx = idx;
+    b.disabled = true;
+    b.addEventListener('click', ()=>geniusTileClick(idx));
+    wrap.appendChild(b);
+  });
+}
+function renderGeniusDots(){
+  const wrap = document.getElementById('genius-dots');
+  wrap.innerHTML='';
+  for(let i=0;i<geniusRounds;i++){
+    const d = document.createElement('span');
+    d.className='dot'+(i<geniusRound?' filled':(i===geniusRound?' current':''));
+    wrap.appendChild(d);
+  }
+}
+function geniusSetGridEnabled(on){
+  geniusGridEnabled = on;
+  document.querySelectorAll('#genius-tiles .genius-tile').forEach(b=>b.disabled=!on);
+}
+function geniusFlash(idx, cls, dur){
+  const tile = document.querySelector('#genius-tiles .genius-tile[data-idx="'+idx+'"]');
+  tile.classList.add(cls);
+  setTimeout(()=>tile.classList.remove(cls), dur);
+}
+function geniusPlayRound(station){
+  const token = ++geniusRunToken;
+  document.querySelectorAll('#genius-tiles .genius-tile').forEach(b=>b.classList.remove('picked','bad'));
+  renderGeniusDots();
+  document.getElementById('genius-status').textContent = 'Rodada '+(geniusRound+1)+' de '+geniusRounds;
+  document.getElementById('genius-msg').textContent = 'Decore...';
+  geniusSetGridEnabled(false);
+  const seqLen = geniusRound+1;
+  let i=0;
+  function showStep(){
+    if(token!==geniusRunToken) return;
+    if(i>=seqLen){
+      document.getElementById('genius-emoji').textContent = '';
+      document.getElementById('genius-msg').textContent = 'Selecione...';
+      geniusInputPos = 0;
+      geniusSetGridEnabled(true);
+      return;
+    }
+    document.getElementById('genius-emoji').textContent = geniusSet[i].e;
+    setTimeout(()=>{ if(token!==geniusRunToken) return; i++; showStep(); }, 1000);
+  }
+  showStep();
+}
+function geniusTileClick(gridIdx){
+  if(!geniusGridEnabled) return;
+  const station = current;
+  if(gridIdx===geniusInputPos){
+    document.querySelector('#genius-tiles .genius-tile[data-idx="'+gridIdx+'"]').classList.add('picked');
+    geniusInputPos++;
+    if(geniusInputPos===geniusRound+1){
+      geniusSetGridEnabled(false);
+      geniusRound++;
+      if(geniusRound>=geniusRounds){
+        setTimeout(()=>{
+          closeOverlay('overlay-genius');
+          const stars = finishStation(station.id, geniusRounds, geniusRounds);
+          showResult(station, geniusRounds, geniusRounds, stars);
+        }, 500);
+      } else {
+        setTimeout(()=>geniusPlayRound(station), 700);
+      }
+    }
+  } else {
+    geniusFlash(gridIdx,'bad',500);
+    geniusSetGridEnabled(false);
+    setTimeout(()=>geniusPlayRound(station), 900);
+  }
+}
+document.getElementById('genius-back').addEventListener('click', ()=>{
+  geniusRunToken++;
+  closeOverlay('overlay-genius');
+});
+
+/* ================= DODGER ENGINE ================= */
+const DODGER_BASE_SPEED = 1.5, DODGER_SPEED_CAP = 4.6, DODGER_GROWTH = 1.09;
+const HERO_KEY_SPEED = 5.5;
+let dodger = null;
+let dodgerCtx = null, dodgerDPR = 1;
+
+function startDodger(station){
+  const needCats = station.needCategories || station.categories.length;
+  const chosenCats = shuffle(station.categories).slice(0, needCats);
+  const challenges = [];
+  chosenCats.forEach((cat, ci)=>{
+    const items = cat.build();
+    items.forEach((it, ii)=>{
+      challenges.push({
+        catLabel:cat.label, catNumber:ci+1, totalCats:chosenCats.length,
+        challengeInCat:ii+1, totalInCat:items.length, isFirstInCat: ii===0,
+        bubbleCount:cat.bubbles, correct:it.correct, wrong:it.wrong
+      });
+    });
+  });
+  dodger = {
+    challenges, chIndex:0, lives:3, score:0, speed: DODGER_BASE_SPEED,
+    heroX:0, heroW:40, heroH:40,
+    bubbles:[], keys:{left:false,right:false}, dragTargetX:null,
+    running:false, rafId:null, resolvingLock:false
+  };
+  document.getElementById('dodger-endbuttons').style.display='none';
+  document.getElementById('dodger-msg').classList.remove('show');
+  openOverlay('overlay-dodger');
+  requestAnimationFrame(()=>{ dodgerSetupCanvas(); dodgerNextChallenge(station); dodgerStartLoop(station); });
+}
+function dodgerSetupCanvas(){
+  const canvas = document.getElementById('dodger-canvas');
+  const wrap = canvas.closest('.dodger-canvas-wrap');
+  const cssW = wrap.clientWidth;
+  const cssH = wrap.clientHeight;
+  dodgerDPR = Math.min(window.devicePixelRatio||1, 2);
+  canvas.style.width = cssW+'px';
+  canvas.style.height = cssH+'px';
+  canvas.width = Math.round(cssW*dodgerDPR);
+  canvas.height = Math.round(cssH*dodgerDPR);
+  dodgerCtx = canvas.getContext('2d');
+  dodgerCtx.setTransform(dodgerDPR,0,0,dodgerDPR,0,0);
+  dodger.cssW = cssW; dodger.cssH = cssH;
+  dodger.heroX = cssW/2;
+}
+function dodgerUpdateHUD(){
+  document.getElementById('dodger-lives').textContent = '❤️'.repeat(Math.max(0,dodger.lives)) + '🖤'.repeat(Math.max(0,3-dodger.lives));
+  document.getElementById('dodger-score').textContent = 'Acertos: '+dodger.score;
+  const ch = dodger.challenges[dodger.chIndex];
+  document.getElementById('dodger-progress').textContent = 'Categoria '+ch.catNumber+'/'+ch.totalCats+' · '+ch.challengeInCat+'/'+ch.totalInCat;
+}
+function dodgerFitWidth(text){
+  const len = text.length;
+  const fontSize = len>18 ? 11 : len>10 ? 12.5 : (len>6 ? 14 : 15.5);
+  const w = clamp(len*fontSize*0.58+24, 64, 230);
+  return {w, fontSize};
+}
+function dodgerSpawnBubbles(ch){
+  const options = shuffle([{t:ch.correct,ok:true}, ...ch.wrong.map(w=>({t:w,ok:false}))]);
+  const n = options.length;
+  const laneW = dodger.cssW/n;
+  dodger.bubbles = options.map((o,i)=>{
+    const fit = dodgerFitWidth(o.t);
+    const laneCenter = laneW*i + laneW/2;
+    const jitter = (Math.random()-0.5)*Math.min(laneW*0.3, 24);
+    return {
+      x: clamp(laneCenter+jitter, fit.w/2+4, dodger.cssW-fit.w/2-4),
+      y: -20 - Math.random()*40,
+      w: fit.w, h: 34, fontSize: fit.fontSize,
+      text:o.t, correct:o.ok, resolved:false
+    };
+  });
+  dodger.resolvingLock=false;
+}
+function dodgerNextChallenge(station){
+  const ch = dodger.challenges[dodger.chIndex];
+  document.getElementById('dodger-question').textContent = ch.catLabel.toUpperCase();
+  dodgerUpdateHUD();
+  dodger.bubbles = [];
+  dodger.resolvingLock = true;
+  const delay = ch.isFirstInCat ? 1000 : 0;
+  setTimeout(()=>dodgerSpawnBubbles(ch), delay);
+}
+function dodgerOnCatch(b, station){
+  if(dodger.resolvingLock) return;
+  dodger.resolvingLock=true;
+  dodger.bubbles.forEach(x=>x.resolved=true);
+  if(b.correct){
+    dodger.score++;
+    dodger.speed = Math.min(dodger.speed*DODGER_GROWTH, DODGER_SPEED_CAP);
+  } else {
+    dodger.lives--;
+    dodgerUpdateHUD();
+    if(dodger.lives<=0){
+      setTimeout(()=>dodgerEnd(station,false), 550);
+      return;
+    }
+  }
+  setTimeout(()=>{
+    dodger.chIndex++;
+    if(dodger.chIndex>=dodger.challenges.length){ dodgerEnd(station,true); return; }
+    dodgerNextChallenge(station);
+  }, 650);
+}
+function dodgerEnd(station, won){
+  dodger.running=false;
+  if(dodger.rafId) cancelAnimationFrame(dodger.rafId);
+  const stars = finishStation(station.id, dodger.score, dodger.challenges.length);
+  document.getElementById('dodger-msg-title').textContent = won ? 'Vitória!' : 'Vidas esgotadas!';
+  document.getElementById('dodger-msg-text').textContent = 'Toque em continuar para ver o resultado.';
+  document.getElementById('dodger-msg').classList.add('show');
+  setTimeout(()=>{
+    closeOverlay('overlay-dodger');
+    if(station.id==='final') showTrophy(dodger.score, dodger.challenges.length, stars, won);
+    else showResult(station, dodger.score, dodger.challenges.length, stars);
+  }, 900);
+}
+function dodgerDraw(station){
+  const ctx = dodgerCtx;
+  if(!ctx) return;
+  const w = dodger.cssW, h = dodger.cssH;
+  const grad = ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,'#151233'); grad.addColorStop(1,'#2A1F4D');
+  ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+
+  ctx.font = (h*0.16)+'px sans-serif';
+  ctx.textAlign='right'; ctx.textBaseline='top'; ctx.globalAlpha=.55;
+  ctx.fillText(station && station.icon ? station.icon : '🏹', w-10, 6);
+  ctx.globalAlpha=1;
+
+  dodger.bubbles.forEach(b=>{
+    if(b.resolved) return;
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.fillStyle = 'rgba(255,255,255,0.94)';
+    ctx.strokeStyle = 'rgba(27,42,86,0.55)';
+    ctx.lineWidth = 2;
+    const rw=b.w, rh=b.h, rr=rh/2;
+    ctx.beginPath();
+    ctx.moveTo(-rw/2+rr,-rh/2);
+    ctx.arcTo(rw/2,-rh/2, rw/2,rh/2, rr);
+    ctx.arcTo(rw/2,rh/2, -rw/2,rh/2, rr);
+    ctx.arcTo(-rw/2,rh/2, -rw/2,-rh/2, rr);
+    ctx.arcTo(-rw/2,-rh/2, rw/2,-rh/2, rr);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#161829';
+    ctx.font = '800 '+b.fontSize+'px sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(b.text, 0, 1);
+    ctx.restore();
+  });
+
+  const heroY = h - dodger.heroH/2 - 12;
+  ctx.font = (dodger.heroH*1.15)+'px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('🧑', dodger.heroX, heroY);
+}
+function dodgerUpdate(station){
+  if(dodger.keys.left) dodger.heroX -= HERO_KEY_SPEED;
+  if(dodger.keys.right) dodger.heroX += HERO_KEY_SPEED;
+  if(dodger.dragTargetX!=null){
+    dodger.heroX += (dodger.dragTargetX - dodger.heroX)*0.35;
+  }
+  dodger.heroX = clamp(dodger.heroX, dodger.heroW/2, dodger.cssW-dodger.heroW/2);
+
+  const heroY = dodger.cssH - dodger.heroH/2 - 12;
+  for(const b of dodger.bubbles){
+    if(b.resolved) continue;
+    b.y += dodger.speed;
+    if(Math.abs(b.y-heroY) < (b.h/2+dodger.heroH/2-10) && Math.abs(b.x-dodger.heroX) < (b.w/2+dodger.heroW/2-10)){
+      dodgerOnCatch(b, station);
+      break;
+    }
+    if(b.y - b.h/2 > dodger.cssH){ b.resolved = true; }
+  }
+  if(!dodger.resolvingLock && dodger.bubbles.length && dodger.bubbles.every(b=>b.resolved)){
+    dodger.resolvingLock = true;
+    setTimeout(()=>{
+      dodger.chIndex++;
+      if(dodger.chIndex>=dodger.challenges.length){ dodgerEnd(station,true); return; }
+      dodgerNextChallenge(station);
+    }, 300);
+  }
+}
+function dodgerStartLoop(station){
+  dodger.running=true;
+  function loop(){
+    if(!dodger.running) return;
+    dodgerUpdate(station);
+    dodgerDraw(station);
+    dodger.rafId = requestAnimationFrame(loop);
+  }
+  loop();
+}
+document.addEventListener('keydown', e=>{
+  if(!dodger || !dodger.running) return;
+  if(e.key==='ArrowLeft') dodger.keys.left=true;
+  if(e.key==='ArrowRight') dodger.keys.right=true;
+});
+document.addEventListener('keyup', e=>{
+  if(!dodger) return;
+  if(e.key==='ArrowLeft') dodger.keys.left=false;
+  if(e.key==='ArrowRight') dodger.keys.right=false;
+});
+(function setupDodgerPointer(){
+  const wrap = document.querySelector('.dodger-canvas-wrap');
+  function toLocalX(e){
+    const rect = wrap.getBoundingClientRect();
+    return e.clientX - rect.left;
+  }
+  wrap.addEventListener('pointerdown', e=>{
+    if(!dodger || !dodger.running) return;
+    wrap.setPointerCapture(e.pointerId);
+    dodger.dragTargetX = toLocalX(e);
+  });
+  wrap.addEventListener('pointermove', e=>{
+    if(!dodger || !dodger.running) return;
+    if(e.pressure===0 && e.pointerType==='mouse') return;
+    if(e.buttons===0 && e.pointerType==='mouse') return;
+    dodger.dragTargetX = toLocalX(e);
+  });
+})();
+document.getElementById('dodger-back').addEventListener('click', ()=>{
+  if(dodger){ dodger.running=false; if(dodger.rafId) cancelAnimationFrame(dodger.rafId); }
+  closeOverlay('overlay-dodger');
+});
+document.getElementById('dodger-retry').addEventListener('click', ()=>{ startDodger(current); });
+document.getElementById('dodger-map').addEventListener('click', ()=>{ renderMap(); });
+window.addEventListener('resize', ()=>{
+  if(dodger && document.getElementById('overlay-dodger').classList.contains('open')) dodgerSetupCanvas();
+});
+
+/* ================= INIT ================= */
+applyTheme();
+renderMap();
+</script>
+</body>
+</html>
