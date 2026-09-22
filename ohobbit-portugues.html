@@ -191,6 +191,7 @@ p{margin:0; line-height:1.55;}
 
 .genius-word-box{text-align:center; background:var(--card); border:2px solid var(--card-border); border-radius:1rem; padding:1.1rem; margin-bottom:1rem; min-height:6.5rem; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.35rem;}
 .genius-emoji{font-size:3rem; line-height:1; min-height:3.4rem; display:flex; align-items:center; justify-content:center;}
+.genius-hint{font-size:.95rem; font-weight:800; color:var(--ink); min-height:1.3em;}
 .genius-msg{font-size:.8rem; font-weight:800; color:var(--ink-soft); letter-spacing:.04em; text-transform:uppercase;}
 .genius-tiles{display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; margin-bottom:.9rem;}
 .genius-tile{
@@ -335,6 +336,7 @@ p{margin:0; line-height:1.55;}
     <div class="genius-status" id="genius-status"></div>
     <div class="genius-word-box">
       <span class="genius-emoji" id="genius-emoji"></span>
+      <span class="genius-hint" id="genius-hint"></span>
       <span class="genius-msg" id="genius-msg"></span>
     </div>
     <div class="genius-tiles" id="genius-tiles"></div>
@@ -426,14 +428,15 @@ const NONR_WORDS = ['GELO','NEVE','LUA','SOL','MOEDA','FOLHA','NUVEM','VENTO','I
 const NUMERAIS_WORDS = ['UM','DOIS','TRES','QUATRO','CINCO','SEIS','SETE','OITO','NOVE','DEZ','ONZE','DOZE','TREZE','PRIMEIRO','SEGUNDO','TERCEIRO','QUARTO','QUINTO','SEXTO','DUZIA','VINTE','CEM'];
 const DISTRACT_COMMON = ['CASA','LUA','GATO','FOLHA','NUVEM','PONTE','CHAVE','LIVRO'];
 const ADJETIVO_ITEMS = [
-  {c:'GIGANTE',e:'🐉'},{c:'VELOZ',e:'🦅'},{c:'FORTE',e:'🐻'},{c:'SÁBIO',e:'🧙'},{c:'CORAJOSO',e:'🗡️'},
-  {c:'ASSUSTADOR',e:'👹'},{c:'BRILHANTE',e:'💍'},{c:'ANTIGO',e:'🏰'},{c:'PERIGOSO',e:'🕷️'}
+  {c:'GIGANTE',e:'🐉',hint:'Dragão'},{c:'VELOZ',e:'🦅',hint:'Águia'},{c:'FORTE',e:'🐻',hint:'Urso'},
+  {c:'SÁBIO',e:'🧙',hint:'Mago'},{c:'CORAJOSO',e:'🗡️',hint:'Guerreiro'},{c:'ASSUSTADOR',e:'👹',hint:'Goblin'},
+  {c:'BRILHANTE',e:'💍',hint:'Anel'},{c:'ANTIGO',e:'🏰',hint:'Castelo'},{c:'PERIGOSO',e:'🕷️',hint:'Aranha'}
 ];
 const ADJ_WRONG_NOUNS = ['DRAGÃO','ANEL','CAVALO','PONTE','FLORESTA','CASTELO','ESCUDO','TESOURO'];
 const GRAU_ITEMS = [
-  {c:'CASINHA',kind:'dim',e:'🏠'},{c:'PORTÃO',kind:'aum',e:'🚪'},{c:'ESPADÃO',kind:'aum',e:'⚔️'},
-  {c:'LIVRINHO',kind:'dim',e:'📖'},{c:'CASTELÃO',kind:'aum',e:'🏰'},{c:'CHAVEZINHA',kind:'dim',e:'🔑'},
-  {c:'DRAGÃOZINHO',kind:'dim',e:'🐲'},{c:'HOMENZARRÃO',kind:'aum',e:'🧔'},{c:'PEDRINHA',kind:'dim',e:'🪨'}
+  {c:'CASINHA',kind:'dim',e:'🏠',hint:'Casa'},{c:'PORTÃO',kind:'aum',e:'🚪',hint:'Porta'},{c:'ESPADÃO',kind:'aum',e:'⚔️',hint:'Espada'},
+  {c:'LIVRINHO',kind:'dim',e:'📖',hint:'Livro'},{c:'CASTELÃO',kind:'aum',e:'🏰',hint:'Castelo'},{c:'CHAVEZINHA',kind:'dim',e:'🔑',hint:'Chave'},
+  {c:'DRAGÃOZINHO',kind:'dim',e:'🐲',hint:'Dragão'},{c:'HOMENZARRÃO',kind:'aum',e:'🧔',hint:'Homem'},{c:'PEDRINHA',kind:'dim',e:'🪨',hint:'Pedra'}
 ];
 const ACENT_MONO = [
   {wrong:'PA',correct:'PÁ'},{wrong:'PE',correct:'PÉ'},{wrong:'DO',correct:'DÓ'},{wrong:'NOS',correct:'NÓS'},
@@ -1260,12 +1263,14 @@ function geniusPlayRound(station){
     if(token!==geniusRunToken) return;
     if(i>=seqLen){
       document.getElementById('genius-emoji').textContent = '';
+      document.getElementById('genius-hint').textContent = '';
       document.getElementById('genius-msg').textContent = 'Selecione...';
       geniusInputPos = 0;
       geniusSetGridEnabled(true);
       return;
     }
     document.getElementById('genius-emoji').textContent = geniusSet[i].e;
+    document.getElementById('genius-hint').textContent = geniusSet[i].hint || '';
     setTimeout(()=>{ if(token!==geniusRunToken) return; i++; showStep(); }, 1000);
   }
   showStep();
