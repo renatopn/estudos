@@ -1,0 +1,1512 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulado de Português</title>
+<style>
+:root{
+  --ink:#1F2433; --ink-soft:#5A6078; --paper:#F4F1EA; --card:#FFFFFF; --card-border:#E1DACB;
+  --primary:#E0702A; --primary-dark:#B8561B; --blue:#2F6FB0; --blue-bg:#E4EEF9;
+  --success:#2F8F4E; --success-bg:#E2F4E7; --danger:#C8432F; --danger-bg:#FBE5E0;
+  --accent:#F2B705; --shadow:rgba(31,36,51,.14);
+  --art:#2F6FB0; --sub:#D9822B; --adj:#3F8F4F;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --ink:#EFEDE8; --ink-soft:#B4B8C8; --paper:#14161E; --card:#1F2230; --card-border:#353A4E;
+    --primary:#F08A45; --primary-dark:#C0632A; --blue:#6FA3DD; --blue-bg:#1B2A40;
+    --success:#6CCB85; --success-bg:#16311F; --danger:#F08C78; --danger-bg:#3A1C17;
+    --accent:#F2C94C; --shadow:rgba(0,0,0,.5);
+    --art:#6FA3DD; --sub:#F0A85A; --adj:#6CCB85;
+  }
+}
+*{box-sizing:border-box;}
+html,body{margin:0; padding:0;}
+body{background:var(--paper); color:var(--ink); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; min-height:100vh; -webkit-font-smoothing:antialiased; overflow-x:hidden;}
+button{font-family:inherit;}
+p{margin:0 0 .6rem; line-height:1.55;}
+:focus-visible{outline:3px solid var(--accent); outline-offset:3px; border-radius:6px;}
+
+#app{max-width:560px; margin:0 auto; padding:0 .85rem 3rem;}
+.top{position:sticky; top:0; z-index:10; background:var(--paper); padding:.7rem 0 .6rem;}
+.top-row{display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-bottom:.5rem;}
+.brand{font-weight:900; font-size:1.05rem; color:var(--primary);}
+.icon-btn{width:2.3rem; height:2.3rem; border-radius:50%; border:2px solid var(--card-border); background:var(--card); color:var(--ink); cursor:pointer; font-size:1.05rem; display:flex; align-items:center; justify-content:center; padding:0;}
+.bar{height:.5rem; background:var(--card-border); border-radius:999px; overflow:hidden;}
+.fill{height:100%; width:0; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:999px; transition:width .3s ease;}
+.meta{display:flex; justify-content:space-between; align-items:center; margin-top:.45rem; font-size:.8rem; font-weight:700; color:var(--ink-soft);}
+.chip-topic{background:var(--blue-bg); color:var(--blue); padding:.2rem .6rem; border-radius:999px; font-weight:800;}
+
+.card{background:var(--card); border:2px solid var(--card-border); border-radius:1.1rem; padding:1rem; box-shadow:0 3px 0 var(--card-border); margin-top:.6rem;}
+.kicker{font-size:.72rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--primary); margin-bottom:.35rem;}
+.prompt{font-size:1.08rem; font-weight:800; line-height:1.4; margin-bottom:.9rem;}
+.passage{background:var(--paper); border-radius:.8rem; padding:.85rem .9rem; font-size:1rem; line-height:1.65; white-space:pre-line;}
+.passage mark{background:#FFE58A; color:#2A2000; font-weight:800; text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px; border-radius:.25rem; padding:0 .15rem;}
+.evidence{margin-top:.8rem;}
+.evidence-title{font-weight:800; color:var(--blue); margin-bottom:.4rem; line-height:1.4;}
+.source{font-size:.78rem; color:var(--ink-soft); font-style:italic; margin-top:.5rem;}
+details.reread{margin-bottom:.9rem;}
+details.reread summary{cursor:pointer; font-weight:800; color:var(--blue); font-size:.9rem; padding:.3rem 0; list-style:none;}
+details.reread summary::-webkit-details-marker{display:none;}
+details.reread[open] summary{margin-bottom:.4rem;}
+
+.opts{display:grid; gap:.55rem;}
+.opt{background:var(--card); border:2px solid var(--card-border); border-radius:.9rem; padding:.8rem .95rem; text-align:left; font-weight:700; font-size:1rem; color:var(--ink); cursor:pointer; box-shadow:0 3px 0 var(--card-border); min-height:48px;}
+.opt:disabled{cursor:default;}
+.opt.sel{background:var(--blue-bg); border-color:var(--blue); color:var(--blue);}
+.opt.ok{background:var(--success-bg); border-color:var(--success); color:var(--success);}
+.opt.no{background:var(--danger-bg); border-color:var(--danger); color:var(--danger);}
+.opt.dim{opacity:.5;}
+
+.vf-list{display:grid; gap:.6rem;}
+.vf-item{border:2px solid var(--card-border); border-radius:.9rem; padding:.7rem .8rem;}
+.vf-item.ok{border-color:var(--success); background:var(--success-bg);}
+.vf-item.no{border-color:var(--danger); background:var(--danger-bg);}
+.vf-text{font-weight:700; margin-bottom:.5rem; line-height:1.4;}
+.vf-btns{display:flex; gap:.5rem;}
+.vf-btn{flex:1; min-height:44px; border-radius:.7rem; border:2px solid var(--card-border); background:var(--card); color:var(--ink); font-weight:900; font-size:1rem; cursor:pointer;}
+.vf-btn.sel{background:var(--blue); border-color:var(--blue); color:#fff;}
+.vf-btn:disabled{cursor:default;}
+.vf-exp{font-size:.86rem; margin-top:.45rem; color:var(--ink); font-weight:600;}
+
+textarea.answer{width:100%; min-height:6.5rem; border-radius:.8rem; border:2px solid var(--card-border); background:var(--paper); color:var(--ink); padding:.7rem; font-family:inherit; font-size:1rem; line-height:1.5; resize:vertical;}
+textarea.answer:focus{outline:none; border-color:var(--blue);}
+.self-q{font-weight:800; margin:.8rem 0 .5rem; text-align:center;}
+
+.feedback{border-radius:.9rem; padding:.8rem .9rem; margin-top:.8rem; font-weight:600; line-height:1.45;}
+.feedback.ok{background:var(--success-bg); color:var(--success);}
+.feedback.no{background:var(--danger-bg); color:var(--danger);}
+.feedback .fb-exp{color:var(--ink); display:block; margin-top:.2rem; font-size:.93rem;}
+
+.btn{display:block; width:100%; border:none; border-radius:999px; padding:.85rem 1.2rem; font-weight:900; font-size:1rem; cursor:pointer; margin-top:.9rem;}
+.btn:active{transform:translateY(2px);}
+.btn:disabled{opacity:.45; cursor:default; transform:none;}
+.btn-primary{background:var(--primary); color:#fff; box-shadow:0 4px 0 var(--primary-dark);}
+.btn-secondary{background:var(--card); color:var(--ink); border:2px solid var(--card-border); box-shadow:0 4px 0 var(--card-border);}
+.btn-row{display:flex; gap:.6rem;}
+.btn-row .btn{flex:1;}
+.btn-ok{background:var(--success); color:#fff;}
+.btn-no{background:var(--danger); color:#fff;}
+
+.tip h2{font-size:1.25rem; margin:0 0 .6rem;}
+.tip ul{margin:0; padding-left:1.1rem;}
+.tip li{margin-bottom:.5rem; line-height:1.5;}
+.tip b{color:var(--primary);}
+
+.sentence{font-size:1.2rem; line-height:2.5; margin:.3rem 0 .9rem;}
+.word-chip{display:inline-block; border:2px dashed var(--ink-soft); background:var(--card); color:var(--ink); border-radius:.6rem; padding:0 .45rem; font-size:1.15rem; font-weight:800; cursor:pointer; line-height:1.9; margin:0 .08rem;}
+.word-chip.sel{border-style:solid; border-color:var(--accent); background:var(--accent); color:#3a2a00;}
+.word-chip.art{border-style:solid; border-color:var(--art); background:var(--art); color:#fff;}
+.word-chip.sub{border-style:solid; border-color:var(--sub); background:var(--sub); color:#fff;}
+.word-chip.adj{border-style:solid; border-color:var(--adj); background:var(--adj); color:#fff;}
+.word-chip.sel.art,.word-chip.sel.sub,.word-chip.sel.adj{outline:3px solid var(--accent); outline-offset:2px;}
+.class-btns{display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem;}
+.class-btn{min-height:52px; border:none; border-radius:.8rem; color:#fff; font-weight:900; font-size:.95rem; cursor:pointer;}
+.class-btn.art{background:var(--art);} .class-btn.sub{background:var(--sub);} .class-btn.adj{background:var(--adj);}
+.class-btn:disabled{opacity:.4; cursor:default;}
+.hint{font-size:.85rem; color:var(--ink-soft); font-weight:600; margin-bottom:.6rem;}
+.legend{display:flex; gap:.8rem; flex-wrap:wrap; font-size:.8rem; font-weight:700; margin-top:.7rem; color:var(--ink-soft);}
+.legend span::before{content:""; display:inline-block; width:.7rem; height:.7rem; border-radius:3px; margin-right:.3rem; vertical-align:-1px; background:currentColor;}
+.legend .l-art{color:var(--art);} .legend .l-sub{color:var(--sub);} .legend .l-adj{color:var(--adj);}
+
+.start h1{font-size:1.6rem; margin:.2rem 0 .5rem; color:var(--primary);}
+.start ul{padding-left:1.1rem; margin:.4rem 0 0;}
+.start li{margin-bottom:.35rem; line-height:1.45;}
+
+.res-row{margin-bottom:.75rem;}
+.res-top{display:flex; justify-content:space-between; font-weight:800; font-size:.92rem; margin-bottom:.25rem;}
+.res-bar{height:.6rem; background:var(--card-border); border-radius:999px; overflow:hidden;}
+.res-fill{height:100%; border-radius:999px;}
+.big-score{text-align:center; font-size:2.6rem; font-weight:900; color:var(--primary); margin:.3rem 0;}
+.stars{text-align:center; font-size:2rem; letter-spacing:.3rem;}
+.review{background:var(--danger-bg); border-radius:.8rem; padding:.7rem .85rem; margin-top:.8rem; font-weight:600;}
+
+/* ===== REVISÃO ===== */
+.rev-tabs{display:flex; gap:.5rem; margin-top:.8rem;}
+.rev-tabs .btn{margin-top:0; padding:.6rem .8rem; font-size:.9rem;}
+.rev-tabs .btn.active{background:var(--blue); color:#fff; border-color:var(--blue); box-shadow:none;}
+.rev-item{background:var(--card); border:2px solid var(--card-border); border-left:6px solid var(--success); border-radius:.9rem; padding:.8rem .9rem; margin-top:.6rem;}
+.rev-item.wrong{border-left-color:var(--danger);}
+.rev-head{display:flex; justify-content:space-between; gap:.5rem; font-size:.78rem; font-weight:800; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em; margin-bottom:.35rem;}
+.rev-q{font-weight:800; margin-bottom:.45rem; line-height:1.4;}
+.rev-line{font-size:.93rem; line-height:1.5; margin:.15rem 0;}
+.rev-line .lbl{font-weight:800; color:var(--ink-soft);}
+.rev-line.good{color:var(--success);} .rev-line.bad{color:var(--danger);}
+.rev-answer{background:var(--paper); border-radius:.6rem; padding:.5rem .65rem; margin:.25rem 0 .4rem; white-space:pre-wrap; font-size:.95rem;}
+.rev-note{font-size:.85rem; color:var(--ink-soft); margin-top:.35rem; line-height:1.45;}
+.rev-note mark{background:#FFE58A; color:#2A2000; border-radius:.2rem; padding:0 .15rem;}
+.rev-vf{border-top:1px dashed var(--card-border); padding-top:.35rem; margin-top:.35rem;}
+@media print{ .top, .rev-tabs, .no-print{display:none !important;} body{background:#fff; color:#000;} .rev-item{break-inside:avoid;} }
+
+/* ===== SHOOTER ===== */
+#shooter{position:fixed; inset:0; z-index:50; background:#0B1026; display:none; flex-direction:column; padding:.55rem .55rem .45rem; color:#fff;}
+#shooter.open{display:flex;}
+.sh-top{display:flex; justify-content:space-between; align-items:center; font-weight:800; font-size:.85rem; margin-bottom:.35rem; gap:.5rem;}
+.sh-skip{background:rgba(255,255,255,.12); color:#fff; border:none; border-radius:999px; padding:.3rem .7rem; font-weight:700; cursor:pointer; font-size:.78rem;}
+.sh-cmd{text-align:center; background:linear-gradient(90deg,#E0702A,#F2B705); color:#1F1300; border-radius:.8rem; padding:.45rem .6rem; margin-bottom:.4rem;}
+.sh-cmd small{display:block; font-size:.68rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; opacity:.8;}
+.sh-cmd b{font-size:1.25rem; font-weight:900;}
+.sh-cmd.flash{animation:flash .6s 2;}
+@keyframes flash{50%{transform:scale(1.06); box-shadow:0 0 0 4px rgba(255,255,255,.5);}}
+.sh-wrap{position:relative; flex:1 1 auto; min-height:0; border-radius:.9rem; overflow:hidden; touch-action:none; border:2px solid rgba(255,255,255,.15);}
+#sh-canvas{display:block; width:100%; height:100%;}
+.sh-hint{text-align:center; font-size:.74rem; opacity:.75; margin-top:.35rem; font-weight:600;}
+.sh-over{position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:.4rem; background:rgba(8,10,24,.82); text-align:center; padding:1.2rem;}
+.sh-over.show{display:flex;}
+.sh-over h2{margin:0; font-size:1.5rem;}
+.sh-over p{margin:0; font-size:1rem;}
+.sh-over .btn{max-width:280px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="top-row">
+      <span class="brand">📝 Simulado de Português</span>
+      <button class="icon-btn" id="restart" aria-label="Recomeçar simulado" title="Recomeçar simulado">↺</button>
+    </div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="meta"><span class="chip-topic" id="topic-chip">Início</span><span id="counter"></span></div>
+  </header>
+  <main id="screen"></main>
+</div>
+
+<div id="shooter">
+  <div class="sh-top">
+    <span id="sh-lives"></span>
+    <span id="sh-score"></span>
+    <button class="sh-skip" id="sh-skip">Pular jogo ⏭</button>
+  </div>
+  <div class="sh-cmd" id="sh-cmd"><small>Acerte só as palavras da classe:</small><b id="sh-cmd-text"></b></div>
+  <div class="sh-wrap" id="sh-wrap">
+    <canvas id="sh-canvas"></canvas>
+    <div class="sh-over" id="sh-over">
+      <h2 id="sh-over-title"></h2>
+      <p id="sh-over-text"></p>
+      <button class="btn btn-primary" id="sh-back">Voltar ao simulado</button>
+      <button class="btn btn-secondary" id="sh-again">Jogar de novo</button>
+    </div>
+  </div>
+  <div class="sh-hint">Toque embaixo da palavra certa para mover o foguete e atirar ⚡ (no teclado: ← → e espaço)</div>
+</div>
+
+<script>
+"use strict";
+/* ================= TEXTOS ================= */
+const TEXTS = {
+  fabula:{
+    title:'A lebre e a tartaruga',
+    source:'Fábula de Esopo (adaptação)',
+    body:`Numa floresta, a lebre vivia se gabando de ser o animal mais veloz de todos. Um dia, a tartaruga, cansada de ouvir tanta vaidade, desafiou a lebre para uma corrida. Os bichos riram muito, mas a corrida foi marcada.
+
+Logo na largada, a lebre disparou e deixou a tartaruga para trás. Confiante, resolveu tirar um cochilo embaixo de uma árvore. Enquanto isso, a tartaruga seguia devagar, passo a passo, sem parar nem um minuto.
+
+Quando a lebre acordou, correu o mais rápido que pôde, mas era tarde: a tartaruga já cruzava a linha de chegada, aplaudida por todos os animais.
+
+Moral da história: devagar e sempre se chega na frente.`
+  },
+  sitio:{
+    title:'Uma manhã no Sítio',
+    source:'Inspirado no Sítio do Picapau Amarelo, de Monteiro Lobato (adaptação)',
+    body:`Numa manhã ensolarada no Sítio do Picapau Amarelo, Narizinho acordou com um barulho no quintal. Era a Emília, a boneca de pano mais falante do mundo, correndo atrás de um sapinho verde.
+
+— Volta aqui, bichinho! Quero te fazer uma pergunta! — gritava a boneca.
+
+O Visconde de Sabugosa, sábio como sempre, ajeitou a cartola e explicou:
+
+— Emília, sapos não respondem perguntas.
+
+— Isso é porque ninguém nunca perguntou direito! — retrucou ela.
+
+Tia Nastácia riu lá da cozinha, enquanto tirava do forno um bolo quentinho de fubá. No fim, o sapinho pulou no riacho e desapareceu, e a turma toda correu para a mesa.`
+  },
+  hobbit:{
+    title:'Enigmas no escuro',
+    source:'Adaptado de um capítulo de O Hobbit, de J. R. R. Tolkien',
+    body:`Bilbo Bolseiro estava perdido nos túneis escuros da montanha. Tateando o chão frio, encontrou um pequeno anel dourado e o guardou no bolso, sem pensar muito.
+
+Mais adiante, chegou à margem de um lago subterrâneo. Ali vivia Gollum, uma criatura magra, de olhos grandes e brilhantes, que falava sozinha. Gollum propôs um jogo de adivinhas: se Bilbo vencesse, ele mostraria a saída; se perdesse, seria devorado!
+
+Os dois trocaram enigmas por um longo tempo. Por fim, sem ideias, Bilbo fez uma pergunta que nem era uma adivinha de verdade:
+
+— O que eu tenho no meu bolso?
+
+Gollum não soube responder e ficou furioso. Foi assim que o hobbit escapou, levando consigo o anel misterioso.`
+  }
+};
+
+/* ================= TEMAS E DICAS ================= */
+const TOPICS = {
+  interp:'Interpretação de texto', genero:'Flexão de gênero', letraR:'Uso da letra R',
+  grau:'Grau do substantivo', acent:'Acentuação', artigo:'Artigo',
+  adjetivo:'Adjetivo', numeral:'Numerais', classes:'Classes de palavras'
+};
+const TIPS = {
+  interp:{title:'📖 Como responder interpretação', items:[
+    'Leia o texto <b>com calma</b>, do começo ao fim.',
+    'Muitas respostas estão <b>escritas no próprio texto</b>: volte nele para conferir.',
+    'Nas respostas escritas, use <b>frases completas</b> e explique com suas palavras.',
+    'Se precisar, toque em <b>"Reler o texto"</b> em cada pergunta.'
+  ]},
+  genero:{title:'♂♀ Relembre: flexão de gênero', items:[
+    '<b>Masculino</b>: aceita <i>o, os, um, uns</i>. <b>Feminino</b>: aceita <i>a, as, uma, umas</i>.',
+    'Regra mais comum: trocar <b>-o por -a</b> (menino → menina).',
+    'Outros padrões: <b>-ão → -oa, -ona, -ã</b> (leão → leoa, irmão → irmã) · <b>-or → -ora</b> (cantor → cantora) · <b>-e → -a</b> (mestre → mestra) · <b>-ês → -esa</b> (marquês → marquesa).',
+    'Casos especiais: galo → galinha · ator → atriz · herói → heroína · príncipe → princesa · imperador → imperatriz · boi → vaca · pai → mãe.',
+    'Uma forma só: <b>comum de dois gêneros</b> (o/a jovem: o artigo mostra o gênero), <b>sobrecomum</b> (a criança: pessoas dos dois sexos) e <b>epiceno</b> (baleia-macho, baleia-fêmea: animais).',
+    'Terminações: são masculinos muitos terminados em <b>-é, -l, -r, -s</b> (café, anzol, açúcar, lápis) e os nomes de <b>meses, rios, mares</b>. São femininos muitos terminados em <b>-ã, -dade, -ice, -gem</b> (maçã, cidade, velhice, viagem). Há exceções: maré, cometa, dia, planeta.'
+  ]},
+  letraR:{title:'🔤 Relembre: usos da letra R', items:[
+    'No <b>início da palavra</b>, o R tem som <b>forte</b>: rato, rua, rio.',
+    '<b>Entre vogais</b>, um só <b>r</b> tem som <b>fraco</b>: arara, barata, aurora.',
+    'Para ter som <b>forte entre vogais</b>, usamos <b>rr</b>: carro, terra.',
+    'O <b>rr</b> é um <b>dígrafo</b> (duas letras, um só som). Na separação silábica, cada <b>r</b> fica numa sílaba: car-ro, ter-ra.'
+  ]},
+  grau:{title:'🐕 Relembre: grau do substantivo', items:[
+    '<b>Normal</b>: cachorro · <b>Diminutivo</b>: cachorrinho (ideia de redução) · <b>Aumentativo</b>: cachorrão (ideia de algo grande, forte).',
+    'Terminações do diminutivo: <b>-inho/-zinho</b> (filhinho, florzinha), <b>-acho</b> (riacho), <b>-ejo</b> (vilarejo), <b>-ela</b> (ruela), <b>-eta/-eto</b> (maleta, livreto), <b>-ico</b> (burrico), <b>-ota</b> (ilhota), <b>-ote</b> (caixote).',
+    'O grau também mostra <b>carinho</b> (mãezinha, amigão) ou <b>desprezo</b> ("Que ideiazinha a sua!").'
+  ]},
+  acent:{title:'´ Relembre: regras de acentuação', items:[
+    'Acentos: <b>agudo</b> ( ´ ) e <b>circunflexo</b> ( ^ ).',
+    '1ª regra: <b>monossílabos tônicos</b> terminados em <b>-a(s), -e(s), -o(s)</b> levam acento: já, pá, pé, três, mês, pó, nós, só.',
+    'Monossílabos tônicos terminados em <b>-i</b> e <b>-u</b> <b>não</b> levam acento: tu, nu, cru.',
+    '2ª regra: <b>oxítonas</b> (a sílaba mais forte é a última) terminadas em <b>-a(s), -e(s), -o(s), -em, -ens</b> levam acento: cajá, café, você, avós, dominó, também, parabéns.',
+    'Oxítonas terminadas em <b>-i</b> e <b>-u</b> não levam acento: caqui, urubu, jabuti.'
+  ]},
+  artigo:{title:'🔎 Relembre: artigos', items:[
+    'Artigos vêm <b>antes do substantivo</b> e indicam seu <b>gênero</b> e <b>número</b>.',
+    '<b>Definidos</b> (algo específico, conhecido): <b>o, a, os, as</b> — <i>o carro</i>.',
+    '<b>Indefinidos</b> (algo qualquer, genérico): <b>um, uma, uns, umas</b> — <i>um carro</i>.',
+    'Atenção: <b>um/uma</b> são <b>numerais</b> quando indicam quantidade ("Tomei um copo de água e o Antônio, dois").',
+    'Artigo junto com preposição: de + o = <b>do</b> · em + a = <b>na</b> · a + o = <b>ao</b>.'
+  ]},
+  adjetivo:{title:'✨ Relembre: adjetivos', items:[
+    '<b>Adjetivo</b> expressa uma característica do substantivo: menino <i>estudioso</i>, noite <i>chuvosa</i>.',
+    '<b>Adjetivo pátrio</b> indica a origem: Brasil → brasileiro · Inglaterra → inglês · São Paulo → paulista · Pérsia → persa.',
+    'Concorda com o substantivo em <b>gênero e número</b>: meninos fortes, crianças alemãs.',
+    'Feminino: belo → bela · chinês → chinesa · defensor → defensora · bondoso → bondosa. <b>Uniformes</b> (uma forma só): fiel, ruim, particular, simples.',
+    'Grau: <b>comparativo</b> ("Bento é mais faminto do que os irmãos"), <b>superlativo relativo</b> ("o mais faminto dos irmãos"), <b>superlativo absoluto analítico</b> (muito estudioso) e <b>sintético</b> (estudiosíssimo).',
+    '<b>Adjetivo substantivado</b>: adjetivo usado como substantivo ("O jovem viajou pelo mundo").'
+  ]},
+  numeral:{title:'🔢 Relembre: numerais', items:[
+    'Numerais dão ideia de <b>quantidade</b> ou de <b>ordem</b>.',
+    '<b>Cardinal</b>: um, dois, três · <b>Ordinal</b>: primeiro, segundo · <b>Multiplicativo</b>: dobro, triplo · <b>Fracionário</b>: meio, terço, metade.',
+    'Por extenso, use <b>e</b> entre centenas, dezenas e unidades: 125 = cento <b>e</b> vinte <b>e</b> cinco. Entre o milhar e a centena, não: 1234 = mil duzentos e trinta e quatro.',
+    'Flexionam no feminino: um/uma, dois/duas, vinte e uma, duzentos/duzentas.',
+    'O primeiro dia do mês usa o ordinal: "dia <b>primeiro</b> de abril".'
+  ]},
+  classes:{title:'🧩 Última fase: classes de palavras', items:[
+    '<b style="color:var(--art)">Artigo</b>: o, a, os, as, um, uma, uns, umas.',
+    '<b style="color:var(--sub)">Substantivo</b>: dá nome a seres, objetos, lugares e sentimentos.',
+    '<b style="color:var(--adj)">Adjetivo</b>: dá uma característica ao substantivo.',
+    'Dica: muitas vezes aparecem juntos nesta ordem: artigo + substantivo + adjetivo — "<i>o menino estudioso</i>".',
+    'Toque numa palavra destacada e depois na classe certa. As outras palavras da frase não precisam ser classificadas.'
+  ]}
+};
+
+/* ================= SEQUÊNCIA DO SIMULADO ================= */
+/* t: read | tip | mc | vf | open */
+const SEQ = [
+ {t:'tip', topic:'interp'},
+ {t:'read', text:'fabula'},
+ {t:'mc', topic:'interp', text:'fabula', q:'Quem desafiou quem para a corrida?', o:['A tartaruga desafiou a lebre','A lebre desafiou a tartaruga','A coruja desafiou as duas','Os bichos desafiaram a lebre'], c:0, hl:['a tartaruga, cansada de ouvir tanta vaidade, desafiou a lebre para uma corrida']},
+ {t:'vf', topic:'interp', text:'fabula', items:[
+   {s:'A lebre dormiu embaixo de uma árvore durante a corrida.', v:true, hl:'resolveu tirar um cochilo embaixo de uma árvore'},
+   {s:'A tartaruga parou várias vezes para descansar.', v:false, hl:'sem parar nem um minuto'},
+   {s:'Os animais aplaudiram a tartaruga no final.', v:true, hl:'aplaudida por todos os animais'}
+ ]},
+ {t:'open', topic:'interp', text:'fabula', q:'Por que a lebre perdeu a corrida, mesmo sendo mais rápida?', ref:'Porque ficou confiante demais e parou para dormir no meio da corrida, enquanto a tartaruga continuou sem parar.', hl:['Confiante, resolveu tirar um cochilo embaixo de uma árvore','a tartaruga seguia devagar, passo a passo, sem parar nem um minuto']},
+ {t:'open', topic:'interp', text:'fabula', q:'Qual é o ensinamento (a moral) dessa fábula? Explique com suas palavras.', ref:'"Devagar e sempre se chega na frente": quem é persistente e não desiste pode vencer; ser convencido pode levar à derrota.', hl:['Moral da história: devagar e sempre se chega na frente.']},
+
+ {t:'tip', topic:'genero'},
+ {t:'mc', topic:'genero', q:'Qual é o feminino de "leão"?', o:['leoa','leã','leona','leoça'], c:0, e:'Substantivos em -ão podem fazer o feminino em -oa: leão → leoa.'},
+ {t:'vf', topic:'genero', items:[
+   {s:'O feminino de "cantor" é "cantora".', v:true, e:'Masculino em -or → feminino em -ora.'},
+   {s:'O feminino de "marquês" é "marquesa".', v:true, e:'Masculino em -ês → feminino em -esa.'},
+   {s:'O feminino de "ator" é "atora".', v:false, e:'É um caso especial: ator → atriz.'},
+   {s:'"Galo" e "galinha" seguem a regra de só trocar -o por -a.', v:false, e:'É um caso especial: galo → galinha (não "gala").'}
+ ]},
+ {t:'mc', topic:'genero', q:'"A criança" serve para menino e para menina. Esse substantivo é:', o:['Comum de dois gêneros','Sobrecomum','Epiceno'], c:1, e:'Sobrecomum: uma só forma para falar de pessoas dos dois sexos (a criança).'},
+ {t:'mc', topic:'genero', q:'"A baleia-macho" e "a baleia-fêmea": o substantivo "baleia" é:', o:['Comum de dois gêneros','Sobrecomum','Epiceno'], c:2, e:'Epiceno: animais com uma só forma; usamos macho ou fêmea para indicar o sexo.'},
+ {t:'vf', topic:'genero', items:[
+   {s:'São masculinos os substantivos terminados em -é, como "café" e "chulé".', v:true, e:'É uma das regras de terminação do masculino.'},
+   {s:'"Maré" e "chaminé" são exceções: são femininos.', v:true, e:'Dizemos a maré, a chaminé.'},
+   {s:'Substantivos terminados em -dade, como "cidade", são masculinos.', v:false, e:'Terminados em -dade são femininos: a cidade, a verdade.'},
+   {s:'Os nomes dos meses, como "janeiro", são masculinos.', v:true, e:'Dizemos "o janeiro chuvoso": nomes de meses são masculinos.'}
+ ]},
+ {t:'mc', topic:'genero', q:'Em "o jovem" e "a jovem", o que mostra se é masculino ou feminino?', o:['A terminação da palavra','O artigo antes da palavra','O acento','A letra inicial'], c:1, e:'"Jovem" é comum de dois gêneros: a mesma forma, e o artigo (o/a) indica o gênero.'},
+ {t:'mc', topic:'genero', q:'Qual destas palavras é MASCULINA, mesmo terminando em -a?', o:['cometa','cadeira','maçã','cidade'], c:0, e:'"O cometa" é uma exceção: termina em -a, mas é masculino (como o dia, o planeta).'},
+ {t:'mc', topic:'genero', q:'Qual é o feminino de "imperador"?', o:['imperadora','imperatriz','imperadeira','imperatora'], c:1, e:'Caso especial: imperador → imperatriz (como ator → atriz).'},
+ {t:'vf', topic:'genero', items:[
+   {s:'Substantivos terminados em -ã, como "maçã" e "manhã", costumam ser femininos.', v:true, e:'A maçã, a manhã, a avelã.'},
+   {s:'"Ímã" e "talismã" são exceções masculinas.', v:true, e:'Dizemos o ímã, o talismã.'},
+   {s:'"Pai" e "mãe" são palavras diferentes para indicar masculino e feminino.', v:true, e:'São palavras totalmente diferentes, como boi/vaca e homem/mulher.'},
+   {s:'O feminino de "boi" é "boia".', v:false, e:'O feminino de boi é vaca.'}
+ ]},
+ {t:'mc', topic:'genero', q:'Qual substantivo é COMUM DE DOIS GÊNEROS?', o:['estudante','criança','cobra','homem'], c:0, e:'Dizemos o estudante / a estudante: o artigo mostra o gênero. "Criança" é sobrecomum e "cobra" é epiceno.'},
+
+ {t:'tip', topic:'letraR'},
+ {t:'mc', topic:'letraR', q:'Em qual palavra o R tem som FRACO?', o:['rato','carro','barata','terra'], c:2, e:'Em "barata", o r está sozinho entre vogais: som fraco.'},
+ {t:'vf', topic:'letraR', items:[
+   {s:'No início da palavra, o R tem som forte, como em "rato".', v:true, e:'R no início da palavra: som forte (ra, re, ri, ro, ru).'},
+   {s:'Entre vogais, usamos RR para o som forte, como em "carro".', v:true, e:'O rr representa o som forte entre vogais.'},
+   {s:'A palavra "arara" é escrita com RR.', v:false, e:'A-ra-ra: som fraco entre vogais, com um r só.'},
+   {s:'A separação silábica de "terra" é ter-ra.', v:true, e:'No dígrafo rr, cada r fica em uma sílaba.'}
+ ]},
+ {t:'mc', topic:'letraR', q:'Complete: "O ca__o do meu pai é azul."', o:['r','rr'], c:1, e:'Carro: som forte entre vogais pede rr.'},
+ {t:'mc', topic:'letraR', q:'Qual é a separação silábica correta de "carroça"?', o:['ca-rro-ça','car-ro-ça','carr-o-ça','ca-rroç-a'], c:1, e:'Os dois r se separam: car-ro-ça.'},
+ {t:'mc', topic:'letraR', q:'Complete: "A ba__ata subiu na parede."', o:['r','rr'], c:0, e:'Barata: som fraco entre vogais, com um r só.'},
+ {t:'vf', topic:'letraR', items:[
+   {s:'"Aurora" tem R com som fraco.', v:true, e:'Au-ro-ra: r sozinho entre vogais.'},
+   {s:'"Guerra" tem R com som fraco.', v:false, e:'Guer-ra: rr = som forte.'},
+   {s:'O RR é um dígrafo: duas letras que formam um só som.', v:true, e:'Dígrafo = duas letras, um som.'}
+ ]},
+ {t:'mc', topic:'letraR', q:'Qual palavra está escrita CORRETAMENTE?', o:['corida','corrida','coriida','korrida'], c:1, e:'Cor-ri-da: som forte entre vogais, com rr.'},
+ {t:'mc', topic:'letraR', q:'Qual palavra tem R com som FORTE?', o:['pirata','cadeira','rua','pera'], c:2, e:'"Rua" começa com R: som forte.'},
+
+ {t:'tip', topic:'grau'},
+ {t:'mc', topic:'grau', q:'"Cachorrinho" está no grau:', o:['normal','diminutivo','aumentativo'], c:1, e:'A terminação -inho indica o diminutivo.'},
+ {t:'vf', topic:'grau', items:[
+   {s:'"Cachorrão" está no grau aumentativo.', v:true, e:'-ão indica aumentativo.'},
+   {s:'O diminutivo transmite a ideia de redução, diminuição.', v:true, e:'É o que diz a regra do grau diminutivo.'},
+   {s:'O aumentativo transmite a ideia de algo pequeno e fraco.', v:false, e:'O aumentativo passa a ideia de algo grande, intenso, forte.'},
+   {s:'"Riacho" é o diminutivo de "rio".', v:true, e:'Terminação -acho: rio → riacho.'}
+ ]},
+ {t:'mc', topic:'grau', q:'Qual é o diminutivo de "ilha"?', o:['ilhota','ilhão','ilhaça','ilheira'], c:0, e:'Terminação -ota: ilha → ilhota.'},
+ {t:'mc', topic:'grau', q:'Em "Que ideiazinha a sua, hein?", o diminutivo foi usado para mostrar:', o:['tamanho pequeno','carinho','desprezo'], c:2, e:'Aqui o diminutivo mostra desprezo pela ideia.'},
+ {t:'mc', topic:'grau', q:'Em "Minha mãezinha querida", o diminutivo mostra:', o:['desprezo','carinho','tamanho grande'], c:1, e:'O diminutivo também é usado para demonstrar carinho.'},
+ {t:'vf', topic:'grau', items:[
+   {s:'"Vilarejo" é o diminutivo de "vila".', v:true, e:'Terminação -ejo: vila → vilarejo.'},
+   {s:'"Livreto" é o diminutivo de "livro".', v:true, e:'Terminação -eto: livro → livreto.'},
+   {s:'"Ruela" é o aumentativo de "rua".', v:false, e:'Ruela é diminutivo (terminação -ela).'},
+   {s:'"Casarão" é o aumentativo de "casa".', v:true, e:'Casarão passa a ideia de uma casa grande.'}
+ ]},
+ {t:'mc', topic:'grau', q:'Qual é o aumentativo de "amigo"?', o:['amiguinho','amigão','amigote','amiguito'], c:1, e:'Amigão: aumentativo (que também pode mostrar carinho).'},
+ {t:'mc', topic:'grau', q:'Qual é o diminutivo de "flor"?', o:['florzona','florzinha','florão','florada'], c:1, e:'Terminação -zinha: flor → florzinha.'},
+
+ {t:'read', text:'sitio'},
+ {t:'mc', topic:'interp', text:'sitio', q:'O que Emília estava fazendo no quintal?', o:['Correndo atrás de um sapinho','Brincando de esconde-esconde','Colhendo frutas','Dormindo na rede'], c:0, hl:['correndo atrás de um sapinho verde']},
+ {t:'open', topic:'interp', text:'sitio', q:'Por que Emília achava que o sapo poderia responder à pergunta dela?', ref:'Porque, segundo ela, ninguém nunca tinha perguntado direito ao sapo.', hl:['Isso é porque ninguém nunca perguntou direito!']},
+ {t:'vf', topic:'interp', text:'sitio', items:[
+   {s:'Tia Nastácia estava na cozinha fazendo um bolo de fubá.', v:true, hl:'Tia Nastácia riu lá da cozinha, enquanto tirava do forno um bolo quentinho de fubá'},
+   {s:'O Visconde de Sabugosa disse que sapos respondem perguntas.', v:false, hl:'Emília, sapos não respondem perguntas.'},
+   {s:'No final, o sapinho pulou no riacho.', v:true, hl:'o sapinho pulou no riacho e desapareceu'}
+ ]},
+ {t:'open', topic:'interp', text:'sitio', q:'Copie do texto duas palavras que estão no grau diminutivo.', ref:'Duas entre: sapinho, bichinho, quentinho, riacho, Narizinho.', hl:['correndo atrás de um sapinho verde','Volta aqui, bichinho!','um bolo quentinho de fubá']},
+
+ {t:'tip', topic:'acent'},
+ {t:'mc', topic:'acent', q:'Monossílabos tônicos terminados em -a, -e, -o (com ou sem s) levam acento. Qual palavra segue essa regra?', o:['pé','sol','mar','flor'], c:0, e:'"Pé" é monossílabo tônico terminado em -e: leva acento.'},
+ {t:'vf', topic:'acent', items:[
+   {s:'"Três" e "mês" são monossílabos tônicos acentuados.', v:true, e:'Terminam em -es: levam acento.'},
+   {s:'Monossílabos tônicos terminados em -i e -u recebem acento.', v:false, e:'Os terminados em -i e -u NÃO se acentuam.'},
+   {s:'"Nós" e "só" levam acento porque terminam em -o(s).', v:true, e:'Regra dos monossílabos tônicos em -o(s).'},
+   {s:'A palavra "tu" deve ser escrita "tú".', v:false, e:'Tu termina em -u: não leva acento.'}
+ ]},
+ {t:'mc', topic:'acent', q:'Por que "café" tem acento e "caqui" não tem?', o:['Porque café é oxítona terminada em -e, e caqui termina em -i','Porque caqui é uma fruta','Porque café tem mais letras','Porque caqui é monossílabo'], c:0, e:'Oxítonas em -e levam acento; oxítonas em -i, como caqui, não.'},
+ {t:'mc', topic:'acent', q:'Qual oxítona está escrita CORRETAMENTE?', o:['você','vôce','vocé','voce'], c:0, e:'Você: oxítona terminada em -e, com acento circunflexo.'},
+ {t:'vf', topic:'acent', items:[
+   {s:'"Também" e "alguém" são oxítonas terminadas em -em e levam acento.', v:true, e:'Oxítonas em -em são acentuadas.'},
+   {s:'"Parabéns" leva acento porque é oxítona terminada em -ens.', v:true, e:'Oxítonas em -ens são acentuadas.'},
+   {s:'"Jabuti" deve ter acento no i.', v:false, e:'Oxítonas terminadas em -i não levam acento.'},
+   {s:'"Dominó" e "paletó" são oxítonas terminadas em -o.', v:true, e:'Por isso levam acento.'}
+ ]},
+ {t:'mc', topic:'acent', q:'Qual palavra NÃO deve receber acento?', o:['urubu','sofá','cajá','avô'], c:0, e:'Urubu é oxítona terminada em -u: não leva acento.'},
+ {t:'mc', topic:'acent', q:'Qual é a sílaba mais forte (tônica) de "jacaré"?', o:['ja','ca','ré'], c:2, e:'Ja-ca-RÉ: oxítona terminada em -e, por isso tem acento.'},
+ {t:'mc', topic:'acent', q:'Complete: "Vovó adora tomar ___ de camomila."', o:['chá','cha'], c:0, e:'Chá: monossílabo tônico terminado em -a leva acento.'},
+
+ {t:'tip', topic:'artigo'},
+ {t:'mc', topic:'artigo', q:'Quais são os artigos DEFINIDOS?', o:['o, a, os, as','um, uma, uns, umas','de, em, por','eu, tu, ele'], c:0, e:'Os artigos definidos são o, a, os, as.'},
+ {t:'vf', topic:'artigo', items:[
+   {s:'Os artigos vêm antes do substantivo.', v:true, e:'Eles acompanham o substantivo.'},
+   {s:'"Um carro" fala de um carro qualquer, não específico.', v:true, e:'"Um" é artigo indefinido: algo genérico.'},
+   {s:'Em "o carro", temos um artigo indefinido.', v:false, e:'"O" é artigo definido: um carro específico.'},
+   {s:'"Umas" é artigo indefinido feminino plural.', v:true, e:'Uma (singular) → umas (plural).'}
+ ]},
+ {t:'mc', topic:'artigo', q:'Na frase "Bebi um suco muito gostoso", a palavra "um" é:', o:['artigo','numeral'], c:0, e:'Não indica quantidade, só um suco qualquer: é artigo.'},
+ {t:'mc', topic:'artigo', q:'Na frase "Tomei um copo de água e o Antônio, dois", a palavra "um" é:', o:['artigo','numeral'], c:1, e:'Aqui "um" indica quantidade (um copo, dois copos): é numeral.'},
+ {t:'mc', topic:'artigo', q:'Complete com o artigo definido correto: "___ meninas jogaram bola."', o:['As','Os','Umas','A'], c:0, e:'Meninas é feminino plural: as.'},
+ {t:'vf', topic:'artigo', items:[
+   {s:'O artigo indica o gênero (masculino ou feminino) do substantivo.', v:true, e:'O menino / a menina.'},
+   {s:'O artigo indica o número (singular ou plural) do substantivo.', v:true, e:'O menino / os meninos.'},
+   {s:'"Uns" é artigo definido masculino plural.', v:false, e:'"Uns" é indefinido. O definido masculino plural é "os".'}
+ ]},
+ {t:'mc', topic:'artigo', q:'Qual é o artigo indefinido masculino singular?', o:['um','o','uma','uns'], c:0, e:'Um: indefinido, masculino, singular.'},
+ {t:'mc', topic:'artigo', q:'Em "o jovem" e "a jovem", o artigo ajuda a saber:', o:['o gênero','o grau','o número de sílabas'], c:0, e:'O artigo mostra se é masculino ou feminino.'},
+ {t:'mc', topic:'artigo', q:'Em "a casa do vizinho", a palavra "do" é a junção de:', o:['de + o','do + o','de + um','em + o'], c:0, e:'Preposição de + artigo o = do.'},
+
+ {t:'tip', topic:'adjetivo'},
+ {t:'mc', topic:'adjetivo', q:'O que é um adjetivo?', o:['Palavra que dá nome aos seres','Palavra que expressa uma característica do substantivo','Palavra que indica quantidade','Palavra que liga duas outras palavras'], c:1, e:'Adjetivos expressam características do substantivo.'},
+ {t:'vf', topic:'adjetivo', items:[
+   {s:'Em "noite chuvosa", a palavra "chuvosa" é adjetivo.', v:true, e:'Chuvosa é uma característica da noite.'},
+   {s:'Em "menino estudioso", a palavra "menino" é adjetivo.', v:false, e:'Menino é substantivo; estudioso é o adjetivo.'},
+   {s:'O adjetivo concorda com o substantivo em gênero e número.', v:true, e:'Menino alto, meninas altas.'},
+   {s:'Em "homens bons", o adjetivo está no plural.', v:true, e:'Bons acompanha homens, no plural.'}
+ ]},
+ {t:'mc', topic:'adjetivo', q:'Quem nasce no Brasil é:', o:['brasileiro','brasiliano','brasilense','brasilês'], c:0, e:'Adjetivo pátrio: Brasil → brasileiro.'},
+ {t:'mc', topic:'adjetivo', q:'Quem nasce no estado de São Paulo é:', o:['paulista','paulês','paulense','paulino'], c:0, e:'Adjetivo pátrio: São Paulo → paulista.'},
+ {t:'mc', topic:'adjetivo', q:'Qual é o feminino do adjetivo "português"?', o:['portuguesa','portuguêsa','portugueza','portuguesas'], c:0, e:'Terminados em -ês ganham -a: português → portuguesa (sem acento).'},
+ {t:'vf', topic:'adjetivo', items:[
+   {s:'"Fiel" tem a mesma forma no masculino e no feminino: homem fiel, mulher fiel.', v:true, e:'Adjetivos em -l costumam ser uniformes.'},
+   {s:'"Simples" vira "simplesa" no feminino.', v:false, e:'Simples é uniforme: história simples, conto simples.'},
+   {s:'O feminino de "bondoso" é "bondosa".', v:true, e:'Terminados em -oso fazem o feminino em -osa.'},
+   {s:'"Ruim" é um adjetivo uniforme: bolo ruim, bala ruim.', v:true, e:'Adjetivos em -m costumam ser uniformes.'}
+ ]},
+ {t:'mc', topic:'adjetivo', q:'Em "O jovem viajou pelo mundo", a palavra "jovem" é:', o:['adjetivo substantivado','artigo','numeral'], c:0, e:'É um adjetivo usado como substantivo: adjetivo substantivado.'},
+ {t:'mc', topic:'adjetivo', q:'Em "Antônio é estudiosíssimo", o adjetivo está no grau:', o:['superlativo absoluto sintético','superlativo absoluto analítico','comparativo'], c:0, e:'O adjetivo recebeu uma terminação (-íssimo): sintético.'},
+ {t:'mc', topic:'adjetivo', q:'Em "Antônio é muito estudioso", temos o superlativo:', o:['absoluto analítico','absoluto sintético','relativo'], c:0, e:'Usou-se outra palavra (muito) além do adjetivo: analítico.'},
+ {t:'vf', topic:'adjetivo', items:[
+   {s:'"Bento é o mais faminto dos irmãos" é superlativo relativo.', v:true, e:'Destaca Bento em relação aos outros.'},
+   {s:'"Bento é mais faminto do que os irmãos" é comparativo.', v:true, e:'Fórmula: mais + adjetivo + do que.'},
+   {s:'O superlativo sintético de "feliz" é "felicíssimo".', v:true, e:'Feliz → felicíssimo.'},
+   {s:'O superlativo sintético de "fácil" é "facilzíssimo".', v:false, e:'Fácil → facílimo ("A prova foi facílima").'}
+ ]},
+ {t:'mc', topic:'adjetivo', q:'Qual é o superlativo absoluto sintético de "fiel"?', o:['fidelíssimo','fielzão','fielzinho','muito fielzíssimo'], c:0, e:'Fiel → fidelíssimo.'},
+
+ {t:'tip', topic:'numeral'},
+ {t:'mc', topic:'numeral', q:'O que os numerais indicam?', o:['Quantidade ou ordem','Qualidade','O nome dos seres','Ações'], c:0, e:'Numerais dão ideia de quantidade ou de ordenação.'},
+ {t:'mc', topic:'numeral', q:'Em "Eu fui o primeiro a chegar", "primeiro" é numeral:', o:['cardinal','ordinal','multiplicativo','fracionário'], c:1, e:'Indica ordem, posição: ordinal.'},
+ {t:'vf', topic:'numeral', items:[
+   {s:'"Dobro" e "triplo" são numerais multiplicativos.', v:true, e:'Indicam multiplicação.'},
+   {s:'"Metade" e "terço" indicam partes de algo: são fracionários.', v:true, e:'Indicam divisão.'},
+   {s:'"Três" é um numeral ordinal.', v:false, e:'Três é cardinal (quantidade). O ordinal é terceiro.'},
+   {s:'Dizemos "dia primeiro de abril", e não "dia um de abril".', v:true, e:'O primeiro dia do mês usa o ordinal.'}
+ ]},
+ {t:'mc', topic:'numeral', q:'Como se escreve 125 por extenso?', o:['cento e vinte e cinco','cento vinte cinco','cem e vinte e cinco','cento e vinte cinco'], c:0, e:'Usa-se "e" entre centenas, dezenas e unidades.'},
+ {t:'mc', topic:'numeral', q:'Como se escreve 1234 por extenso?', o:['mil duzentos e trinta e quatro','mil e duzentos e trinta e quatro','um mil duzentos trinta e quatro','mil duzentos e trinta quatro'], c:0, e:'Não se usa "e" entre o milhar e a centena.'},
+ {t:'mc', topic:'numeral', q:'Complete: "Comprei vinte e ___ sandálias."', o:['uma','um'], c:0, e:'Sandálias é feminino: vinte e uma.'},
+ {t:'vf', topic:'numeral', items:[
+   {s:'Os numerais "um" e "dois" têm forma feminina: "uma" e "duas".', v:true, e:'São exceções que flexionam.'},
+   {s:'Dizemos "duzentas caixas", pois as centenas a partir de duzentos flexionam.', v:true, e:'Duzentos/duzentas, trezentos/trezentas...'},
+   {s:'A maioria dos numerais muda de forma no feminino.', v:false, e:'A maioria é invariável (tem uma só forma).'}
+ ]},
+ {t:'mc', topic:'numeral', q:'Em "Isabela comeu metade do pacote", "metade" é numeral:', o:['fracionário','ordinal','cardinal','multiplicativo'], c:0, e:'Indica parte de algo: fracionário.'},
+
+ {t:'read', text:'hobbit'},
+ {t:'mc', topic:'interp', text:'hobbit', q:'Onde Bilbo encontrou o anel?', o:['No chão dos túneis escuros da montanha','No fundo do lago','No bolso de Gollum','Na casa de um mago'], c:0, hl:['perdido nos túneis escuros da montanha','Tateando o chão frio, encontrou um pequeno anel dourado']},
+ {t:'vf', topic:'interp', text:'hobbit', items:[
+   {s:'Gollum era uma criatura de olhos grandes e brilhantes.', v:true, hl:'uma criatura magra, de olhos grandes e brilhantes'},
+   {s:'Se Bilbo perdesse o jogo, Gollum mostraria a saída.', v:false, hl:'se Bilbo vencesse, ele mostraria a saída; se perdesse, seria devorado!'},
+   {s:'A última pergunta de Bilbo não era uma adivinha de verdade.', v:true, hl:'uma pergunta que nem era uma adivinha de verdade'}
+ ]},
+ {t:'open', topic:'interp', text:'hobbit', q:'Por que Gollum ficou furioso?', ref:'Porque não conseguiu responder à pergunta de Bilbo ("O que eu tenho no meu bolso?") e perdeu o jogo.', hl:['— O que eu tenho no meu bolso?','Gollum não soube responder e ficou furioso.']},
+ {t:'open', topic:'interp', text:'hobbit', q:'Copie do texto um adjetivo e o substantivo que ele acompanha.', ref:'Um par entre: túneis escuros, chão frio, pequeno anel, anel dourado, lago subterrâneo, criatura magra, olhos grandes, olhos brilhantes, anel misterioso.', hl:['túneis escuros da montanha','Tateando o chão frio, encontrou um pequeno anel dourado','uma criatura magra, de olhos grandes e brilhantes']}
+];
+
+/* ================= CLASSIFICAÇÃO (fase final) ================= */
+const CLASSIFY = [
+  '[O|art] [menino|sub] [estudioso|adj] leu [um|art] [livro|sub] [engraçado|adj].',
+  '[A|art] [tartaruga|sub] [persistente|adj] venceu [a|art] [lebre|sub] [apressada|adj].',
+  '[Os|art] [anões|sub] [corajosos|adj] seguiram [o|art] [mapa|sub] [antigo|adj].',
+  '[Uma|art] [boneca|sub] [falante|adj] correu atrás de [um|art] [sapinho|sub] [verde|adj].',
+  '[As|art] [crianças|sub] [brasileiras|adj] adoram [histórias|sub] [divertidas|adj].',
+  '[O|art] [dragão|sub] [enorme|adj] guardava [um|art] [tesouro|sub] [brilhante|adj].',
+  '[Umas|art] [nuvens|sub] [escuras|adj] cobriram [o|art] [céu|sub] [azul|adj].',
+  '[A|art] [professora|sub] [paciente|adj] explicou [a|art] [lição|sub] [difícil|adj].'
+];
+const CLASS_NAMES = {art:'Artigo', sub:'Substantivo', adj:'Adjetivo'};
+
+/* ================= COMANDOS DO JOGO DE NAVE ================= */
+const SHOOTER_POOLS = {
+  genero:[
+    {label:'Substantivo feminino', ok:['RAINHA','GALINHA','ATRIZ','PRINCESA','HEROÍNA','LEOA','PATROA','CANTORA','MARQUESA','IMPERATRIZ','VACA','ÉGUA','CIDADE','MAÇÃ','VELHICE'], bad:['REI','GALO','ATOR','PRÍNCIPE','HERÓI','LEÃO','PATRÃO','CANTOR','MARQUÊS','BOI','CAVALO','CAFÉ','CHAPÉU','LÁPIS','COMETA']},
+    {label:'Substantivo masculino', ok:['REI','GALO','ATOR','PRÍNCIPE','HERÓI','LEÃO','PATRÃO','CANTOR','MARQUÊS','BOI','CAVALO','CAFÉ','CHAPÉU','LÁPIS','COMETA'], bad:['RAINHA','GALINHA','ATRIZ','PRINCESA','HEROÍNA','LEOA','PATROA','CANTORA','MARQUESA','VACA','ÉGUA','CIDADE','MAÇÃ','VELHICE']}
+  ],
+  letraR:[
+    {label:'R com som forte', ok:['RATO','CARRO','TERRA','RUA','ROSA','GUERRA','FERRO','RIO','BURRO','TORRE','CORRIDA','RODA'], bad:['ARARA','BARATA','AURORA','PIRATA','CARETA','CADEIRA','PERA','FERIDA','MARIDO','COROA','TOURO','PRATO']},
+    {label:'R com som fraco', ok:['ARARA','BARATA','AURORA','PIRATA','CARETA','CADEIRA','PERA','FERIDA','MARIDO','COROA','TOURO'], bad:['RATO','CARRO','TERRA','RUA','ROSA','GUERRA','FERRO','RIO','BURRO','TORRE','CORRIDA','RODA']}
+  ],
+  grau:[
+    {label:'Diminutivo', ok:['CASINHA','FLORZINHA','AVEZINHA','RIACHO','VIELA','RUELA','LIVRETO','MALETA','ILHOTA','BURRICO','VILAREJO','MESINHA','FILHINHO'], bad:['CACHORRÃO','CASARÃO','NARIGÃO','BOCARRA','PAIZÃO','AMIGÃO','GATÃO','PRATÃO','CAMISÃO','CHAPELÃO']},
+    {label:'Aumentativo', ok:['CACHORRÃO','CASARÃO','NARIGÃO','BOCARRA','PAIZÃO','AMIGÃO','GATÃO','PRATÃO','CAMISÃO','CHAPELÃO'], bad:['CASINHA','FLORZINHA','AVEZINHA','RIACHO','VIELA','RUELA','LIVRETO','MALETA','ILHOTA','BURRICO','VILAREJO','MESINHA']}
+  ],
+  acent:[
+    {label:'Monossílabo tônico com acento', ok:['PÁ','PÉ','PÓ','JÁ','MÁ','MÊS','TRÊS','NÓS','SÓ','CHÁ','FÉ','DÓ'], bad:['TU','PAI','MEU','SOL','MAR','FLOR','LUZ','CRU','NU','MIL','PAZ','BOM']},
+    {label:'Oxítona com acento', ok:['CAFÉ','VOCÊ','JACARÉ','DOMINÓ','PALETÓ','TAMBÉM','ALGUÉM','PARABÉNS','SOFÁ','CAJÁ','AVÔ','AMÉM','BEBÊ'], bad:['CAQUI','URUBU','JABUTI','TATU','SACI','CADERNO','JANELA','ESCOLA','BONECA','PANELA','CAJU']}
+  ],
+  artigo:[
+    {label:'Artigo definido', ok:['O','A','OS','AS'], bad:['UM','UMA','UNS','UMAS','MESA','BOLA','FELIZ','GATO']},
+    {label:'Artigo indefinido', ok:['UM','UMA','UNS','UMAS'], bad:['O','A','OS','AS','LIVRO','CASA','ALTO','RUA']}
+  ],
+  adjetivo:[
+    {label:'Adjetivo', ok:['BONITO','ALTA','CORAJOSO','ENGRAÇADO','CHUVOSA','FELIZ','FIEL','SIMPLES','BONDOSA','RUIM','ESTUDIOSO','AMADA','VELOZ'], bad:['CASA','LIVRO','MENINO','ÁRVORE','CACHORRO','BOLA','ESCOLA','DRAGÃO','O','UMA']},
+    {label:'Adjetivo pátrio', ok:['BRASILEIRO','INGLÊS','PAULISTA','PERSA','MINEIRO','CARIOCA','CHINÊS','PORTUGUÊS','ALEMÃ','BAIANO'], bad:['BONITO','ALTO','FELIZ','CHUVOSO','FORTE','GENTIL','RÁPIDO','ALEGRE','MAGRO']}
+  ],
+  numeral:[
+    {label:'Numeral ordinal', ok:['PRIMEIRO','SEGUNDO','TERCEIRO','QUINTO','SEXTO','SÉTIMO','OITAVO','DÉCIMO'], bad:['DOIS','TRÊS','DEZ','CINCO','VINTE','CEM','DOBRO','METADE']},
+    {label:'Numeral cardinal', ok:['DOIS','TRÊS','DEZ','CINCO','VINTE','CEM','MIL','SETE','OITO'], bad:['PRIMEIRO','SEGUNDO','TERCEIRO','DOBRO','TRIPLO','METADE','TERÇO','DÉCIMO']}
+  ]
+};
+/* ================= HELPERS ================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html!=null) e.innerHTML = html;
+  return e;
+}
+
+/* ================= BUILD STEPS ================= */
+function buildSteps(){
+  const steps = [];
+  const topicsSoFar = [];
+  let qCount = 0;
+  SEQ.forEach(item=>{
+    if(item.t==='read'){ steps.push({kind:'read', text:item.text}); return; }
+    if(item.t==='tip'){ steps.push({kind:'tip', topic:item.topic}); return; }
+    qCount++;
+    steps.push({kind:'q', q:item, n:qCount});
+    topicsSoFar.push(item.topic);
+    if(qCount % 10 === 0){
+      const recent = topicsSoFar.slice(-10).filter(t=>t!=='interp');
+      const counts = {};
+      recent.forEach(t=>counts[t]=(counts[t]||0)+1);
+      let best = null, bestN = -1;
+      recent.forEach(t=>{ if(counts[t]>=bestN){ bestN=counts[t]; best=t; } });
+      if(best && SHOOTER_POOLS[best]) steps.push({kind:'break', topic:best});
+    }
+  });
+  steps.push({kind:'tip', topic:'classes'});
+  CLASSIFY.forEach((_,i)=>steps.push({kind:'classify', i}));
+  steps.push({kind:'end'});
+  return {steps, total:qCount};
+}
+const BUILT = buildSteps();
+const STEPS = BUILT.steps;
+const TOTAL_Q = BUILT.total;
+
+/* ================= STATE ================= */
+const KEY = 'simuladoPortuguesSet2026v1';
+function freshState(){ return {pos:0, stats:{}, game:{hits:0, errors:0}, answers:{}}; }
+function loadState(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      const s = JSON.parse(raw);
+      if(typeof s.pos==='number' && s.pos < STEPS.length){ s.answers = s.answers || {}; return s; }
+    }
+  }catch(e){}
+  return freshState();
+}
+function saveState(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+let state = loadState();
+let pending = [];
+let pendingAnswer = null;
+
+function advance(){
+  pending.forEach(r=>{
+    const s = state.stats[r.topic] || (state.stats[r.topic] = {ok:0, total:0});
+    s.total++;
+    if(r.ok) s.ok++;
+  });
+  if(pendingAnswer) state.answers[state.pos] = pendingAnswer;
+  pending = [];
+  pendingAnswer = null;
+  state.pos = Math.min(state.pos+1, STEPS.length-1);
+  saveState();
+  render();
+}
+
+/* ================= HEADER ================= */
+function lastQuestionNumber(pos){
+  for(let i=pos;i>=0;i--) if(STEPS[i].kind==='q') return STEPS[i].n;
+  return 0;
+}
+function updateHeader(step){
+  document.getElementById('fill').style.width = Math.round(100*state.pos/(STEPS.length-1))+'%';
+  const chip = document.getElementById('topic-chip');
+  const counter = document.getElementById('counter');
+  if(!step){ chip.textContent='Início'; counter.textContent = TOTAL_Q+' questões'; return; }
+  switch(step.kind){
+    case 'q': chip.textContent = TOPICS[step.q.topic]; counter.textContent = 'Questão '+step.n+' de '+TOTAL_Q; break;
+    case 'read': chip.textContent = 'Leitura'; counter.textContent = 'Antes da questão '+(lastQuestionNumber(state.pos)+1); break;
+    case 'tip': chip.textContent = TOPICS[step.topic]; counter.textContent = step.topic==='classes' ? 'Fase final' : 'Relembre'; break;
+    case 'break': chip.textContent = 'Jogo bônus 🚀'; counter.textContent = 'Depois da questão '+lastQuestionNumber(state.pos); break;
+    case 'classify': chip.textContent = TOPICS.classes; counter.textContent = 'Frase '+(step.i+1)+' de '+CLASSIFY.length; break;
+    case 'end': chip.textContent = 'Resultado'; counter.textContent = 'Fim! 🎉'; break;
+  }
+}
+
+/* ================= RENDER ================= */
+const screen = document.getElementById('screen');
+function render(){
+  pending = [];
+  pendingAnswer = null;
+  const step = STEPS[state.pos];
+  updateHeader(step);
+  screen.innerHTML = '';
+  switch(step.kind){
+    case 'q':
+      if(step.q.t==='mc') renderMC(step.q);
+      else if(step.q.t==='vf') renderVF(step.q);
+      else renderOpen(step.q);
+      break;
+    case 'read': renderRead(step); break;
+    case 'tip': renderTip(step); break;
+    case 'break': renderBreak(step); break;
+    case 'classify': renderClassify(step); break;
+    case 'end': renderEnd(); break;
+  }
+  window.scrollTo(0,0);
+}
+
+function rereadBlock(textId){
+  const t = TEXTS[textId];
+  const d = el('details','reread');
+  const s = el('summary', null, '📖 Reler o texto: '+t.title);
+  const p = el('div','passage');
+  p.textContent = t.body;
+  d.appendChild(s); d.appendChild(p);
+  return d;
+}
+function continueButton(label){
+  const b = el('button','btn btn-primary', label || 'Continuar ➜');
+  b.addEventListener('click', advance);
+  return b;
+}
+
+function renderStart(){
+  updateHeader(null);
+  screen.innerHTML = '';
+  const card = el('div','card start');
+  const hasProgress = state.pos>0;
+  card.innerHTML = `
+    <div class="kicker">Prova de 28/09 · Unidades 4 e 5</div>
+    <h1>Simulado de Português</h1>
+    <p>São <b>${TOTAL_Q} questões</b> de múltipla escolha, verdadeiro ou falso e interpretação de texto, com dicas para relembrar cada assunto. A cada 10 questões tem um <b>jogo de nave 🚀</b>, e no final uma fase para classificar palavras.</p>
+    <p>Nas questões de gramática, responda com calma: a correção aparece <b>só no final</b>. Na interpretação, o texto ajuda você a encontrar a resposta.</p>
+    <ul>
+      <li>📖 Interpretação de texto (3 textos)</li>
+      <li>♂♀ Flexão de gênero do substantivo</li>
+      <li>🔤 Uso da letra R</li>
+      <li>🐕 Grau do substantivo</li>
+      <li>´ Acentuação: monossílabos tônicos e oxítonas</li>
+      <li>🔎 Artigo · ✨ Adjetivo · 🔢 Numerais</li>
+    </ul>`;
+  if(hasProgress){
+    card.appendChild(el('p','hint','Você parou na etapa '+(state.pos+1)+' de '+STEPS.length+'. O progresso fica salvo neste aparelho.'));
+    const cont = el('button','btn btn-primary','Continuar de onde parei ➜');
+    cont.addEventListener('click', render);
+    const reset = el('button','btn btn-secondary','Começar do zero');
+    reset.addEventListener('click', ()=>{ state = freshState(); saveState(); render(); });
+    card.appendChild(cont); card.appendChild(reset);
+  } else {
+    const go = el('button','btn btn-primary','Começar o simulado ➜');
+    go.addEventListener('click', render);
+    card.appendChild(go);
+  }
+  screen.appendChild(card);
+}
+
+function renderRead(step){
+  const t = TEXTS[step.text];
+  const card = el('div','card');
+  card.appendChild(el('div','kicker','Leia com atenção'));
+  card.appendChild(el('h2',null,t.title));
+  const p = el('div','passage'); p.textContent = t.body;
+  card.appendChild(p);
+  card.appendChild(el('div','source',t.source));
+  card.appendChild(continueButton('Li o texto! Vamos às perguntas ➜'));
+  screen.appendChild(card);
+}
+
+function renderTip(step){
+  const tip = TIPS[step.topic];
+  const card = el('div','card tip');
+  card.appendChild(el('h2',null,tip.title));
+  const ul = el('ul');
+  tip.items.forEach(it=>ul.appendChild(el('li',null,it)));
+  card.appendChild(ul);
+  card.appendChild(continueButton(step.topic==='classes' ? 'Começar a fase final ➜' : 'Entendi! Vamos praticar ➜'));
+  screen.appendChild(card);
+}
+
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function evidenceBlock(textId, phrases, title){
+  const box = el('div','evidence');
+  box.appendChild(el('div','evidence-title', title));
+  let html = escapeHtml(TEXTS[textId].body);
+  phrases.forEach(ph=>{
+    const e = escapeHtml(ph);
+    const i = html.indexOf(e);
+    if(i>=0) html = html.slice(0,i)+'<mark>'+e+'</mark>'+html.slice(i+e.length);
+  });
+  const p = el('div','passage', html);
+  box.appendChild(p);
+  return box;
+}
+function showEvidence(card, holder, block){
+  if(holder.el) holder.el.replaceWith(block); else card.appendChild(block);
+  holder.el = block;
+  block.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function renderMC(q){
+  if(q.hl) return renderMCInterp(q);
+  const card = el('div','card');
+  card.appendChild(el('div','kicker', 'Múltipla escolha'));
+  if(q.text) card.appendChild(rereadBlock(q.text));
+  const prompt = el('div','prompt'); prompt.textContent = q.q;
+  card.appendChild(prompt);
+  const opts = el('div','opts');
+  const confirm = el('button','btn btn-primary','Confirmar resposta ➜');
+  confirm.disabled = true;
+  let chosen = null;
+  const buttons = [];
+  shuffle(q.o.map((_,i)=>i)).forEach(idx=>{
+    const b = el('button','opt'); b.textContent = q.o[idx];
+    b.addEventListener('click', ()=>{
+      chosen = idx;
+      buttons.forEach(bb=>bb.classList.toggle('sel', bb===b));
+      confirm.disabled = false;
+    });
+    buttons.push(b); opts.appendChild(b);
+  });
+  confirm.addEventListener('click', ()=>{
+    pending = [{topic:q.topic, ok: chosen===q.c}];
+    pendingAnswer = {chosen:[chosen]};
+    advance();
+  });
+  card.appendChild(opts); card.appendChild(confirm);
+  screen.appendChild(card);
+}
+
+function renderMCInterp(q){
+  const card = el('div','card');
+  card.appendChild(el('div','kicker', 'Múltipla escolha'));
+  card.appendChild(rereadBlock(q.text));
+  const prompt = el('div','prompt'); prompt.textContent = q.q;
+  card.appendChild(prompt);
+  const opts = el('div','opts');
+  const fb = el('div','feedback'); fb.style.display='none';
+  const cont = continueButton(); cont.style.display='none';
+  const evidence = {el:null};
+  const buttons = [];
+  let firstTry = true;
+  const attempts = [];
+  shuffle(q.o.map((_,i)=>i)).forEach(idx=>{
+    const b = el('button','opt'); b.textContent = q.o[idx];
+    b.addEventListener('click', ()=>{
+      if(b.disabled) return;
+      const ok = idx===q.c;
+      attempts.push(idx);
+      pendingAnswer = {chosen:attempts.slice()};
+      if(firstTry){ pending = [{topic:q.topic, ok}]; firstTry = false; }
+      if(ok){
+        buttons.forEach(bb=>{ bb.disabled = true; if(bb!==b && !bb.classList.contains('no')) bb.classList.add('dim'); });
+        b.classList.add('ok');
+        fb.className = 'feedback ok'; fb.textContent = 'Isso mesmo! ✅';
+        fb.style.display = 'block';
+        showEvidence(card, evidence, evidenceBlock(q.text, q.hl, 'Veja no texto onde está a resposta:'));
+        card.appendChild(cont); cont.style.display = 'block';
+      } else {
+        b.disabled = true; b.classList.add('no');
+        fb.className = 'feedback no'; fb.textContent = 'Ainda não! Releia o trecho destacado no texto e escolha outra alternativa.';
+        fb.style.display = 'block';
+        showEvidence(card, evidence, evidenceBlock(q.text, q.hl, '📖 O trecho destacado ajuda a responder:'));
+      }
+    });
+    buttons.push(b); opts.appendChild(b);
+  });
+  card.appendChild(opts); card.appendChild(fb);
+  screen.appendChild(card);
+}
+
+function renderVFInterp(q){
+  const card = el('div','card');
+  card.appendChild(el('div','kicker','Verdadeiro ou falso'));
+  card.appendChild(rereadBlock(q.text));
+  card.appendChild(el('div','prompt','Marque <b>V</b> (verdadeiro) ou <b>F</b> (falso) em cada frase:'));
+  const list = el('div','vf-list');
+  const rows = q.items.map(it=>{
+    const r = {it, sel:null, locked:false};
+    r.row = el('div','vf-item');
+    const txt = el('div','vf-text'); txt.textContent = it.s;
+    const btns = el('div','vf-btns');
+    r.bV = el('button','vf-btn','V'); r.bF = el('button','vf-btn','F');
+    r.bV.setAttribute('aria-label','Verdadeiro'); r.bF.setAttribute('aria-label','Falso');
+    const pick = val=>{
+      if(r.locked) return;
+      r.sel = val;
+      r.bV.classList.toggle('sel', val===true);
+      r.bF.classList.toggle('sel', val===false);
+      r.row.classList.remove('no');
+      check.disabled = rows.some(x=>x.sel===null);
+    };
+    r.bV.addEventListener('click', ()=>pick(true));
+    r.bF.addEventListener('click', ()=>pick(false));
+    btns.appendChild(r.bV); btns.appendChild(r.bF);
+    r.exp = el('div','vf-exp'); r.exp.style.display='none';
+    r.row.appendChild(txt); r.row.appendChild(btns); r.row.appendChild(r.exp);
+    list.appendChild(r.row);
+    return r;
+  });
+  const check = el('button','btn btn-primary','Conferir respostas');
+  check.disabled = true;
+  const fb = el('div','feedback'); fb.style.display='none';
+  const cont = continueButton(); cont.style.display='none';
+  const evidence = {el:null};
+  let firstTry = true;
+  check.addEventListener('click', ()=>{
+    const wrong = [];
+    if(firstTry) pendingAnswer = {sel: rows.map(r=>r.sel)};
+    rows.forEach(r=>{
+      if(r.locked) return;
+      const ok = r.sel===r.it.v;
+      if(firstTry) pending.push({topic:q.topic, ok});
+      r.exp.style.display = 'block';
+      if(ok){
+        r.locked = true;
+        r.bV.disabled = true; r.bF.disabled = true;
+        r.row.classList.remove('no'); r.row.classList.add('ok');
+        r.exp.textContent = '✅ Correto!';
+      } else {
+        wrong.push(r);
+        r.row.classList.add('no');
+        r.exp.textContent = '❌ Ainda não. Releia o trecho destacado e mude sua resposta.';
+      }
+    });
+    firstTry = false;
+    if(wrong.length){
+      check.textContent = 'Conferir de novo';
+      fb.className = 'feedback no';
+      fb.textContent = 'Algumas frases ainda não estão certas. Os trechos destacados no texto abaixo ajudam a descobrir.';
+      showEvidence(card, evidence, evidenceBlock(q.text, wrong.map(r=>r.it.hl), '📖 Releia os trechos destacados:'));
+    } else {
+      check.style.display = 'none';
+      fb.className = 'feedback ok';
+      fb.textContent = 'Muito bem! Todas as frases estão certas ✅';
+      showEvidence(card, evidence, evidenceBlock(q.text, q.items.map(it=>it.hl), 'Veja no texto de onde vêm as respostas:'));
+      card.appendChild(cont); cont.style.display = 'block';
+    }
+    fb.style.display = 'block';
+  });
+  card.appendChild(list); card.appendChild(check); card.appendChild(fb);
+  screen.appendChild(card);
+}
+
+function renderVF(q){
+  if(q.items[0].hl) return renderVFInterp(q);
+  const card = el('div','card');
+  card.appendChild(el('div','kicker','Verdadeiro ou falso'));
+  if(q.text) card.appendChild(rereadBlock(q.text));
+  card.appendChild(el('div','prompt','Marque <b>V</b> (verdadeiro) ou <b>F</b> (falso) em cada frase:'));
+  const list = el('div','vf-list');
+  const sel = q.items.map(()=>null);
+  const confirm = el('button','btn btn-primary','Confirmar respostas ➜');
+  confirm.disabled = true;
+  q.items.forEach((it,i)=>{
+    const row = el('div','vf-item');
+    const txt = el('div','vf-text'); txt.textContent = it.s;
+    const btns = el('div','vf-btns');
+    const bV = el('button','vf-btn','V'); const bF = el('button','vf-btn','F');
+    bV.setAttribute('aria-label','Verdadeiro'); bF.setAttribute('aria-label','Falso');
+    const pick = val=>{
+      sel[i] = val;
+      bV.classList.toggle('sel', val===true);
+      bF.classList.toggle('sel', val===false);
+      confirm.disabled = sel.some(s=>s===null);
+    };
+    bV.addEventListener('click', ()=>pick(true));
+    bF.addEventListener('click', ()=>pick(false));
+    btns.appendChild(bV); btns.appendChild(bF);
+    row.appendChild(txt); row.appendChild(btns);
+    list.appendChild(row);
+  });
+  confirm.addEventListener('click', ()=>{
+    pending = q.items.map((it,i)=>({topic:q.topic, ok: sel[i]===it.v}));
+    pendingAnswer = {sel: sel.slice()};
+    advance();
+  });
+  card.appendChild(list); card.appendChild(confirm);
+  screen.appendChild(card);
+}
+
+function renderOpen(q){
+  const card = el('div','card');
+  card.appendChild(el('div','kicker','Resposta escrita'));
+  if(q.text) card.appendChild(rereadBlock(q.text));
+  const prompt = el('div','prompt'); prompt.textContent = q.q;
+  card.appendChild(prompt);
+  const ta = el('textarea','answer');
+  ta.placeholder = 'Escreva sua resposta aqui...';
+  card.appendChild(ta);
+  const check = el('button','btn btn-primary','Conferir resposta');
+  check.disabled = true;
+  ta.addEventListener('input', ()=>{ check.disabled = ta.value.trim().length<3; });
+  check.addEventListener('click', ()=>{
+    check.style.display='none';
+    const first = ta.value.trim();
+    const save = self=>{ pending=[{topic:q.topic, ok:self}]; pendingAnswer = {first, final: ta.value.trim(), self}; advance(); };
+    const ev = evidenceBlock(q.text, q.hl, '📖 Volte ao texto: o trecho destacado ajuda a responder. Compare com o que você escreveu e, se quiser, melhore sua resposta.');
+    card.insertBefore(ev, ta);
+    ev.scrollIntoView({behavior:'smooth', block:'start'});
+    card.appendChild(el('div','self-q','Sua resposta explica o que diz o trecho destacado?'));
+    const row = el('div','btn-row');
+    const yes = el('button','btn btn-ok','✅ Sim, está completa');
+    const no = el('button','btn btn-no','❌ Não, mas agora entendi');
+    yes.addEventListener('click', ()=>save(true));
+    no.addEventListener('click', ()=>save(false));
+    row.appendChild(yes); row.appendChild(no);
+    card.appendChild(row);
+  });
+  card.appendChild(check);
+  screen.appendChild(card);
+}
+
+function renderBreak(step){
+  const pool = SHOOTER_POOLS[step.topic];
+  const card = el('div','card');
+  card.innerHTML = `
+    <div class="kicker">Jogo bônus</div>
+    <h2 style="margin:0 0 .5rem">🚀 Hora da nave!</h2>
+    <p>Palavras vão cair do céu. Um comando aparece no topo da tela: atire ⚡ <b>só nas palavras daquela classe</b>.</p>
+    <p>Comandos desta rodada: <b>${pool.map(c=>c.label).join('</b> e depois <b>')}</b>.</p>
+    <p class="hint">Toque embaixo da palavra certa: o foguete vai até lá e atira. Acertar uma palavra errada custa uma vida ❤️.</p>`;
+  const go = el('button','btn btn-primary','Jogar! 🚀');
+  go.addEventListener('click', ()=>startShooter(step));
+  const skip = el('button','btn btn-secondary','Pular o jogo');
+  skip.addEventListener('click', advance);
+  card.appendChild(go); card.appendChild(skip);
+  screen.appendChild(card);
+}
+
+function renderClassify(step){
+  const src = CLASSIFY[step.i];
+  const card = el('div','card');
+  card.appendChild(el('div','kicker','Artigo, substantivo ou adjetivo?'));
+  card.appendChild(el('div','hint','Toque numa palavra destacada e depois na classe dela. Você pode trocar antes de confirmar.'));
+  const sentence = el('div','sentence');
+  const chips = parseClassify(src);
+  let selected = null;
+  const confirm = el('button','btn btn-primary', step.i===CLASSIFY.length-1 ? 'Confirmar e ver meu resultado 🎉' : 'Confirmar e ir para a próxima frase ➜');
+  confirm.disabled = true;
+  const fb = el('div','feedback'); fb.style.display='none';
+  chips.forEach(c=>{
+    if(c.plain!=null){ sentence.appendChild(document.createTextNode(c.plain)); return; }
+    c.assigned = null;
+    c.chip = el('button','word-chip'); c.chip.textContent = c.word;
+    c.chip.addEventListener('click', ()=>{
+      chips.forEach(x=>x.chip && x.chip.classList.remove('sel'));
+      selected = c; c.chip.classList.add('sel');
+      fb.style.display='none';
+    });
+    sentence.appendChild(c.chip);
+  });
+  const words = chips.filter(c=>c.plain==null);
+  card.appendChild(sentence);
+  const btns = el('div','class-btns');
+  ['art','sub','adj'].forEach(cls=>{
+    const b = el('button','class-btn '+cls, CLASS_NAMES[cls]);
+    b.addEventListener('click', ()=>{
+      if(!selected){ fb.className='feedback no'; fb.textContent='Primeiro toque numa palavra destacada.'; fb.style.display='block'; return; }
+      selected.assigned = cls;
+      selected.chip.classList.remove('sel','art','sub','adj');
+      selected.chip.classList.add(cls);
+      selected = null;
+      confirm.disabled = words.some(w=>!w.assigned);
+    });
+    btns.appendChild(b);
+  });
+  confirm.addEventListener('click', ()=>{
+    pending = words.map(w=>({topic:'classes', ok: w.assigned===w.cls}));
+    pendingAnswer = {assign: words.map(w=>w.assigned)};
+    advance();
+  });
+  card.appendChild(btns);
+  card.appendChild(el('div','legend','<span class="l-art">Artigo</span><span class="l-sub">Substantivo</span><span class="l-adj">Adjetivo</span>'));
+  card.appendChild(fb); card.appendChild(confirm);
+  screen.appendChild(card);
+}
+
+function parseClassify(src){
+  const parts = [];
+  const re = /\[([^|\]]+)\|(art|sub|adj)\]/g;
+  let last = 0, m;
+  while((m = re.exec(src))){
+    if(m.index>last) parts.push({plain: src.slice(last, m.index)});
+    parts.push({word:m[1], cls:m[2]});
+    last = re.lastIndex;
+  }
+  if(last<src.length) parts.push({plain: src.slice(last)});
+  return parts;
+}
+
+function renderEnd(){
+  const order = Object.keys(TOPICS).filter(t=>state.stats[t]);
+  let ok=0, total=0;
+  order.forEach(t=>{ ok+=state.stats[t].ok; total+=state.stats[t].total; });
+  const pct = total ? Math.round(100*ok/total) : 0;
+  const stars = pct>=90?3:pct>=70?2:pct>=50?1:0;
+  const card = el('div','card');
+  card.appendChild(el('div','kicker','Simulado concluído'));
+  card.appendChild(el('div','stars', '★'.repeat(stars)+'☆'.repeat(3-stars)));
+  card.appendChild(el('div','big-score', pct+'%'));
+  const summary = el('p',null,'Você acertou <b>'+ok+'</b> de <b>'+total+'</b> itens.');
+  summary.style.textAlign = 'center';
+  card.appendChild(summary);
+  const weak = [];
+  order.forEach(t=>{
+    const s = state.stats[t];
+    const p = Math.round(100*s.ok/s.total);
+    if(p<70) weak.push(t);
+    const color = p>=70 ? 'var(--success)' : p>=50 ? 'var(--accent)' : 'var(--danger)';
+    const row = el('div','res-row',
+      '<div class="res-top"><span>'+TOPICS[t]+'</span><span>'+s.ok+'/'+s.total+' · '+p+'%</span></div>'+
+      '<div class="res-bar"><div class="res-fill" style="width:'+p+'%; background:'+color+'"></div></div>');
+    card.appendChild(row);
+  });
+  if(state.game.hits || state.game.errors){
+    card.appendChild(el('p','hint','🚀 Jogos de nave: '+state.game.hits+' palavras certas atingidas, '+state.game.errors+' erradas.'));
+  }
+  if(weak.length){
+    const rev = el('div','review','Vale revisar antes da prova:');
+    weak.forEach(t=>{
+      if(!TIPS[t]) return;
+      const d = el('details','reread');
+      d.appendChild(el('summary',null,'📚 '+TOPICS[t]));
+      const ul = el('ul'); TIPS[t].items.forEach(it=>ul.appendChild(el('li',null,it)));
+      d.appendChild(ul);
+      rev.appendChild(d);
+    });
+    card.appendChild(rev);
+  } else {
+    card.appendChild(el('div','feedback ok','Excelente! Você está pronto para a prova. 🎉'));
+  }
+  const review = el('button','btn btn-primary','📋 Revisão das respostas (para o adulto)');
+  review.addEventListener('click', ()=>renderReview(false));
+  const again = el('button','btn btn-secondary','Refazer o simulado');
+  again.addEventListener('click', ()=>{ state = freshState(); saveState(); renderStart(); });
+  card.appendChild(review);
+  card.appendChild(again);
+  screen.appendChild(card);
+}
+
+/* ================= REVISÃO PARA O ADULTO ================= */
+function vfLabel(v){ return v===true ? 'V' : v===false ? 'F' : '—'; }
+function revLine(label, text, cls){
+  const d = el('div','rev-line'+(cls?' '+cls:''));
+  d.appendChild(el('span','lbl', label+' '));
+  d.appendChild(document.createTextNode(text));
+  return d;
+}
+function quoteHl(phrases){
+  return '<b>Trecho do texto:</b> ' + phrases.map(p=>'<mark>'+escapeHtml(p)+'</mark>').join(' … ');
+}
+
+function reviewQuestion(step, ans){
+  const q = step.q;
+  const item = el('div','rev-item');
+  let wrong = false;
+  const head = el('div','rev-head');
+  const qText = el('div','rev-q');
+  item.appendChild(head); item.appendChild(qText);
+
+  if(q.t==='mc'){
+    qText.textContent = q.q;
+    const chosen = ans ? ans.chosen : [];
+    const first = chosen[0];
+    wrong = first!==q.c;
+    item.appendChild(revLine('Resposta:', first!=null ? q.o[first] : 'não respondeu', wrong?'bad':'good'));
+    if(chosen.length>1) item.appendChild(revLine('Tentativas depois de reler o texto:', chosen.slice(1).map(i=>q.o[i]).join(' → ')));
+    if(wrong) item.appendChild(revLine('Correta:', q.o[q.c], 'good'));
+    item.appendChild(el('div','rev-note', q.hl ? quoteHl(q.hl) : escapeHtml(q.e)));
+  } else if(q.t==='vf'){
+    qText.textContent = 'Verdadeiro ou falso:';
+    const sel = ans ? ans.sel : [];
+    q.items.forEach((it,i)=>{
+      const ok = sel[i]===it.v;
+      if(!ok) wrong = true;
+      const box = el('div','rev-vf');
+      box.appendChild(el('div','rev-line', escapeHtml(it.s)));
+      box.appendChild(revLine('Marcou:', vfLabel(sel[i])+(ok?' ✅':' ❌  (correto: '+vfLabel(it.v)+')'), ok?'good':'bad'));
+      box.appendChild(el('div','rev-note', it.hl ? quoteHl([it.hl]) : escapeHtml(it.e)));
+      item.appendChild(box);
+    });
+  } else {
+    qText.textContent = q.q;
+    wrong = !(ans && ans.self);
+    item.appendChild(el('div','rev-line','<span class="lbl">Resposta escrita:</span>'));
+    const a1 = el('div','rev-answer'); a1.textContent = ans ? ans.first : '(não respondeu)';
+    item.appendChild(a1);
+    if(ans && ans.final && ans.final!==ans.first){
+      item.appendChild(el('div','rev-line','<span class="lbl">Depois de reler o texto, melhorou para:</span>'));
+      const a2 = el('div','rev-answer'); a2.textContent = ans.final;
+      item.appendChild(a2);
+    }
+    item.appendChild(revLine('Autoavaliação do aluno:', ans ? (ans.self ? '✅ disse que acertou' : '❌ disse que precisa revisar') : '—', ans && ans.self ? 'good' : 'bad'));
+    item.appendChild(revLine('Resposta de referência:', q.ref));
+    item.appendChild(el('div','rev-note', quoteHl(q.hl)));
+  }
+
+  head.innerHTML = '<span>Questão '+step.n+' · '+escapeHtml(TOPICS[q.topic])+'</span><span>'+(q.t==='open' ? '✍️ conferir' : wrong ? '❌' : '✅')+'</span>';
+  if(wrong) item.classList.add('wrong');
+  return {item, wrong};
+}
+
+function reviewClassify(step, ans){
+  const parts = parseClassify(CLASSIFY[step.i]);
+  const words = parts.filter(p=>p.plain==null);
+  const assign = ans ? ans.assign : [];
+  const item = el('div','rev-item');
+  const wrongWords = words.filter((w,k)=>assign[k]!==w.cls);
+  const wrong = wrongWords.length>0;
+  item.appendChild(el('div','rev-head','<span>Frase '+(step.i+1)+' · Classes de palavras</span><span>'+(wrong?'❌':'✅')+'</span>'));
+  const sentence = el('div','rev-q');
+  sentence.textContent = parts.map(p=>p.plain!=null ? p.plain : p.word).join('');
+  item.appendChild(sentence);
+  words.forEach((w,k)=>{
+    const ok = assign[k]===w.cls;
+    item.appendChild(revLine(w.word+':', (assign[k] ? CLASS_NAMES[assign[k]] : '—')+(ok?' ✅':' ❌  (correto: '+CLASS_NAMES[w.cls]+')'), ok?'good':'bad'));
+  });
+  if(wrong) item.classList.add('wrong');
+  return {item, wrong};
+}
+
+function renderReview(onlyWrong){
+  document.getElementById('topic-chip').textContent = 'Revisão';
+  document.getElementById('counter').textContent = 'Para o adulto';
+  screen.innerHTML = '';
+  const intro = el('div','card');
+  intro.innerHTML = '<div class="kicker">Revisão para o adulto</div><h2 style="margin:0 0 .4rem">Respostas do simulado</h2>'+
+    '<p class="hint">Cada questão mostra a resposta dada, a correta e a explicação. Nas respostas escritas, confira com a criança usando a resposta de referência e o trecho do texto. Em interpretação, vale a <b>primeira</b> resposta; as tentativas depois de reler o texto aparecem separadas.</p>';
+  const tabs = el('div','rev-tabs');
+  const all = el('button','btn btn-secondary'+(onlyWrong?'':' active'),'Todas');
+  const errs = el('button','btn btn-secondary'+(onlyWrong?' active':''),'Só erros e respostas escritas');
+  all.addEventListener('click', ()=>renderReview(false));
+  errs.addEventListener('click', ()=>renderReview(true));
+  tabs.appendChild(all); tabs.appendChild(errs);
+  intro.appendChild(tabs);
+  screen.appendChild(intro);
+
+  let shown = 0;
+  STEPS.forEach((step,idx)=>{
+    if(step.kind!=='q' && step.kind!=='classify') return;
+    const ans = state.answers[idx];
+    const r = step.kind==='q' ? reviewQuestion(step, ans) : reviewClassify(step, ans);
+    const isOpen = step.kind==='q' && step.q.t==='open';
+    if(onlyWrong && !r.wrong && !isOpen) return;
+    screen.appendChild(r.item);
+    shown++;
+  });
+  if(!shown) screen.appendChild(el('div','card','<p>Nenhum erro para revisar. 🎉</p>'));
+
+  const actions = el('div','card no-print');
+  const print = el('button','btn btn-secondary','🖨️ Imprimir ou salvar em PDF');
+  print.addEventListener('click', ()=>window.print());
+  const back = el('button','btn btn-primary','← Voltar ao resultado');
+  back.addEventListener('click', ()=>render());
+  actions.appendChild(print); actions.appendChild(back);
+  screen.appendChild(actions);
+  window.scrollTo(0,0);
+}
+
+/* ================= RESTART BUTTON ================= */
+(function(){
+  const btn = document.getElementById('restart');
+  let armed = false, timer;
+  btn.addEventListener('click', ()=>{
+    if(!armed){
+      armed = true;
+      btn.textContent = '✓';
+      btn.style.borderColor = 'var(--danger)';
+      document.getElementById('counter').textContent = 'Toque de novo para recomeçar';
+      timer = setTimeout(()=>{ armed=false; btn.textContent='↺'; btn.style.borderColor=''; updateHeader(STEPS[state.pos]); }, 3000);
+    } else {
+      clearTimeout(timer); armed=false; btn.textContent='↺'; btn.style.borderColor='';
+      state = freshState(); saveState(); renderStart();
+    }
+  });
+})();
+/* ================= JOGO DE NAVE ================= */
+const SH_WAVES_PER_CMD = 3;
+const SH_BULLET_SPEED = 620;
+let sh = null, shCtx = null, shRaf = null, shToken = 0;
+
+function startShooter(step){
+  if(sh) sh.running = false;
+  if(shRaf) cancelAnimationFrame(shRaf);
+  const token = ++shToken;
+  const cmds = SHOOTER_POOLS[step.topic];
+  const waves = [];
+  cmds.forEach((cmd,ci)=>{
+    const okQ = [], badQ = [];
+    const take = (queue, pool, used)=>{
+      for(let tries=0; tries<6; tries++){
+        if(!queue.length) queue.push(...shuffle(pool));
+        const w = queue.pop();
+        if(!used.includes(w)) return w;
+      }
+      return queue.pop() || pool[0];
+    };
+    for(let w=0; w<SH_WAVES_PER_CMD; w++){
+      const nOk = Math.random()<0.5 ? 1 : 2;
+      const used = [];
+      const words = [];
+      for(let k=0;k<nOk;k++){ const t = take(okQ, cmd.ok, used); used.push(t); words.push({text:t, ok:true}); }
+      for(let k=0;k<4-nOk;k++){ const t = take(badQ, cmd.bad, used); used.push(t); words.push({text:t, ok:false}); }
+      waves.push({cmd:ci, words:shuffle(words)});
+    }
+  });
+  sh = {
+    step, cmds, waves, waveIdx:0, words:[], bullets:[], fx:[],
+    lives:3, hits:0, errors:0, missed:0, rocketX:0, running:true,
+    lastTs:0, lastShot:0, keys:{left:false,right:false}, curCmd:-1, gap:0, W:0, H:0, stars:[], time:0, token
+  };
+  document.getElementById('sh-over').classList.remove('show');
+  document.getElementById('shooter').classList.add('open');
+  requestAnimationFrame(()=>{
+    if(token !== shToken) return;
+    shSetupCanvas();
+    sh.rocketX = sh.W/2;
+    shUpdateHud();
+    shSpawnWave();
+    shRaf = requestAnimationFrame(shLoop);
+  });
+}
+
+function shSetupCanvas(){
+  const canvas = document.getElementById('sh-canvas');
+  const wrap = document.getElementById('sh-wrap');
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  const dpr = Math.min(window.devicePixelRatio||1, 2);
+  canvas.width = Math.round(W*dpr); canvas.height = Math.round(H*dpr);
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  shCtx = canvas.getContext('2d');
+  shCtx.setTransform(dpr,0,0,dpr,0,0);
+  sh.W = W; sh.H = H;
+  sh.rocketX = clamp(sh.rocketX || W/2, 22, W-22);
+  if(!sh.stars.length){
+    for(let i=0;i<45;i++) sh.stars.push({x:Math.random(), y:Math.random(), r:Math.random()*1.4+.4, p:Math.random()*6});
+  }
+}
+
+function shUpdateHud(){
+  document.getElementById('sh-lives').textContent = '❤️'.repeat(Math.max(0,sh.lives)) + '🖤'.repeat(Math.max(0,3-sh.lives));
+  document.getElementById('sh-score').textContent = 'Acertos: '+sh.hits+' · Onda '+Math.max(1,sh.waveIdx)+'/'+sh.waves.length;
+}
+
+function shSetCommand(ci){
+  sh.curCmd = ci;
+  document.getElementById('sh-cmd-text').textContent = sh.cmds[ci].label;
+  const box = document.getElementById('sh-cmd');
+  box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash');
+}
+
+function shSpawnWave(){
+  const wave = sh.waves[sh.waveIdx];
+  if(wave.cmd !== sh.curCmd) shSetCommand(wave.cmd);
+  const ctx = shCtx;
+  const lanes = wave.words.length;
+  const laneW = sh.W/lanes;
+  const order = shuffle(wave.words.map((_,i)=>i));
+  const speed = 46 + sh.waveIdx*5;
+  wave.words.forEach((w,i)=>{
+    let fs = 15;
+    ctx.font = '800 '+fs+'px system-ui, sans-serif';
+    let tw = ctx.measureText(w.text).width;
+    if(tw+22 > laneW-6){ fs = clamp(fs*(laneW-28)/tw, 9, 15); ctx.font = '800 '+fs+'px system-ui, sans-serif'; tw = ctx.measureText(w.text).width; }
+    const bw = Math.min(laneW-6, tw+22);
+    sh.words.push({
+      text:w.text, ok:w.ok, fs, w:bw, h:32,
+      x: laneW*i + laneW/2,
+      y: -24 - order[i]*72,
+      vy: speed, alive:true
+    });
+  });
+  sh.waveIdx++;
+  shUpdateHud();
+}
+
+function shFire(){
+  if(!sh || !sh.running) return;
+  const now = performance.now();
+  if(now - sh.lastShot < 150) return;
+  sh.lastShot = now;
+  sh.bullets.push({x:sh.rocketX, y:sh.H-54});
+}
+
+function shUpdate(dt){
+  sh.time += dt;
+  const dir = (sh.keys.right?1:0) - (sh.keys.left?1:0);
+  if(dir) sh.rocketX = clamp(sh.rocketX + dir*320*dt, 22, sh.W-22);
+
+  sh.bullets.forEach(b=>{ b.y -= SH_BULLET_SPEED*dt; });
+  sh.bullets = sh.bullets.filter(b=>b.y > -30);
+
+  sh.words.forEach(w=>{
+    if(!w.alive) return;
+    w.y += w.vy*dt;
+    if(w.y - w.h/2 > sh.H){ w.alive = false; if(w.ok) sh.missed++; }
+  });
+
+  for(let bi=sh.bullets.length-1; bi>=0; bi--){
+    const b = sh.bullets[bi];
+    for(const w of sh.words){
+      if(!w.alive || w.y < -w.h/2) continue;
+      if(Math.abs(b.x-w.x) <= w.w/2+3 && Math.abs(b.y-w.y) <= w.h/2+8){
+        sh.bullets.splice(bi,1);
+        w.alive = false;
+        if(w.ok){ sh.hits++; sh.fx.push({x:w.x, y:w.y, text:'+1', color:'#6CFF8E', t:0}); }
+        else { sh.errors++; sh.lives--; sh.fx.push({x:w.x, y:w.y, text:'✗ '+w.text, color:'#FF8A7A', t:0}); }
+        shUpdateHud();
+        if(sh.lives<=0){ shEnd(false); return; }
+        break;
+      }
+    }
+  }
+
+  sh.fx.forEach(f=>{ f.t += dt; f.y -= 34*dt; });
+  sh.fx = sh.fx.filter(f=>f.t < 0.9);
+  sh.words = sh.words.filter(w=>w.alive);
+  // sem palavras certas restantes, as erradas saem rápido para a próxima onda não demorar
+  if(sh.words.length && sh.words.every(w=>!w.ok)) sh.words.forEach(w=>{ w.vy = Math.max(w.vy, 340); });
+
+  if(sh.gap>0){
+    sh.gap -= dt;
+    if(sh.gap<=0) shSpawnWave();
+    return;
+  }
+  if(sh.words.length) return;
+  if(sh.waveIdx >= sh.waves.length){ shEnd(true); return; }
+  const next = sh.waves[sh.waveIdx];
+  sh.gapNewCmd = next.cmd !== sh.curCmd;
+  sh.gap = sh.gapNewCmd ? 1.4 : 0.35;
+}
+
+function shRoundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function shDraw(){
+  const ctx = shCtx, W = sh.W, H = sh.H;
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0B1026'); g.addColorStop(1,'#1E2A5A');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  sh.stars.forEach(s=>{
+    ctx.globalAlpha = .35 + .35*Math.sin(sh.time*2 + s.p);
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2); ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+
+  sh.words.forEach(w=>{
+    ctx.fillStyle = 'rgba(255,255,255,.95)';
+    ctx.strokeStyle = 'rgba(242,183,5,.9)';
+    ctx.lineWidth = 2;
+    shRoundRect(ctx, w.x-w.w/2, w.y-w.h/2, w.w, w.h, w.h/2);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#161829';
+    ctx.font = '800 '+w.fs+'px system-ui, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(w.text, w.x, w.y+1);
+  });
+
+  ctx.font = '22px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  sh.bullets.forEach(b=>ctx.fillText('⚡', b.x, b.y));
+
+  ctx.save();
+  ctx.translate(sh.rocketX, H-30);
+  ctx.rotate(-Math.PI/4);
+  ctx.font = '40px sans-serif';
+  ctx.fillText('🚀', 0, 0);
+  ctx.restore();
+
+  sh.fx.forEach(f=>{
+    ctx.globalAlpha = Math.max(0, 1 - f.t/0.9);
+    ctx.fillStyle = f.color;
+    ctx.font = '900 18px system-ui, sans-serif';
+    ctx.fillText(f.text, f.x, f.y);
+  });
+  ctx.globalAlpha = 1;
+
+  if(sh.gap>0 && sh.gapNewCmd){
+    ctx.fillStyle = 'rgba(8,10,24,.6)';
+    ctx.fillRect(0, H/2-34, W, 68);
+    ctx.fillStyle = '#F2B705';
+    ctx.font = '900 20px system-ui, sans-serif';
+    ctx.fillText('Novo comando!', W/2, H/2-10);
+    ctx.fillStyle = '#fff';
+    ctx.font = '800 16px system-ui, sans-serif';
+    ctx.fillText(sh.cmds[sh.waves[sh.waveIdx].cmd].label, W/2, H/2+14);
+  }
+}
+
+function shLoop(ts){
+  if(!sh || !sh.running || sh.token !== shToken) return;
+  const dt = sh.lastTs ? Math.min(0.05, (ts - sh.lastTs)/1000) : 0;
+  sh.lastTs = ts;
+  shUpdate(dt);
+  if(!sh.running) return;
+  shDraw();
+  shRaf = requestAnimationFrame(shLoop);
+}
+
+function shEnd(won){
+  sh.running = false;
+  if(shRaf) cancelAnimationFrame(shRaf);
+  shDraw();
+  state.game.hits += sh.hits;
+  state.game.errors += sh.errors;
+  saveState();
+  document.getElementById('sh-over-title').textContent = won ? '🚀 Missão cumprida!' : '💥 Suas vidas acabaram!';
+  document.getElementById('sh-over-text').textContent =
+    'Você acertou '+sh.hits+(sh.hits===1?' palavra certa':' palavras certas')+' e atingiu '+sh.errors+(sh.errors===1?' errada.':' erradas.');
+  document.getElementById('sh-over').classList.add('show');
+}
+
+function shClose(){
+  if(sh){ sh.running = false; if(shRaf) cancelAnimationFrame(shRaf); }
+  document.getElementById('shooter').classList.remove('open');
+}
+
+(function setupShooterControls(){
+  const wrap = document.getElementById('sh-wrap');
+  const localX = e=>e.clientX - wrap.getBoundingClientRect().left;
+  wrap.addEventListener('pointerdown', e=>{
+    if(!sh || !sh.running) return;
+    wrap.setPointerCapture(e.pointerId);
+    sh.rocketX = clamp(localX(e), 22, sh.W-22);
+    shFire();
+  });
+  wrap.addEventListener('pointermove', e=>{
+    if(!sh || !sh.running || !wrap.hasPointerCapture(e.pointerId)) return;
+    sh.rocketX = clamp(localX(e), 22, sh.W-22);
+  });
+  document.addEventListener('keydown', e=>{
+    if(!sh || !sh.running) return;
+    if(e.key==='ArrowLeft') sh.keys.left = true;
+    else if(e.key==='ArrowRight') sh.keys.right = true;
+    else if(e.key===' ' || e.key==='ArrowUp'){ e.preventDefault(); shFire(); }
+  });
+  document.addEventListener('keyup', e=>{
+    if(!sh) return;
+    if(e.key==='ArrowLeft') sh.keys.left = false;
+    if(e.key==='ArrowRight') sh.keys.right = false;
+  });
+  document.getElementById('sh-back').addEventListener('click', ()=>{ shClose(); advance(); });
+  document.getElementById('sh-again').addEventListener('click', ()=>startShooter(sh.step));
+  document.getElementById('sh-skip').addEventListener('click', ()=>{ shClose(); advance(); });
+  window.addEventListener('resize', ()=>{
+    if(sh && document.getElementById('shooter').classList.contains('open')) shSetupCanvas();
+  });
+})();
+
+/* ================= INIT ================= */
+renderStart();
+</script>
+</body>
+</html>
