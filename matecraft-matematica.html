@@ -1,0 +1,1217 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MateCraft: Revisão de Matemática</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --grass:#5DB443; --grass-light:#7ED35C; --grass-dark:#3C7F2B;
+  --dirt:#86582E; --dirt-dark:#5B3A1C;
+  --panel:#C6C6C6; --panel-hi:#FFFFFF; --panel-lo:#555555; --edge:#1E1E1E;
+  --ink:#1E1E1E; --ink-soft:#404040;
+  --emerald:#138A3D; --emerald-bg:#D6F2DF; --redstone:#B3242A; --redstone-bg:#F6D6D6;
+  --gold:#E3B20B; --diamond:#1FA5B8; --lapis:#2C4FA8; --amethyst:#8A4FC4;
+  --pixel:'VT323','Courier New',monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0; padding:0;}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif; color:var(--ink); min-height:100vh; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  background-color:var(--dirt);
+  background-image:
+    linear-gradient(45deg, rgba(0,0,0,.13) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.13) 75%),
+    linear-gradient(45deg, rgba(0,0,0,.13) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.13) 75%);
+  background-size:28px 28px; background-position:0 0, 14px 14px;
+}
+button{font-family:inherit;}
+p{margin:0 0 .6rem; line-height:1.5;}
+:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+
+#app{max-width:560px; margin:0 auto; padding:0 .75rem 3rem;}
+.top{position:sticky; top:0; z-index:10; margin:0 -.75rem; padding:.55rem .75rem .5rem; background:var(--grass); border-bottom:6px solid var(--dirt-dark); box-shadow:inset 0 -6px 0 var(--grass-dark);}
+.top-row{display:flex; align-items:center; justify-content:space-between; gap:.5rem;}
+.brand{font-family:var(--pixel); font-size:1.7rem; color:#fff; text-shadow:2px 2px 0 var(--grass-dark), 3px 3px 0 #000; line-height:1;}
+.icon-btn{width:2.4rem; height:2.4rem; border:3px solid var(--edge); background:#7D7D7D; color:#fff; font-size:1.1rem; cursor:pointer; box-shadow:inset 2px 2px 0 #AAAAAA, inset -2px -3px 0 #4A4A4A; padding:0;}
+.bar{height:.7rem; margin-top:.45rem; background:#2A2A2A; border:2px solid var(--edge);}
+.fill{height:100%; width:0; background:linear-gradient(#8CF26A, #4FB32F); transition:width .3s ease;}
+.meta{display:flex; justify-content:space-between; align-items:center; margin-top:.35rem; font-family:var(--pixel); font-size:1.15rem; color:#fff; text-shadow:1px 1px 0 #000;}
+
+.panel{background:var(--panel); border:3px solid var(--edge); box-shadow:inset 3px 3px 0 var(--panel-hi), inset -3px -3px 0 var(--panel-lo); padding:1rem; margin-top:.8rem;}
+.kicker{font-family:var(--pixel); font-size:1.15rem; color:var(--lapis); margin-bottom:.2rem;}
+.title{font-weight:800; font-size:1.05rem; line-height:1.4; margin-bottom:.7rem;}
+.info{background:#E8E8E8; border:2px solid #8B8B8B; padding:.6rem .7rem; margin-bottom:.7rem; line-height:1.5;}
+h1,h2{font-family:var(--pixel); font-weight:400; margin:0 0 .5rem;}
+h1{font-size:2.2rem; color:var(--grass-dark); line-height:1;}
+h2{font-size:1.7rem; line-height:1.05;}
+.hint{font-size:.88rem; color:var(--ink-soft); line-height:1.45; margin-bottom:.5rem;}
+.extra-tag{display:inline-block; background:var(--amethyst); color:#fff; font-family:var(--pixel); font-size:1rem; padding:0 .4rem; margin-left:.3rem;}
+
+.lines{display:grid; gap:.55rem; margin-bottom:.4rem;}
+.line{font-size:1.12rem; line-height:2.1; display:flex; flex-wrap:wrap; align-items:center; gap:.25rem .35rem;}
+.line .lbl{font-weight:800; color:var(--ink-soft);}
+.blank{width:4.2rem; height:2.3rem; background:#111; color:#fff; border:2px solid #A0A0A0; font-family:var(--pixel); font-size:1.55rem; text-align:center; padding:0 .2rem; border-radius:0;}
+.blank:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 2px var(--gold);}
+.blank.letters{width:5.2rem; font-size:1.3rem; text-transform:uppercase;}
+.blank::placeholder{color:#6F6F6F;}
+textarea.explain{width:100%; min-height:5rem; background:#111; color:#fff; border:2px solid #A0A0A0; padding:.55rem; font-family:inherit; font-size:1rem; line-height:1.45; resize:vertical;}
+textarea.explain:focus{outline:none; border-color:var(--gold);}
+.part{margin-top:.8rem;}
+.part-q{font-weight:700; margin-bottom:.45rem; line-height:1.4;}
+
+.opts{display:grid; gap:.5rem;}
+.opt{text-align:left; font-size:1rem; font-weight:700; min-height:46px; padding:.6rem .8rem; background:#E4E4E4; color:var(--ink); border:3px solid var(--edge); box-shadow:inset 2px 2px 0 #fff, inset -2px -3px 0 #9A9A9A; cursor:pointer;}
+.opt.sel{background:#CFE8FF; box-shadow:inset 0 0 0 3px var(--lapis);}
+
+.btn{display:block; width:100%; margin-top:.9rem; padding:.7rem 1rem; font-family:var(--pixel); font-size:1.5rem; line-height:1; color:#fff; text-shadow:2px 2px 0 #3A3A3A; background:#7D7D7D; border:3px solid var(--edge); box-shadow:inset 2px 2px 0 #AAAAAA, inset -2px -4px 0 #4A4A4A; cursor:pointer;}
+.btn:active{transform:translateY(2px);}
+.btn:disabled{opacity:.5; cursor:default; transform:none;}
+.btn-go{background:var(--grass); box-shadow:inset 2px 2px 0 var(--grass-light), inset -2px -4px 0 var(--grass-dark); text-shadow:2px 2px 0 var(--grass-dark);}
+.btn-row{display:flex; gap:.5rem;}
+.btn-row .btn{flex:1;}
+
+.tip ul{margin:.3rem 0 0; padding-left:1.15rem;}
+.tip li{margin-bottom:.45rem; line-height:1.5;}
+.tip b{color:var(--lapis);}
+
+/* desenho com blocos */
+.draw-hint{font-size:.92rem; margin-bottom:.45rem; color:var(--ink-soft);}
+.draw-grid{display:grid; gap:4px; justify-content:start; background:#9ED1F4; border:3px solid var(--edge); padding:6px; width:max-content; max-width:100%;}
+.cell{width:40px; height:40px; border:2px dashed rgba(0,0,0,.25); background:rgba(255,255,255,.35); cursor:pointer; padding:0;}
+.cell.on{border:2px solid #2B1A0A; background:linear-gradient(#72C94E 0 30%, #4E9A33 30% 38%, #8B5A2B 38% 100%); box-shadow:inset 3px 3px 0 rgba(255,255,255,.25), inset -3px -3px 0 rgba(0,0,0,.25);}
+.draw-foot{display:flex; justify-content:space-between; align-items:center; margin-top:.45rem; font-family:var(--pixel); font-size:1.3rem;}
+.mini-btn{font-family:var(--pixel); font-size:1.15rem; background:#7D7D7D; color:#fff; border:2px solid var(--edge); padding:.15rem .6rem; cursor:pointer;}
+
+/* ligar termos */
+.match{position:relative; display:grid; grid-template-columns:38% 1fr; column-gap:2.2rem; row-gap:.5rem; align-items:center;}
+.match svg{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible;}
+.m-item{position:relative; z-index:1; text-align:left; font-size:.93rem; font-weight:700; line-height:1.3; min-height:48px; padding:.45rem .55rem; background:#E4E4E4; color:var(--ink); border:3px solid var(--edge); cursor:pointer;}
+.m-left{font-family:var(--pixel); font-size:1.35rem; font-weight:400;}
+.m-item.sel{box-shadow:0 0 0 3px var(--gold);}
+.m-item.c0{background:#BFF2D0;} .m-item.c1{background:#BDEFF5;} .m-item.c2{background:#FFF0B3;} .m-item.c3{background:#F8C9CB;}
+
+/* resultado e revisão */
+.big{text-align:center; font-family:var(--pixel); font-size:3.4rem; color:var(--grass-dark); line-height:1;}
+.hearts{text-align:center; font-size:1.7rem; letter-spacing:.2rem; margin:.2rem 0;}
+.res-row{margin-bottom:.65rem;}
+.res-top{display:flex; justify-content:space-between; font-weight:800; font-size:.92rem; margin-bottom:.2rem;}
+.res-bar{height:.8rem; background:#2A2A2A; border:2px solid var(--edge);}
+.res-fill{height:100%;}
+.rev-tabs{display:flex; gap:.5rem;}
+.rev-tabs .btn{font-size:1.2rem; margin-top:.6rem;}
+.rev-tabs .btn.active{background:var(--lapis);}
+.rev-item{background:#EDEDED; border:3px solid var(--edge); border-left:10px solid var(--emerald); padding:.7rem .8rem; margin-top:.6rem;}
+.rev-item.wrong{border-left-color:var(--redstone);}
+.rev-head{display:flex; justify-content:space-between; gap:.5rem; font-family:var(--pixel); font-size:1.15rem; color:var(--ink-soft); margin-bottom:.25rem;}
+.rev-title{font-weight:800; margin-bottom:.35rem; line-height:1.4;}
+.rev-line{font-size:.95rem; line-height:1.55;}
+.rev-line.good{color:var(--emerald);} .rev-line.bad{color:var(--redstone);}
+.rev-ans{background:#fff; border:2px solid #9A9A9A; padding:.4rem .55rem; margin:.2rem 0 .35rem; white-space:pre-wrap;}
+.rev-note{font-size:.85rem; color:var(--ink-soft); margin-top:.25rem;}
+@media print{ .top,.rev-tabs,.no-print{display:none !important;} body{background:#fff;} .rev-item{break-inside:avoid;} }
+
+/* ===== JOGO DA ESPADA ===== */
+#shooter{position:fixed; inset:0; z-index:50; background:#0E1633; display:none; flex-direction:column; padding:.55rem .55rem .45rem; color:#fff;}
+#shooter.open{display:flex;}
+.sh-top{display:flex; justify-content:space-between; align-items:center; font-family:var(--pixel); font-size:1.3rem; margin-bottom:.35rem; gap:.5rem;}
+.sh-skip{font-family:var(--pixel); font-size:1.1rem; background:#7D7D7D; color:#fff; border:2px solid #000; padding:.1rem .6rem; cursor:pointer;}
+.sh-cmd{text-align:center; background:var(--grass); border:3px solid #000; box-shadow:inset 2px 2px 0 var(--grass-light), inset -2px -4px 0 var(--grass-dark); padding:.3rem .5rem; margin-bottom:.4rem;}
+.sh-cmd small{display:block; font-family:var(--pixel); font-size:1.05rem; opacity:.9;}
+.sh-cmd b{font-family:var(--pixel); font-weight:400; font-size:2.1rem; line-height:1; text-shadow:2px 2px 0 var(--grass-dark);}
+.sh-cmd.flash{animation:flash .5s 2;}
+@keyframes flash{50%{transform:scale(1.05);}}
+.sh-wrap{position:relative; flex:1 1 0; min-height:0; overflow:hidden; touch-action:none; border:3px solid #000;}
+#sh-canvas{position:absolute; inset:0; display:block;}
+.sh-hint{text-align:center; font-size:.75rem; opacity:.8; margin-top:.35rem;}
+.sh-over{position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:.3rem; background:rgba(0,0,0,.78); text-align:center; padding:1.2rem;}
+.sh-over.show{display:flex;}
+.sh-over h2{color:#fff; margin:0;}
+.sh-over p{margin:0;}
+.sh-over .btn{max-width:290px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="top-row">
+      <span class="brand">⛏️ MateCraft</span>
+      <button class="icon-btn" id="restart" aria-label="Recomeçar" title="Recomeçar">↺</button>
+    </div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="meta"><span id="topic-chip">Início</span><span id="counter"></span></div>
+  </header>
+  <main id="screen"></main>
+</div>
+
+<div id="shooter">
+  <div class="sh-top">
+    <span id="sh-lives"></span>
+    <span id="sh-score"></span>
+    <button class="sh-skip" id="sh-skip">Pular ⏭</button>
+  </div>
+  <div class="sh-cmd" id="sh-cmd"><small>Acerte a resposta certa de:</small><b id="sh-cmd-text"></b></div>
+  <div class="sh-wrap" id="sh-wrap">
+    <canvas id="sh-canvas"></canvas>
+    <div class="sh-over" id="sh-over">
+      <h2 id="sh-over-title"></h2>
+      <p id="sh-over-text"></p>
+      <button class="btn btn-go" id="sh-back">Voltar às questões</button>
+      <button class="btn" id="sh-again">Jogar de novo</button>
+    </div>
+  </div>
+  <div class="sh-hint">Toque embaixo do bloco com a resposta certa: a espada vai até lá e atira (teclado: ← → e espaço)</div>
+</div>
+
+<script>
+"use strict";
+/* ================= TEMAS ================= */
+const TOPICS = {
+  mult:'Multiplicação', div:'Divisão', termos:'Termos da divisão',
+  prova:'Prova e operações inversas', resto:'Divisão com resto', problemas:'Problemas'
+};
+
+/* Sintaxe dos campos nas linhas:
+   [[6]]    número (resposta 6)
+   [[g1:6]] número em grupo: os campos do mesmo grupo valem em qualquer ordem (ex.: fatores da prova)
+   [[@E]]   letras: E, NE, V, F, SIM, NAO
+   [[*]]    campo livre, conferido pela regra "check" da parte */
+function termos(D,d,Q,R){ return ['Dividendo: [['+D+']]','Divisor: [['+d+']]','Quociente: [['+Q+']]','Resto: [['+R+']]']; }
+function prova(g,d,q,D,r){ return 'Prova: [['+g+':'+d+']] × [['+g+':'+q+']]'+(r?' + [['+r+']]':'')+' = [['+D+']]'; }
+
+const SEQ = [
+ {t:'tip', title:'⛏️ Revisão de Matemática – 3º ano', items:[
+   'Faça as contas no <b>papel e lápis</b>. Aqui você só escreve as <b>respostas</b> nos campos.',
+   'Multiplicar é juntar <b>grupos iguais</b>: 3 × 4 são 3 grupos de 4.',
+   'Nas perguntas de desenho, coloque <b>um bloco para cada unidade</b> do resultado.',
+   'A correção aparece <b>só no final</b>. A cada 10 questões tem um jogo da espada! 🗡️'
+ ]},
+
+ /* ===== MULTIPLICAÇÃO ===== */
+ {t:'q', topic:'mult', ref:'Multiplicação · 1', title:'Complete as multiplicações abaixo.', parts:[{k:'lines', lines:[
+   'a) 2 × 3 = [[6]]','b) 4 × 2 = [[8]]','c) 3 × 5 = [[15]]','d) 5 × 2 = [[10]]','e) 6 × 2 = [[12]]']}]},
+ {t:'q', topic:'mult', ref:'Multiplicação · 1', extra:true, title:'Mais multiplicações para treinar.', parts:[{k:'lines', lines:[
+   'f) 3 × 4 = [[12]]','g) 2 × 7 = [[14]]','h) 4 × 5 = [[20]]','i) 3 × 3 = [[9]]','j) 5 × 5 = [[25]]']}]},
+ {t:'q', topic:'problemas', ref:'Multiplicação · 2', title:'Resolva os problemas.', parts:[
+   {k:'lines', lines:['a) Em uma caixa há 4 lápis. Quantos lápis há em 3 caixas? [[12]] lápis']},
+   {k:'lines', lines:['b) Cada criança tem 2 balas. Quantas balas têm 5 crianças? [[10]] balas']}
+ ]},
+ {t:'q', topic:'mult', ref:'Multiplicação · 3a', title:'Complete a multiplicação e depois faça o desenho representando o resultado.', parts:[
+   {k:'lines', lines:['a) 2 × 4 = [[8]]']}, {k:'draw', a:2, b:4}]},
+ {t:'q', topic:'mult', ref:'Multiplicação · 3b', title:'Complete a multiplicação e depois faça o desenho representando o resultado.', parts:[
+   {k:'lines', lines:['b) 3 × 2 = [[6]]']}, {k:'draw', a:3, b:2}]},
+ {t:'q', topic:'mult', ref:'Multiplicação · 3c', title:'Complete a multiplicação e depois faça o desenho representando o resultado.', parts:[
+   {k:'lines', lines:['c) 4 × 3 = [[12]]']}, {k:'draw', a:4, b:3}]},
+ {t:'q', topic:'mult', ref:'Multiplicação · 3d', title:'Complete a multiplicação e depois faça o desenho representando o resultado.', parts:[
+   {k:'lines', lines:['d) 5 × 4 = [[20]]']}, {k:'draw', a:5, b:4}]},
+
+ /* ===== DIVISÃO ===== */
+ {t:'tip', title:'🪓 Divisão: os termos', items:[
+   '<b>Dividendo</b>: o número que será dividido.',
+   '<b>Divisor</b>: o número pelo qual vamos dividir.',
+   '<b>Quociente</b>: o resultado; indica quantas vezes o divisor cabe no dividendo.',
+   '<b>Resto</b>: o que não foi possível dividir. Se o resto é 0, a divisão é <b>exata</b>.'
+ ]},
+ {t:'q', topic:'termos', ref:'Divisão · Termos da divisão', title:'Ligue cada termo à sua função.', parts:[{k:'match',
+   left:['Dividendo','Divisor','Quociente','Resto'],
+   right:['Número que indica quantas vezes o divisor cabe no dividendo.','Número que será dividido.','Número que não foi possível dividir.','Número pelo qual vamos dividir.'],
+   pairs:[1,3,0,2]}]},
+ {t:'q', topic:'termos', ref:'Divisão · 3a e 3b', title:'Resolva as divisões e complete com os termos.', parts:[
+   {k:'lines', lines:['a) 12 ÷ 3 = [[4]]'].concat(termos(12,3,4,0))},
+   {k:'lines', lines:['b) 15 ÷ 4 = [[3]]'].concat(termos(15,4,3,3))}
+ ]},
+ {t:'q', topic:'termos', ref:'Divisão · 3c e 3d', title:'Resolva as divisões e complete com os termos.', parts:[
+   {k:'lines', lines:['c) 18 ÷ 3 = [[6]]'].concat(termos(18,3,6,0))},
+   {k:'lines', lines:['d) 20 ÷ 5 = [[4]]'].concat(termos(20,5,4,0))}
+ ]},
+ {t:'q', topic:'div', ref:'Divisão · 4', title:'Resolva as divisões simples.', parts:[{k:'lines', lines:[
+   'a) 8 ÷ 2 = [[4]]','b) 9 ÷ 3 = [[3]]','c) 16 ÷ 4 = [[4]]','d) 24 ÷ 6 = [[4]]','e) 28 ÷ 7 = [[4]]',
+   'f) 32 ÷ 8 = [[4]]','g) 10 ÷ 5 = [[2]]','h) 21 ÷ 3 = [[7]]','i) 27 ÷ 3 = [[9]]']}]},
+ {t:'q', topic:'div', ref:'Divisão · 4', extra:true, title:'Mais divisões simples para treinar.', parts:[{k:'lines', lines:[
+   'j) 36 ÷ 6 = [[6]]','k) 45 ÷ 9 = [[5]]','l) 14 ÷ 2 = [[7]]','m) 30 ÷ 5 = [[6]]','n) 49 ÷ 7 = [[7]]','o) 18 ÷ 2 = [[9]]']}]},
+
+ /* ===== FICHA 4 (SALA) ===== */
+ {t:'tip', title:'📜 Atividade de sala · Ficha 4', items:[
+   '<b>Dica para lembrar:</b> dividir é repartir uma quantidade em partes iguais ou formar grupos com a mesma quantidade.',
+   'A multiplicação pode ajudar a encontrar e conferir o resultado.'
+ ]},
+ {t:'q', topic:'problemas', ref:'Ficha 4 · Questão 1 – Dividindo igualmente', title:'A professora separou 24 lápis de cor para distribuir entre 4 grupos. Todos os grupos deverão receber a mesma quantidade.', parts:[
+   {k:'lines', lines:['a) e b) Registre e resolva a divisão: [[24]] ÷ [[4]] = [[6]]']},
+   {k:'lines', lines:['c) Use uma multiplicação para conferir: [[g1:4]] × [[g1:6]] = [[24]]']},
+   {k:'lines', lines:['d) Resposta: cada grupo receberá [[6]] lápis de cor.']}
+ ]},
+ {t:'q', topic:'problemas', ref:'Ficha 4 · Questão 2 – Organizando os livros', title:'A biblioteca recebeu 30 livros e irá organizá-los igualmente em 5 caixas. Quantos livros deverão ser colocados em cada caixa?', parts:[
+   {k:'lines', lines:['Operação: [[30]] ÷ [[5]] = [[6]]','Resposta: [[6]] livros em cada caixa.']}
+ ]},
+ {t:'q', topic:'prova', ref:'Ficha 4 · Questão 3 – A multiplicação pode ajudar', title:'Sabendo que 4 × 7 = 28, complete duas divisões diferentes usando os números 4, 7 e 28.', parts:[
+   {k:'lines', lines:['[[*]] ÷ [[*]] = [[*]]','[[*]] ÷ [[*]] = [[*]]'], check:{type:'twoDiv', p:28, a:4, b:7}},
+   {k:'text', q:'Depois, explique como a multiplicação ajudou você.'}
+ ]},
+ {t:'q', topic:'div', ref:'Ficha 4 · Questão 4 – Número escondido', title:'Descubra o número escondido.', parts:[{k:'lines', lines:[
+   'a) [[12]] ÷ 2 = 6','b) 20 ÷ [[4]] = 5','c) [[21]] ÷ 3 = 7','d) 24 ÷ [[4]] = 6']}]},
+ {t:'q', topic:'prova', ref:'Ficha 4 · Questão 5 – Analisando uma resposta', title:'Lucas afirmou que 24 ÷ 4 = 5 e tentou conferir fazendo 5 × 4 = 20.', parts:[
+   {k:'choice', q:'A resposta está correta?', o:['Sim','Não'], c:1},
+   {k:'lines', lines:['Corrija o cálculo: 24 ÷ 4 = [[6]]','Multiplicação que comprova: [[g1:6]] × [[g1:4]] = [[24]]']}
+ ]},
+ {t:'q', topic:'problemas', ref:'Ficha 4 · Questão 6 – Formando equipes', title:'Vinte e oito alunos serão organizados em 4 equipes com a mesma quantidade de participantes. Quantos alunos ficarão em cada equipe?', parts:[
+   {k:'lines', lines:['Cálculo: [[28]] ÷ [[4]] = [[7]]','Resposta: [[7]] alunos em cada equipe.']}
+ ]},
+
+ /* ===== FICHA 5 (SALA) ===== */
+ {t:'tip', title:'📜 Atividade de sala · Ficha 5', items:[
+   '<b>Dica para lembrar:</b> o número que será dividido é o <b>dividendo</b>; o número pelo qual dividimos é o <b>divisor</b>; o resultado é o <b>quociente</b>; e o que sobra é o <b>resto</b>.',
+   'Para conferir: <b>divisor × quociente + resto = dividendo</b>.'
+ ]},
+ {t:'q', topic:'termos', ref:'Ficha 5 · Questão 1 – Conhecendo os termos', title:'Observe a divisão 24 ÷ 6 = 4. Identifique:', parts:[{k:'lines', lines:termos(24,6,4,0)}]},
+ {t:'q', topic:'prova', ref:'Ficha 5 · Questão 2 – Confira pela multiplicação', title:'Resolva e faça a prova de cada divisão.', parts:[
+   {k:'lines', lines:['a) 18 ÷ 3 = [[6]]', prova('g1',3,6,18)]},
+   {k:'lines', lines:['b) 20 ÷ 4 = [[5]]', prova('g2',4,5,20)]},
+   {k:'lines', lines:['c) 32 ÷ 4 = [[8]]', prova('g3',4,8,32)]}
+ ]},
+ {t:'q', topic:'resto', ref:'Ficha 5 · Questão 3 – Quando há resto', title:'Uma professora tem 13 cartões para repartir igualmente entre 3 alunos.', parts:[{k:'lines', lines:[
+   'a) Quantos cartões cada aluno receberá? [[4]]','b) Quantos cartões sobrarão? [[1]]','c) Complete a prova: 3 × [[4]] + [[1]] = 13']}]},
+ {t:'q', topic:'prova', ref:'Ficha 5 · Questão 4 – A prova revela o erro', title:'Uma aluna registrou: 25 ÷ 5 = 4. Para conferir, fez 5 × 4 = 20.', parts:[
+   {k:'text', q:'Explique por que a prova mostra que há um erro.'},
+   {k:'lines', lines:['Quociente correto: 25 ÷ 5 = [[5]]']}
+ ]},
+ {t:'q', topic:'prova', ref:'Ficha 5 · Questão 5 – Complete a divisão', title:'Use a prova da divisão para descobrir o número que falta.', parts:[{k:'lines', lines:[
+   'a) 6 × [[5]] = 30, então 30 ÷ 6 = [[5]]','b) 4 × [[7]] = 28, então 28 ÷ 4 = [[7]]','c) 5 × [[5]] + 2 = 27, então 27 ÷ 5 = [[5]] e resto [[2]]']}]},
+ {t:'q', topic:'resto', ref:'Ficha 5 · Questão 6 – Problema com resto', title:'Há 22 bolas para guardar em caixas com 5 bolas em cada uma. Quantas caixas ficarão completas e quantas bolas sobrarão?', parts:[
+   {k:'lines', lines:['Divisão: [[22]] ÷ [[5]] = [[4]] e resto [[2]]', prova('g1',5,4,22,2)]},
+   {k:'lines', lines:['Caixas completas: [[4]]','Bolas que sobram: [[2]]']}
+ ]},
+
+ /* ===== DIVISÃO COM A TABUADA ===== */
+ {t:'tip', title:'🧮 Divisão · usando a tabuada', items:[
+   'Use a tabuada para descobrir <b>quantas vezes o divisor cabe no dividendo</b>.',
+   'Exemplo: 12 ÷ 3 → 3 × <b>4</b> = 12, então 12 ÷ 3 = <b>4</b>.'
+ ]},
+ {t:'q', topic:'div', ref:'Divisão com a tabuada · 1', title:'Resolva as divisões. Use a tabuada para descobrir quantas vezes o divisor cabe no dividendo.', parts:[{k:'lines', lines:[
+   'a) 12 ÷ 3 = [[4]]','b) 15 ÷ 5 = [[3]]','c) 16 ÷ 4 = [[4]]','d) 18 ÷ 6 = [[3]]','e) 21 ÷ 3 = [[7]]','f) 24 ÷ 4 = [[6]]','g) 27 ÷ 9 = [[3]]','h) 32 ÷ 8 = [[4]]']}]},
+ {t:'q', topic:'div', ref:'Divisão com a tabuada · 1', extra:true, title:'Mais divisões com a tabuada para treinar.', parts:[{k:'lines', lines:[
+   'i) 35 ÷ 7 = [[5]]','j) 40 ÷ 8 = [[5]]','k) 54 ÷ 9 = [[6]]','l) 42 ÷ 6 = [[7]]','m) 48 ÷ 8 = [[6]]','n) 63 ÷ 7 = [[9]]']}]},
+ {t:'q', topic:'problemas', ref:'Divisão com a tabuada · 2', title:'Agora, resolva os problemas.', parts:[
+   {k:'lines', lines:['a) Ana tem 18 lápis e quer dividir igualmente entre 3 amigas. Quantos lápis cada amiga receberá? [[6]] lápis']},
+   {k:'lines', lines:['b) Em uma caixa há 24 bombons. Eles serão divididos igualmente entre 6 crianças. Quantos bombons cada criança receberá? [[4]] bombons']}
+ ]},
+ {t:'q', topic:'div', ref:'Divisão com a tabuada · Desafio', title:'Desafio: qual é o número que falta?', parts:[{k:'lines', lines:[
+   'a) [[12]] ÷ 4 = 3','b) 5 ÷ [[1]] = 5','c) 27 ÷ 3 = [[9]]']}]},
+
+ /* ===== FICHA 4 (CASA) ===== */
+ {t:'tip', title:'🏠 Atividade de casa · Ficha 4', items:[
+   '<b>Dica para lembrar:</b> para conferir uma divisão exata, multiplique o divisor pelo quociente.',
+   'Quando houver resto, acrescente-o ao produto: divisor × quociente <b>+ resto</b> = dividendo.'
+ ]},
+ {t:'q', topic:'prova', ref:'Casa · Ficha 4 · Questão 1 – Resolva e comprove', title:'Resolva e faça a prova.', parts:[
+   {k:'lines', lines:['a) 24 ÷ 4 = [[6]]', prova('g1',4,6,24)]},
+   {k:'lines', lines:['b) 35 ÷ 5 = [[7]]', prova('g2',5,7,35)]},
+   {k:'lines', lines:['c) 42 ÷ 6 = [[7]]', prova('g3',6,7,42)]}
+ ]},
+ {t:'q', topic:'termos', ref:'Casa · Ficha 4 · Questão 2 – Termos da divisão', title:'Na divisão 28 ÷ 4 = 7, escreva o dividendo, o divisor, o quociente e o resto.', parts:[{k:'lines', lines:termos(28,4,7,0)}]},
+ {t:'q', topic:'resto', ref:'Casa · Ficha 4 · Questão 3 – Sobrou ou não sobrou?', title:'Dezessete brinquedos serão repartidos igualmente entre 4 crianças.', parts:[{k:'lines', lines:[
+   'Quantos brinquedos cada criança receberá? [[4]]','Quantos sobrarão? [[1]]', prova('g1',4,4,17,1)]}]},
+ {t:'q', topic:'prova', ref:'Casa · Ficha 4 · Questão 4 – Encontre o erro', title:'João escreveu: 30 ÷ 5 = 5. Em seguida, fez a prova: 5 × 5 = 25.', parts:[
+   {k:'choice', q:'A prova confirma a resposta?', o:['Sim','Não'], c:1},
+   {k:'lines', lines:['Divisão corrigida: 30 ÷ 5 = [[6]]', prova('g1',5,6,30)]}
+ ]},
+ {t:'q', topic:'resto', ref:'Casa · Ficha 4 · Questão 5 – Revisão final', title:'Uma caixa possui 26 lápis. Eles serão colocados em 4 estojos, com a mesma quantidade em cada um.', parts:[{k:'lines', lines:[
+   'a) Quantos lápis ficarão em cada estojo? [[6]]','b) Quantos lápis sobrarão? [[2]]','c) '+prova('g1',4,6,26,2)]}]},
+
+ /* ===== REVISÃO DE MATEMÁTICA ===== */
+ {t:'tip', title:'💎 Revisão de Matemática', items:[
+   'Agora as divisões têm números maiores: use o <b>algoritmo da divisão</b> no papel.',
+   'Nos campos <b>E/NE</b>, escreva <b>E</b> para divisão exata e <b>NE</b> para não exata. Nos campos <b>V/F</b>, escreva <b>V</b> ou <b>F</b>.'
+ ]},
+ {t:'q', topic:'problemas', ref:'Revisão · Questão 01', title:'Uma professora tem 132 adesivos para distribuir igualmente entre 6 alunas. Quantos adesivos cada aluna receberá?', parts:[{k:'lines', lines:['Resposta: [[22]] adesivos']}]},
+ {t:'q', topic:'termos', ref:'Revisão · Questão 02', title:'Leia cada afirmação e escreva V para verdadeira ou F para falsa.', parts:[{k:'lines', lines:[
+   'a) [[@V]] Em uma divisão exata, o resto é igual a zero.',
+   'b) [[@F]] O número que será dividido é chamado de divisor.',
+   'c) [[@V]] O resultado de uma divisão é chamado de quociente.',
+   'd) [[@V]] Uma divisão que apresenta resto diferente de zero é uma divisão não exata.',
+   'e) [[@V]] Multiplicação e divisão são operações inversas.']}]},
+ {t:'q', topic:'div', ref:'Revisão · Questão 03', title:'Descubra os números que estão faltando.', parts:[{k:'lines', lines:[
+   'a) [[56]] ÷ 7 = 8','b) 72 ÷ [[8]] = 9','c) [[42]] ÷ 6 = 7','d) 64 ÷ [[8]] = 8']}]},
+ {t:'q', topic:'resto', ref:'Revisão · Questão 04', title:'Resolva as divisões. Depois, classifique cada uma como EXATA (E) ou NÃO EXATA (NE).', parts:[{k:'lines', lines:[
+   'a) 81 ÷ 9 = [[9]] → [[@E]]','b) 76 ÷ 5 = [[15]] → [[@NE]]','c) 96 ÷ 8 = [[12]] → [[@E]]','d) 92 ÷ 6 = [[15]] → [[@NE]]']}]},
+ {t:'q', topic:'termos', ref:'Revisão · Questão 05', title:'Observe a divisão: 86 ÷ 7 = 12, resto 2. Complete corretamente:', parts:[{k:'lines', lines:[
+   'a) Dividendo: [[86]]','b) Divisor: [[7]]','c) Quociente: [[12]]','d) Resto: [[2]]']}]},
+ {t:'q', topic:'div', ref:'Revisão · Questão 06', title:'Resolva utilizando o algoritmo da divisão.', parts:[{k:'lines', lines:[
+   'a) 186 ÷ 3 = [[62]]','b) 328 ÷ 4 = [[82]]','c) 455 ÷ 5 = [[91]]','d) 762 ÷ 6 = [[127]]']}]},
+ {t:'q', topic:'resto', ref:'Revisão · Questão 07', title:'Uma papelaria recebeu 157 lápis. Os lápis serão colocados em pacotes com 6 lápis em cada um.', parts:[{k:'lines', lines:[
+   'a) Quantos pacotes completos poderão ser formados? [[26]]','b) Quantos lápis sobrarão? [[1]]']}]},
+ {t:'q', topic:'prova', ref:'Revisão · Questão 08', title:'Multiplicação e divisão são operações inversas. Complete corretamente.', parts:[{k:'lines', lines:[
+   'a) 8 × 7 = 56, então 56 ÷ 8 = [[7]]','b) 6 × 9 = 54, então 54 ÷ 9 = [[6]]','c) 7 × [[7]] = 49, então 49 ÷ 7 = 7','d) [[5]] × 8 = 40, então 40 ÷ 8 = 5']}]},
+ {t:'q', topic:'resto', ref:'Revisão · Questão 09', title:'Sem efetuar todas as operações novamente, observe os resultados e escreva E (exata) ou NE (não exata) em cada uma.', info:'54 ÷ 6 = 9 &nbsp;|&nbsp; 65 ÷ 8 = 8, resto 1 &nbsp;|&nbsp; 42 ÷ 7 = 6 &nbsp;|&nbsp; 73 ÷ 9 = 8, resto 1', parts:[
+   {k:'lines', lines:['54 ÷ 6 = 9 → [[@E]]','65 ÷ 8 = 8, resto 1 → [[@NE]]','42 ÷ 7 = 6 → [[@E]]','73 ÷ 9 = 8, resto 1 → [[@NE]]']},
+   {k:'text', q:'c) Como você identificou as divisões não exatas?'}
+ ]},
+ {t:'q', topic:'problemas', ref:'Revisão · Questão 10', title:'Uma escola recebeu 216 livros e distribuiu igualmente entre 6 turmas. Depois, cada turma emprestou 14 livros aos alunos. Quantos livros permaneceram em cada turma?', parts:[{k:'lines', lines:['Resposta: [[22]] livros em cada turma']}]},
+ {t:'q', topic:'resto', ref:'Revisão · Questão 11', title:'Resolva e registre o quociente e o resto.', parts:[{k:'lines', lines:[
+   'a) 143 ÷ 4 → Quociente: [[35]] Resto: [[3]]','b) 275 ÷ 6 → Quociente: [[45]] Resto: [[5]]','c) 389 ÷ 8 → Quociente: [[48]] Resto: [[5]]','d) 461 ÷ 7 → Quociente: [[65]] Resto: [[6]]']}]},
+ {t:'q', topic:'prova', ref:'Revisão · Questão 12', title:'Observe a multiplicação: 8 × 9 = 72. Utilizando apenas esses três números, escreva as duas divisões que podem ser formadas.', parts:[
+   {k:'lines', lines:['a) [[*]] ÷ [[*]] = [[*]]','b) [[*]] ÷ [[*]] = [[*]]'], check:{type:'twoDiv', p:72, a:8, b:9}},
+   {k:'text', q:'Agora responda: por que podemos dizer que a multiplicação e a divisão são operações inversas?'}
+ ]},
+ {t:'q', topic:'resto', ref:'Revisão · Questão 13', title:'Para uma atividade, 175 peças de montar serão distribuídas igualmente entre 8 grupos.', parts:[{k:'lines', lines:[
+   'a) Quantas peças cada grupo receberá? [[21]]','b) Quantas peças sobrarão? [[7]]','c) Essa divisão é exata (E) ou não exata (NE)? [[@NE]]']}]},
+ {t:'q', topic:'problemas', ref:'Revisão · Questão 14', title:'Uma escola preparou 180 lembrancinhas. Primeiro, elas foram distribuídas igualmente entre 6 turmas. Depois, cada turma entregou 18 lembrancinhas aos seus alunos. Quantas lembrancinhas sobraram em cada turma?', parts:[{k:'lines', lines:['Resposta: [[12]] lembrancinhas']}]},
+
+ /* ===== ATIVIDADE – MULTIPLICAÇÃO E DIVISÃO ===== */
+ {t:'tip', title:'⚔️ Atividade · Multiplicação e divisão', items:[
+   'Última parte! Tem multiplicação, divisão, operações inversas e problemas.',
+   'Lembre: <b>multiplicação e divisão são operações inversas</b>. Se 7 × 8 = 56, então 56 ÷ 8 = 7.'
+ ]},
+ {t:'q', topic:'problemas', ref:'Atividade · 6', title:'Observe o cálculo: 843 – 275 = 678', parts:[
+   {k:'choice', q:'O resultado está correto?', o:['Sim','Não'], c:1},
+   {k:'lines', lines:['Se não estiver, escreva o resultado correto: [[568]]']}
+ ]},
+ {t:'q', topic:'mult', ref:'Atividade · 7', title:'Calcule.', parts:[{k:'lines', lines:[
+   'a) 7 × 8 = [[56]]','b) 9 × 6 = [[54]]','c) 8 × 4 = [[32]]','d) 7 × 9 = [[63]]','e) 6 × 8 = [[48]]']}]},
+ {t:'q', topic:'mult', ref:'Atividade · 7', extra:true, title:'Mais multiplicações para treinar.', parts:[{k:'lines', lines:[
+   'f) 8 × 8 = [[64]]','g) 9 × 8 = [[72]]','h) 6 × 6 = [[36]]','i) 9 × 9 = [[81]]','j) 7 × 6 = [[42]]','k) 8 × 3 = [[24]]']}]},
+ {t:'q', topic:'mult', ref:'Atividade · 8', title:'Complete com o fator que está faltando.', parts:[{k:'lines', lines:[
+   'a) 7 × [[8]] = 56','b) [[9]] × 6 = 54','c) 9 × [[7]] = 63','d) [[5]] × 8 = 40']}]},
+ {t:'q', topic:'mult', ref:'Atividade · 8', extra:true, title:'Mais fatores escondidos para treinar.', parts:[{k:'lines', lines:[
+   'e) 6 × [[7]] = 42','f) [[5]] × 7 = 35','g) 8 × [[6]] = 48','h) [[4]] × 9 = 36']}]},
+ {t:'q', topic:'mult', ref:'Atividade · 9', title:'Arme e efetue (no papel) e escreva a resposta.', parts:[{k:'lines', lines:[
+   'a) 34 × 3 = [[102]]','b) 57 × 4 = [[228]]','c) 126 × 3 = [[378]]','d) 215 × 4 = [[860]]']}]},
+ {t:'q', topic:'mult', ref:'Atividade · 10', title:'Calcule mentalmente.', parts:[{k:'lines', lines:[
+   'a) 23 × 10 = [[230]]','b) 15 × 20 = [[300]]','c) 32 × 30 = [[960]]','d) 12 × 100 = [[1200]]']}]},
+ {t:'q', topic:'problemas', ref:'Atividade · 11', title:'Uma caixa contém 24 lápis. Quantos lápis há em 6 caixas iguais?', parts:[{k:'lines', lines:['Resposta: [[144]] lápis']}]},
+ {t:'q', topic:'problemas', ref:'Atividade · 12', title:'Para uma apresentação, foram organizadas 8 fileiras com 17 cadeiras em cada uma. Quantas cadeiras foram organizadas ao todo?', parts:[{k:'lines', lines:['Resposta: [[136]] cadeiras']}]},
+ {t:'q', topic:'problemas', ref:'Atividade · 13', title:'Uma escola comprou 4 caixas com 125 folhas coloridas em cada uma. Depois, utilizou 138 folhas em uma atividade. Quantas folhas sobraram?', parts:[{k:'lines', lines:['Resposta: [[362]] folhas']}]},
+ {t:'q', topic:'termos', ref:'Atividade · 14', title:'Observe a divisão e identifique seus termos: 56 ÷ 7 = 8', parts:[{k:'lines', lines:[
+   'a) Dividendo: [[56]]','b) Divisor: [[7]]','c) Quociente: [[8]]','d) Resto: [[0]]']}]},
+ {t:'q', topic:'termos', ref:'Atividade · 15', title:'Complete. Na divisão 43 ÷ 5 = 8 e resto 3:', parts:[{k:'lines', lines:[
+   'a) O dividendo é [[43]]','b) O divisor é [[5]]','c) O quociente é [[8]]','d) O resto é [[3]]']}]},
+ {t:'q', topic:'resto', ref:'Atividade · 16', title:'Resolva e escreva E para divisão exata e NE para divisão não exata.', parts:[{k:'lines', lines:[
+   'a) 42 ÷ 6 = [[7]] ([[@E]])','b) 55 ÷ 5 = [[11]] ([[@E]])','c) 38 ÷ 4 = [[9]], resto [[2]] ([[@NE]])','d) 67 ÷ 6 = [[11]], resto [[1]] ([[@NE]])']}]},
+ {t:'q', topic:'termos', ref:'Atividade · 17', title:'Marque a alternativa correta.', parts:[
+   {k:'choice', q:'Em uma divisão exata:', o:['sempre sobra 1.','o resto é zero.','o dividendo é sempre menor que o divisor.','o quociente é sempre zero.'], c:1}
+ ]},
+ {t:'q', topic:'div', ref:'Atividade · 18', title:'Arme e efetue (no papel) utilizando o algoritmo da divisão.', parts:[{k:'lines', lines:[
+   'a) 84 ÷ 4 = [[21]]','b) 96 ÷ 3 = [[32]]','c) 128 ÷ 4 = [[32]]']}]},
+ {t:'q', topic:'div', ref:'Atividade · 19', title:'Continue utilizando o algoritmo da divisão.', parts:[{k:'lines', lines:[
+   'a) 246 ÷ 3 = [[82]]','b) 368 ÷ 4 = [[92]]','c) 425 ÷ 5 = [[85]]']}]},
+ {t:'q', topic:'resto', ref:'Atividade · 20', title:'Resolva as divisões não exatas. Não se esqueça de indicar o resto.', parts:[{k:'lines', lines:[
+   'a) 74 ÷ 8 = [[9]], resto [[2]]','b) 95 ÷ 6 = [[15]], resto [[5]]','c) 137 ÷ 4 = [[34]], resto [[1]]']}]},
+ {t:'q', topic:'div', ref:'Atividade · 21', title:'Descubra o número que está faltando.', parts:[{k:'lines', lines:[
+   'a) [[40]] ÷ 5 = 8','b) 63 ÷ [[7]] = 9','c) [[42]] ÷ 6 = 7','d) 72 ÷ [[9]] = 8']}]},
+ {t:'q', topic:'prova', ref:'Atividade · 22', title:'Multiplicação e divisão são operações inversas. Complete.', parts:[
+   {k:'lines', lines:['Se 7 × 8 = 56, então:','a) 56 ÷ 7 = [[8]]','b) 56 ÷ 8 = [[7]]']},
+   {k:'lines', lines:['Se 6 × 9 = 54, então:','c) 54 ÷ 6 = [[9]]','d) 54 ÷ 9 = [[6]]']}
+ ]},
+ {t:'q', topic:'prova', ref:'Atividade · 23', title:'Use a operação inversa para descobrir se a divisão está correta: 72 ÷ 8 = 9', parts:[
+   {k:'choice', q:'Qual multiplicação pode comprovar esse resultado?', o:['9 × 7 = 63','9 × 8 = 72','8 × 8 = 64','72 × 8 = 576'], c:1}
+ ]},
+ {t:'q', topic:'prova', ref:'Atividade · 24', title:'Complete cada família de operações.', parts:[
+   {k:'lines', lines:['a) 6 × 7 = 42','42 ÷ 6 = [[7]]','42 ÷ 7 = [[6]]']},
+   {k:'lines', lines:['b) [[8]] × 8 = 64','64 ÷ 8 = [[8]]','64 ÷ [[8]] = 8']}
+ ]},
+ {t:'q', topic:'problemas', ref:'Atividade · 25', title:'Uma professora distribuiu igualmente 72 lápis entre 8 alunos. Quantos lápis cada aluno recebeu?', parts:[{k:'lines', lines:['Resposta: [[9]] lápis']}]},
+ {t:'q', topic:'problemas', ref:'Atividade · 26', title:'Uma confeitaria preparou 96 brigadeiros e colocou a mesma quantidade em 6 bandejas. Quantos brigadeiros foram colocados em cada bandeja?', parts:[{k:'lines', lines:['Resposta: [[16]] brigadeiros']}]},
+ {t:'q', topic:'resto', ref:'Atividade · 27', title:'Para uma brincadeira, 53 crianças serão organizadas em grupos de 5.', parts:[{k:'lines', lines:[
+   'a) Quantos grupos completos poderão ser formados? [[10]]','b) Quantas crianças ficarão fora dos grupos completos? [[3]]']}]},
+ {t:'q', topic:'resto', ref:'Atividade · 28', title:'Ana tem 87 figurinhas e quer guardá-las em envelopes com 9 figurinhas em cada um.', parts:[{k:'lines', lines:[
+   'a) Quantos envelopes ficarão completos? [[9]]','b) Quantas figurinhas sobrarão? [[6]]']}]},
+ {t:'q', topic:'problemas', ref:'Atividade · 29', title:'Uma papelaria recebeu 6 caixas com 48 cadernos em cada uma. Os cadernos serão distribuídos igualmente entre 8 prateleiras. Quantos cadernos ficarão em cada prateleira?', parts:[{k:'lines', lines:['Resposta: [[36]] cadernos']}]},
+ {t:'q', topic:'problemas', ref:'Atividade · 30 – Desafio', title:'A professora tinha 150 peças de um jogo. Ela comprou mais 42 peças e, depois, dividiu todas igualmente entre 6 grupos. Quantas peças cada grupo recebeu?', parts:[{k:'lines', lines:['Resposta: [[32]] peças']}]},
+ {t:'q', topic:'resto', ref:'Questão adicional – Visita ao museu', title:'Para uma visita ao museu, 194 alunos serão transportados em vans. Em cada van cabem 9 alunos.', parts:[{k:'lines', lines:[
+   'a) Quantas vans poderão ficar com exatamente 9 alunos? [[21]]',
+   'b) Quantos alunos ainda ficarão sem lugar depois de completar essas vans? [[5]]',
+   'c) Será necessário utilizar outra van para os alunos que sobraram? (sim/não) [[@SIM]]',
+   'd) Quantas vans serão necessárias ao todo para transportar todos os alunos? [[22]]']}]}
+];
+/* ================= HELPERS ================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html!=null) e.innerHTML = html;
+  return e;
+}
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function normLetters(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase().replace(/[^A-Z ]/g,' ').replace(/\s+/g,' ').trim(); }
+const LETTER_ALIASES = {
+  E:['E','EXATA'], NE:['NE','N E','NAO EXATA','NAOEXATA'],
+  V:['V','VERDADEIRA','VERDADEIRO'], F:['F','FALSA','FALSO'],
+  SIM:['SIM','S'], NAO:['NAO','N']
+};
+const LETTER_PLACEHOLDER = {E:'E/NE', NE:'E/NE', V:'V/F', F:'V/F', SIM:'sim/não', NAO:'sim/não'};
+const LETTER_SHOW = {E:'E', NE:'NE', V:'V', F:'F', SIM:'sim', NAO:'não'};
+
+/* ================= CAMPOS ================= */
+function parseLine(line){
+  const segs = [];
+  let label = null;
+  const lm = line.match(/^([a-z]\)(?: e [a-z]\))?)\s+/);
+  if(lm){ label = lm[1]; line = line.slice(lm[0].length); }
+  const re = /\[\[([^\]]+)\]\]/g;
+  let last = 0, m;
+  while((m = re.exec(line))){
+    if(m.index>last) segs.push({text: line.slice(last, m.index)});
+    const raw = m[1];
+    let blank;
+    if(raw==='*') blank = {type:'free'};
+    else if(raw[0]==='@') blank = {type:'let', ans:raw.slice(1)};
+    else if(raw.includes(':')){ const [g,v] = raw.split(':'); blank = {type:'grp', group:g, ans:+v}; }
+    else blank = {type:'num', ans:+raw};
+    segs.push({blank});
+    last = re.lastIndex;
+  }
+  if(last<line.length) segs.push({text: line.slice(last)});
+  return {label, segs};
+}
+function partBlanks(part){
+  const list = [];
+  part.lines.forEach((ln,li)=>parseLine(ln).segs.forEach(s=>{ if(s.blank) list.push(Object.assign({line:li}, s.blank)); }));
+  return list;
+}
+function numVal(v){ const s = String(v||'').replace(/\s/g,''); return /^\d+$/.test(s) ? +s : NaN; }
+
+/* ================= CORREÇÃO ================= */
+function gradeLines(part, vals){
+  const blanks = partBlanks(part);
+  const ok = blanks.map(()=>false);
+  if(part.check && part.check.type==='twoDiv'){
+    const {p,a,b} = part.check;
+    const rows = [0,1].map(r=>[0,1,2].map(k=>numVal(vals[r*3+k])));
+    const good = rows.map(([x,d,q])=> x===p && ((d===a&&q===b)||(d===b&&q===a)));
+    if(good[0] && good[1] && rows[0][1]===rows[1][1]) good[1] = false;
+    good.forEach((g,r)=>{ for(let k=0;k<3;k++) ok[r*3+k] = g; });
+    return ok;
+  }
+  const groups = {};
+  blanks.forEach((b,i)=>{
+    if(b.type==='num') ok[i] = numVal(vals[i])===b.ans;
+    else if(b.type==='let') ok[i] = LETTER_ALIASES[b.ans].includes(normLetters(vals[i]));
+    else if(b.type==='grp'){ (groups[b.group] = groups[b.group] || []).push(i); }
+  });
+  Object.values(groups).forEach(idx=>{
+    const left = idx.map(i=>blanks[i].ans);
+    idx.forEach(i=>{
+      const k = left.indexOf(numVal(vals[i]));
+      ok[i] = k>=0;
+      if(k>=0) left.splice(k,1);
+    });
+  });
+  return ok;
+}
+// resposta certa a mostrar em cada campo errado; nos grupos, o fator que ficou faltando
+function lineExpect(part, vals){
+  const blanks = partBlanks(part);
+  const ok = gradeLines(part, vals);
+  const exp = blanks.map(b=>b.type==='let' ? LETTER_SHOW[b.ans] : b.ans);
+  const groups = {};
+  blanks.forEach((b,i)=>{ if(b.type==='grp') (groups[b.group] = groups[b.group] || []).push(i); });
+  Object.values(groups).forEach(idx=>{
+    const left = idx.map(i=>blanks[i].ans);
+    idx.forEach(i=>{ if(ok[i]) left.splice(left.indexOf(numVal(vals[i])),1); });
+    idx.forEach(i=>{ if(!ok[i]) exp[i] = left.shift(); });
+  });
+  return exp;
+}
+function gradePart(part, val){
+  switch(part.k){
+    case 'lines': return gradeLines(part, val||[]);
+    case 'choice': return [val===part.c];
+    case 'draw': return [val===part.a*part.b];
+    case 'match': return part.left.map((_,i)=>val && val[i]===part.pairs[i]);
+    default: return [];
+  }
+}
+function gradeQuestion(q, ans){
+  return q.parts.map((p,i)=>gradePart(p, ans ? ans.parts[i] : undefined));
+}
+
+/* ================= PASSOS ================= */
+const SHOOTER_KIND = {mult:'mult', resto:'resto'};
+function buildSteps(){
+  const steps = [];
+  const recent = [];
+  let n = 0;
+  SEQ.forEach(item=>{
+    if(item.t==='tip'){ steps.push({kind:'tip', tip:item}); return; }
+    n++;
+    steps.push({kind:'q', q:item, n});
+    recent.push(SHOOTER_KIND[item.topic] || 'div');
+    if(n % 10 === 0){
+      const last = recent.slice(-10);
+      const counts = {mult:0, div:0, resto:0};
+      last.forEach(k=>counts[k]++);
+      const kinds = [];
+      Object.keys(counts).forEach(k=>{ for(let i=0;i<Math.round(6*counts[k]/10);i++) kinds.push(k); });
+      const top = Object.keys(counts).sort((x,y)=>counts[y]-counts[x])[0];
+      while(kinds.length<6) kinds.push(top);
+      steps.push({kind:'break', kinds:kinds.slice(0,6)});
+    }
+  });
+  steps.push({kind:'end'});
+  return {steps, total:n};
+}
+const BUILT = buildSteps();
+const STEPS = BUILT.steps;
+const TOTAL_Q = BUILT.total;
+
+/* ================= ESTADO ================= */
+const KEY = 'mateCraftRevisao3anoV1';
+function freshState(){ return {pos:0, answers:{}, game:{hits:0, errors:0}}; }
+function loadState(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){ const s = JSON.parse(raw); if(typeof s.pos==='number' && s.pos < STEPS.length){ s.answers = s.answers||{}; s.game = s.game||{hits:0,errors:0}; return s; } }
+  }catch(e){}
+  return freshState();
+}
+function saveState(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+let state = loadState();
+let pendingAnswer = null;
+
+function advance(){
+  if(pendingAnswer) state.answers[state.pos] = pendingAnswer;
+  pendingAnswer = null;
+  state.pos = Math.min(state.pos+1, STEPS.length-1);
+  saveState();
+  render();
+}
+
+/* ================= CABEÇALHO ================= */
+function lastQ(pos){ for(let i=pos;i>=0;i--) if(STEPS[i].kind==='q') return STEPS[i].n; return 0; }
+function updateHeader(step){
+  document.getElementById('fill').style.width = Math.round(100*state.pos/(STEPS.length-1))+'%';
+  const chip = document.getElementById('topic-chip'), counter = document.getElementById('counter');
+  if(!step){ chip.textContent = 'Início'; counter.textContent = TOTAL_Q+' questões'; return; }
+  if(step.kind==='q'){ chip.textContent = TOPICS[step.q.topic]; counter.textContent = 'Questão '+step.n+' de '+TOTAL_Q; }
+  else if(step.kind==='tip'){ chip.textContent = 'Dica'; counter.textContent = 'Antes da questão '+(lastQ(state.pos)+1); }
+  else if(step.kind==='break'){ chip.textContent = 'Jogo da espada 🗡️'; counter.textContent = 'Depois da questão '+lastQ(state.pos); }
+  else { chip.textContent = 'Resultado'; counter.textContent = 'Fim! 💎'; }
+}
+
+/* ================= TELAS ================= */
+const screen = document.getElementById('screen');
+function render(){
+  pendingAnswer = null;
+  const step = STEPS[state.pos];
+  updateHeader(step);
+  screen.innerHTML = '';
+  if(step.kind==='q') renderQuestion(step);
+  else if(step.kind==='tip') renderTip(step);
+  else if(step.kind==='break') renderBreak(step);
+  else renderEnd();
+  window.scrollTo(0,0);
+}
+
+function renderStart(){
+  updateHeader(null);
+  screen.innerHTML = '';
+  const card = el('div','panel');
+  card.innerHTML = `
+    <div class="kicker">Revisão de Matemática · 3º ano</div>
+    <h1>MateCraft ⛏️</h1>
+    <p>São <b>${TOTAL_Q} questões</b> de multiplicação e divisão, as mesmas da folha de revisão, com algumas contas extras para treinar.</p>
+    <p>📝 Faça os cálculos no <b>papel e lápis</b> e escreva aqui só as respostas.<br>🧱 Nas questões de desenho, você constrói o resultado com blocos.<br>🗡️ A cada 10 questões tem o <b>jogo da espada</b>.<br>💎 A correção aparece <b>no final</b>.</p>`;
+  if(state.pos>0){
+    card.appendChild(el('p','hint','Você parou na etapa '+(state.pos+1)+' de '+STEPS.length+'. O progresso fica salvo neste aparelho.'));
+    const cont = el('button','btn btn-go','Continuar de onde parei ➜');
+    cont.addEventListener('click', render);
+    const reset = el('button','btn','Começar do zero');
+    reset.addEventListener('click', ()=>{ state = freshState(); saveState(); render(); });
+    card.appendChild(cont); card.appendChild(reset);
+  } else {
+    const go = el('button','btn btn-go','Começar ➜');
+    go.addEventListener('click', render);
+    card.appendChild(go);
+  }
+  screen.appendChild(card);
+}
+
+function renderTip(step){
+  const card = el('div','panel tip');
+  card.appendChild(el('h2',null,step.tip.title));
+  const ul = el('ul');
+  step.tip.items.forEach(it=>ul.appendChild(el('li',null,it)));
+  card.appendChild(ul);
+  const b = el('button','btn btn-go','Entendi ➜');
+  b.addEventListener('click', advance);
+  card.appendChild(b);
+  screen.appendChild(card);
+}
+
+function renderQuestion(step){
+  const q = step.q;
+  const card = el('div','panel');
+  card.appendChild(el('div','kicker', escapeHtml(q.ref) + (q.extra ? '<span class="extra-tag">EXTRA</span>' : '')));
+  card.appendChild(el('div','title', escapeHtml(q.title)));
+  if(q.info) card.appendChild(el('div','info', q.info));
+  const getters = [];
+  const confirm = el('button','btn btn-go','Confirmar ➜');
+  const refresh = ()=>{ confirm.disabled = !getters.every(g=>g.complete()); };
+  q.parts.forEach(part=>{
+    const box = el('div','part');
+    if(part.k==='lines') getters.push(buildLines(box, part, refresh));
+    else if(part.k==='choice') getters.push(buildChoice(box, part, refresh));
+    else if(part.k==='text') getters.push(buildText(box, part, refresh));
+    else if(part.k==='draw') getters.push(buildDraw(box, part, refresh));
+    else if(part.k==='match') getters.push(buildMatch(box, part, refresh));
+    card.appendChild(box);
+  });
+  confirm.addEventListener('click', ()=>{
+    pendingAnswer = {parts: getters.map(g=>g.value())};
+    advance();
+  });
+  card.appendChild(confirm);
+  screen.appendChild(card);
+  refresh();
+  const first = card.querySelector('input');
+  if(first) setTimeout(()=>first.focus({preventScroll:true}), 50);
+}
+
+function buildLines(box, part, refresh){
+  const wrap = el('div','lines');
+  const inputs = [];
+  part.lines.forEach(ln=>{
+    const {label, segs} = parseLine(ln);
+    const row = el('div','line');
+    if(label) row.appendChild(el('span','lbl',label));
+    segs.forEach(s=>{
+      if(s.text!=null){ row.appendChild(document.createTextNode(s.text)); return; }
+      const inp = el('input','blank');
+      inp.type = 'text';
+      inp.autocomplete = 'off';
+      inp.setAttribute('enterkeyhint','next');
+      if(s.blank.type==='let'){
+        inp.classList.add('letters');
+        inp.setAttribute('autocapitalize','characters');
+        inp.placeholder = LETTER_PLACEHOLDER[s.blank.ans];
+        inp.maxLength = 12;
+      } else {
+        inp.inputMode = 'numeric';
+        inp.pattern = '[0-9]*';
+        inp.maxLength = 5;
+        inp.addEventListener('input', ()=>{ inp.value = inp.value.replace(/\D/g,''); });
+      }
+      inp.addEventListener('input', refresh);
+      inp.addEventListener('keydown', e=>{
+        if(e.key!=='Enter') return;
+        e.preventDefault();
+        const all = [...document.querySelectorAll('#screen input.blank')];
+        const nxt = all[all.indexOf(inp)+1];
+        if(nxt) nxt.focus(); else inp.blur();
+      });
+      inputs.push(inp);
+      row.appendChild(inp);
+    });
+    wrap.appendChild(row);
+  });
+  box.appendChild(wrap);
+  return {complete: ()=>inputs.every(i=>i.value.trim()!==''), value: ()=>inputs.map(i=>i.value.trim())};
+}
+
+function buildChoice(box, part, refresh){
+  box.appendChild(el('div','part-q', escapeHtml(part.q)));
+  const opts = el('div','opts');
+  let chosen = null;
+  const btns = part.o.map((txt,i)=>{
+    const b = el('button','opt'); b.textContent = txt;
+    b.addEventListener('click', ()=>{ chosen = i; btns.forEach(x=>x.classList.toggle('sel', x===b)); refresh(); });
+    opts.appendChild(b);
+    return b;
+  });
+  box.appendChild(opts);
+  return {complete: ()=>chosen!==null, value: ()=>chosen};
+}
+
+function buildText(box, part, refresh){
+  box.appendChild(el('div','part-q', escapeHtml(part.q)));
+  const ta = el('textarea','explain');
+  ta.placeholder = 'Escreva sua explicação aqui...';
+  ta.addEventListener('input', refresh);
+  box.appendChild(ta);
+  return {complete: ()=>ta.value.trim().length>=3, value: ()=>ta.value.trim()};
+}
+
+function buildDraw(box, part, refresh){
+  box.appendChild(el('div','part-q','🧱 Desenho: construa o resultado com blocos.'));
+  box.appendChild(el('div','draw-hint','Dica: '+part.a+' × '+part.b+' são '+part.a+' grupos de '+part.b+' blocos. Toque num espaço para colocar ou tirar um bloco.'));
+  const grid = el('div','draw-grid');
+  const COLS = 6, ROWS = 5;
+  grid.style.gridTemplateColumns = 'repeat('+COLS+', 40px)';
+  const foot = el('div','draw-foot');
+  const count = el('span');
+  const clear = el('button','mini-btn','Limpar');
+  let n = 0;
+  const cells = [];
+  const update = ()=>{ count.textContent = 'Blocos: '+n; refresh(); };
+  for(let i=0;i<COLS*ROWS;i++){
+    const c = el('button','cell');
+    c.setAttribute('aria-label','Espaço '+(i+1));
+    c.addEventListener('click', ()=>{ c.classList.toggle('on'); n += c.classList.contains('on') ? 1 : -1; update(); });
+    cells.push(c); grid.appendChild(c);
+  }
+  clear.addEventListener('click', ()=>{ cells.forEach(c=>c.classList.remove('on')); n = 0; update(); });
+  foot.appendChild(count); foot.appendChild(clear);
+  box.appendChild(grid); box.appendChild(foot);
+  update();
+  return {complete: ()=>n>0, value: ()=>n};
+}
+
+function buildMatch(box, part, refresh){
+  box.appendChild(el('div','hint','Toque num termo e depois na função dele. Para trocar, é só ligar de novo.'));
+  const wrap = el('div','match');
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  wrap.appendChild(svg);
+  const COLORS = ['#138A3D','#1FA5B8','#E3B20B','#B3242A'];
+  const order = shuffle(part.right.map((_,i)=>i));
+  const links = part.left.map(()=>null);
+  let selected = null;
+  const leftBtns = [], rightBtns = {};
+  const rows = Math.max(part.left.length, part.right.length);
+  for(let r=0;r<rows;r++){
+    if(r<part.left.length){
+      const b = el('button','m-item m-left'); b.textContent = part.left[r];
+      b.style.gridColumn = '1'; b.style.gridRow = String(r+1);
+      b.addEventListener('click', ()=>{ selected = r; leftBtns.forEach(x=>x.classList.toggle('sel', x===b)); });
+      leftBtns.push(b); wrap.appendChild(b);
+    }
+    if(r<order.length){
+      const ri = order[r];
+      const b = el('button','m-item'); b.textContent = part.right[ri];
+      b.style.gridColumn = '2'; b.style.gridRow = String(r+1);
+      b.addEventListener('click', ()=>{
+        if(selected===null) return;
+        links.forEach((v,li)=>{ if(v===ri) links[li] = null; });
+        links[selected] = ri;
+        selected = null;
+        leftBtns.forEach(x=>x.classList.remove('sel'));
+        paint();
+        refresh();
+      });
+      rightBtns[ri] = b; wrap.appendChild(b);
+    }
+  }
+  function paint(){
+    leftBtns.forEach((b,li)=>{ b.className = 'm-item m-left'+(links[li]!==null ? ' c'+li : ''); });
+    Object.entries(rightBtns).forEach(([ri,b])=>{ const li = links.indexOf(+ri); b.className = 'm-item'+(li>=0 ? ' c'+li : ''); });
+    drawLines();
+  }
+  function drawLines(){
+    if(!wrap.isConnected){ window.removeEventListener('resize', drawLines); return; }
+    const R = wrap.getBoundingClientRect();
+    svg.setAttribute('viewBox','0 0 '+R.width+' '+R.height);
+    svg.innerHTML = '';
+    links.forEach((ri,li)=>{
+      if(ri===null) return;
+      const a = leftBtns[li].getBoundingClientRect(), b = rightBtns[ri].getBoundingClientRect();
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', a.right-R.left); line.setAttribute('y1', a.top+a.height/2-R.top);
+      line.setAttribute('x2', b.left-R.left); line.setAttribute('y2', b.top+b.height/2-R.top);
+      line.setAttribute('stroke', COLORS[li%COLORS.length]); line.setAttribute('stroke-width','5'); line.setAttribute('stroke-linecap','square');
+      svg.appendChild(line);
+    });
+  }
+  window.addEventListener('resize', drawLines);
+  box.appendChild(wrap);
+  return {complete: ()=>links.every(v=>v!==null), value: ()=>links.slice()};
+}
+
+function renderBreak(step){
+  const card = el('div','panel');
+  card.innerHTML = `
+    <div class="kicker">Jogo da espada</div>
+    <h2>🗡️ Hora de atacar os blocos!</h2>
+    <p>Uma conta aparece no topo. Blocos com números vão cair: atire mini blocos <b>só no bloco com a resposta certa</b>.</p>
+    <p class="hint">Toque embaixo do bloco certo: a espada vai até lá e atira. Acertar um bloco errado custa um coração ❤️.</p>`;
+  const go = el('button','btn btn-go','Jogar! 🗡️');
+  go.addEventListener('click', ()=>startShooter(step));
+  const skip = el('button','btn','Pular o jogo');
+  skip.addEventListener('click', advance);
+  card.appendChild(go); card.appendChild(skip);
+  screen.appendChild(card);
+}
+
+/* ================= RESULTADO ================= */
+function computeResults(){
+  const stats = {};
+  STEPS.forEach((step,idx)=>{
+    if(step.kind!=='q') return;
+    const g = gradeQuestion(step.q, state.answers[idx]).flat();
+    const s = stats[step.q.topic] || (stats[step.q.topic] = {ok:0, total:0});
+    s.total += g.length; s.ok += g.filter(Boolean).length;
+  });
+  return stats;
+}
+function renderEnd(){
+  const stats = computeResults();
+  let ok=0, total=0;
+  Object.values(stats).forEach(s=>{ ok+=s.ok; total+=s.total; });
+  const pct = total ? Math.round(100*ok/total) : 0;
+  const hearts = Math.round(pct/10);
+  const card = el('div','panel');
+  card.appendChild(el('div','kicker','Revisão concluída'));
+  card.appendChild(el('div','hearts','❤️'.repeat(hearts)+'🖤'.repeat(10-hearts)));
+  card.appendChild(el('div','big', pct+'%'));
+  const sum = el('p',null,'Você acertou <b>'+ok+'</b> de <b>'+total+'</b> respostas.');
+  sum.style.textAlign = 'center';
+  card.appendChild(sum);
+  Object.keys(TOPICS).filter(t=>stats[t]).forEach(t=>{
+    const s = stats[t], p = Math.round(100*s.ok/s.total);
+    const color = p>=70 ? 'var(--emerald)' : p>=50 ? 'var(--gold)' : 'var(--redstone)';
+    card.appendChild(el('div','res-row',
+      '<div class="res-top"><span>'+TOPICS[t]+'</span><span>'+s.ok+'/'+s.total+' · '+p+'%</span></div>'+
+      '<div class="res-bar"><div class="res-fill" style="width:'+p+'%; background:'+color+'"></div></div>'));
+  });
+  if(state.game.hits || state.game.errors) card.appendChild(el('p','hint','🗡️ Jogos da espada: '+state.game.hits+' blocos certos atingidos, '+state.game.errors+' errados.'));
+  card.appendChild(el('p','hint','As explicações escritas não entram na nota: o adulto confere na revisão.'));
+  const review = el('button','btn btn-go','📋 Revisão das respostas (para o adulto)');
+  review.addEventListener('click', ()=>renderReview(false));
+  const again = el('button','btn','Refazer a revisão');
+  again.addEventListener('click', ()=>{ state = freshState(); saveState(); renderStart(); });
+  card.appendChild(review); card.appendChild(again);
+  screen.appendChild(card);
+}
+
+/* ================= REVISÃO PARA O ADULTO ================= */
+function reviewLines(part, vals, oks){
+  const box = el('div');
+  const blanks = partBlanks(part);
+  const expect = lineExpect(part, vals || []);
+  let bi = 0;
+  part.lines.forEach(ln=>{
+    const {label, segs} = parseLine(ln);
+    let html = label ? '<b>'+label+'</b> ' : '';
+    segs.forEach(s=>{
+      if(s.text!=null){ html += escapeHtml(s.text); return; }
+      const v = vals ? vals[bi] : '';
+      const ok = oks[bi];
+      const b = blanks[bi];
+      const shown = b.type==='let' ? (v||'—').toUpperCase() : (v||'—');
+      html += '<b class="'+(ok?'good':'bad')+'" style="color:'+(ok?'var(--emerald)':'var(--redstone)')+'">['+escapeHtml(shown)+']</b>';
+      if(!ok && b.type!=='free') html += '<span style="color:var(--emerald)"> (certo: '+expect[bi]+')</span>';
+      bi++;
+    });
+    box.appendChild(el('div','rev-line', html));
+  });
+  if(part.check && part.check.type==='twoDiv'){
+    const {p,a,b} = part.check;
+    box.appendChild(el('div','rev-note','Respostas certas: '+p+' ÷ '+a+' = '+b+' e '+p+' ÷ '+b+' = '+a+' (em qualquer ordem).'));
+  }
+  return box;
+}
+function reviewPart(part, val, oks){
+  const box = el('div');
+  if(part.k==='lines') return reviewLines(part, val, oks);
+  if(part.k==='choice'){
+    box.appendChild(el('div','rev-line','<b>'+escapeHtml(part.q)+'</b>'));
+    const ok = oks[0];
+    box.appendChild(el('div','rev-line '+(ok?'good':'bad'), 'Marcou: '+escapeHtml(val!=null ? part.o[val] : '—')+(ok?' ✅':' ❌ (certo: '+escapeHtml(part.o[part.c])+')')));
+  } else if(part.k==='text'){
+    box.appendChild(el('div','rev-line','<b>'+escapeHtml(part.q)+'</b>'));
+    const a = el('div','rev-ans'); a.textContent = val || '(sem resposta)';
+    box.appendChild(a);
+    box.appendChild(el('div','rev-note','✍️ Explicação: confira com a criança (não entra na nota).'));
+  } else if(part.k==='draw'){
+    const ok = oks[0];
+    box.appendChild(el('div','rev-line '+(ok?'good':'bad'), '🧱 Blocos no desenho: '+(val!=null?val:'—')+(ok?' ✅':' ❌ (certo: '+(part.a*part.b)+' blocos = '+part.a+' grupos de '+part.b+')')));
+  } else if(part.k==='match'){
+    part.left.forEach((term,i)=>{
+      const ok = oks[i];
+      const got = val && val[i]!=null ? part.right[val[i]] : '—';
+      box.appendChild(el('div','rev-line '+(ok?'good':'bad'), '<b>'+escapeHtml(term)+'</b> → '+escapeHtml(got)+(ok?' ✅':' ❌<br><span style="color:var(--emerald)">certo: '+escapeHtml(part.right[part.pairs[i]])+'</span>')));
+    });
+  }
+  return box;
+}
+function renderReview(onlyWrong){
+  document.getElementById('topic-chip').textContent = 'Revisão';
+  document.getElementById('counter').textContent = 'Para o adulto';
+  screen.innerHTML = '';
+  const intro = el('div','panel');
+  intro.innerHTML = '<div class="kicker">Revisão para o adulto</div><h2>Respostas da revisão</h2>'+
+    '<p class="hint">Cada questão mostra as respostas digitadas entre colchetes: em verde as certas, em vermelho as erradas, com a resposta certa ao lado. As explicações escritas aparecem para você conferir com a criança.</p>';
+  const tabs = el('div','rev-tabs');
+  const all = el('button','btn'+(onlyWrong?'':' active'),'Todas');
+  const errs = el('button','btn'+(onlyWrong?' active':''),'Só erros e explicações');
+  all.addEventListener('click', ()=>renderReview(false));
+  errs.addEventListener('click', ()=>renderReview(true));
+  tabs.appendChild(all); tabs.appendChild(errs);
+  intro.appendChild(tabs);
+  screen.appendChild(intro);
+  let shown = 0;
+  STEPS.forEach((step,idx)=>{
+    if(step.kind!=='q') return;
+    const q = step.q, ans = state.answers[idx];
+    const grades = gradeQuestion(q, ans);
+    const wrong = grades.flat().some(g=>!g);
+    const hasText = q.parts.some(p=>p.k==='text');
+    if(onlyWrong && !wrong && !hasText) return;
+    const item = el('div','rev-item'+(wrong?' wrong':''));
+    item.appendChild(el('div','rev-head','<span>Questão '+step.n+' · '+escapeHtml(q.ref)+'</span><span>'+(wrong?'❌':'✅')+(hasText?' ✍️':'')+'</span>'));
+    item.appendChild(el('div','rev-title', escapeHtml(q.title)));
+    q.parts.forEach((p,i)=>item.appendChild(reviewPart(p, ans ? ans.parts[i] : undefined, grades[i])));
+    screen.appendChild(item);
+    shown++;
+  });
+  if(!shown) screen.appendChild(el('div','panel','<p>Nenhum erro para revisar! 💎</p>'));
+  const actions = el('div','panel no-print');
+  const print = el('button','btn','🖨️ Imprimir ou salvar em PDF');
+  print.addEventListener('click', ()=>window.print());
+  const back = el('button','btn btn-go','← Voltar ao resultado');
+  back.addEventListener('click', render);
+  actions.appendChild(print); actions.appendChild(back);
+  screen.appendChild(actions);
+  window.scrollTo(0,0);
+}
+
+/* ================= RECOMEÇAR ================= */
+(function(){
+  const btn = document.getElementById('restart');
+  let armed = false, timer;
+  btn.addEventListener('click', ()=>{
+    if(!armed){
+      armed = true; btn.textContent = '✓';
+      document.getElementById('counter').textContent = 'Toque de novo para recomeçar';
+      timer = setTimeout(()=>{ armed=false; btn.textContent='↺'; updateHeader(STEPS[state.pos]); }, 3000);
+    } else {
+      clearTimeout(timer); armed=false; btn.textContent='↺';
+      state = freshState(); saveState(); renderStart();
+    }
+  });
+})();
+/* ================= JOGO DA ESPADA ================= */
+// espada de diamante em pixel art: o emoji 🗡️ aponta para lados diferentes em cada celular
+const SWORD_U = 3, SWORD_H = 22*SWORD_U;
+const SH_BULLET_SPEED = 600;
+function shSword(ctx, x, yB){
+  const u = SWORD_U;
+  const px = (c, gx, gy, w, h)=>{ ctx.fillStyle = c; ctx.fillRect(Math.round(x+gx*u), Math.round(yB-gy*u), w*u, h*u); };
+  px('#1E1E1E', -1.5, 3, 3, 3);   // pomo
+  px('#6B4423', -1, 7, 2, 5);     // cabo
+  px('#1E1E1E', -4.5, 9, 9, 3);   // contorno da guarda
+  px('#3B2612', -4, 8.5, 8, 2);   // guarda
+  px('#1E1E1E', -2, 21, 4, 12.5); // contorno da lâmina
+  px('#4AEDD9', -1.5, 20.5, 3, 12);
+  px('#2A9D8F', 0.5, 20.5, 1, 12);
+  px('#C8FFF6', -1.5, 20.5, 1, 11);
+  px('#1E1E1E', -1, 22.5, 2, 2);  // ponta
+  px('#4AEDD9', -0.5, 22, 1, 1.5);
+}
+let sh = null, shCtx = null, shRaf = null, shToken = 0;
+
+function rnd(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+function makeFact(kind){
+  if(kind==='mult'){
+    const a = rnd(2,9), b = rnd(2,9), ans = a*b;
+    return {label:a+' × '+b, ans, near:[a*(b+1), a*(b-1), (a+1)*b, ans+1, ans-1, ans+10]};
+  }
+  if(kind==='resto'){
+    const d = rnd(3,9), q = rnd(2,9), r = rnd(1,d-1);
+    return {label:'Resto de '+(d*q+r)+' ÷ '+d, ans:r, near:[r+1, r-1, 0, d, q, r+2]};
+  }
+  const d = rnd(2,9), q = rnd(2,9);
+  return {label:(d*q)+' ÷ '+d, ans:q, near:[q+1, q-1, q+2, d, q*2, q-2]};
+}
+function makeWave(kind){
+  const f = makeFact(kind);
+  const wrong = shuffle([...new Set(f.near.filter(v=>v>=0 && v!==f.ans))]).slice(0,3);
+  return {label:f.label, words:shuffle([{text:String(f.ans), ok:true}, ...wrong.map(v=>({text:String(v), ok:false}))])};
+}
+
+function startShooter(step){
+  if(sh) sh.running = false;
+  if(shRaf) cancelAnimationFrame(shRaf);
+  const token = ++shToken;
+  sh = {
+    step, waves: shuffle(step.kinds).map(makeWave), waveIdx:0, words:[], bullets:[], fx:[],
+    lives:3, hits:0, errors:0, x:0, running:true, lastTs:0, lastShot:0,
+    keys:{left:false,right:false}, gap:0, W:0, H:0, stars:[], time:0, token
+  };
+  document.getElementById('sh-over').classList.remove('show');
+  document.getElementById('shooter').classList.add('open');
+  requestAnimationFrame(()=>{
+    if(token!==shToken) return;
+    shSetupCanvas();
+    sh.x = sh.W/2;
+    shUpdateHud();
+    shSpawnWave();
+    shRaf = requestAnimationFrame(shLoop);
+  });
+}
+function shSetupCanvas(){
+  const canvas = document.getElementById('sh-canvas'), wrap = document.getElementById('sh-wrap');
+  const W = wrap.clientWidth, H = wrap.clientHeight, dpr = Math.min(window.devicePixelRatio||1, 2);
+  canvas.width = Math.round(W*dpr); canvas.height = Math.round(H*dpr);
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  shCtx = canvas.getContext('2d'); shCtx.setTransform(dpr,0,0,dpr,0,0);
+  sh.W = W; sh.H = H; sh.x = clamp(sh.x || W/2, 24, W-24);
+  if(!sh.stars.length) for(let i=0;i<40;i++) sh.stars.push({x:Math.random(), y:Math.random()*0.8, s:Math.random()<.3?3:2, p:Math.random()*6});
+}
+function shUpdateHud(){
+  document.getElementById('sh-lives').textContent = '❤️'.repeat(Math.max(0,sh.lives))+'🖤'.repeat(Math.max(0,3-sh.lives));
+  document.getElementById('sh-score').textContent = 'Acertos: '+sh.hits+' · Conta '+Math.max(1,sh.waveIdx)+'/'+sh.waves.length;
+}
+function shSpawnWave(){
+  const wrap = document.getElementById('sh-wrap');
+  if(wrap.clientWidth!==sh.W || wrap.clientHeight!==sh.H) shSetupCanvas();
+  const wave = sh.waves[sh.waveIdx];
+  document.getElementById('sh-cmd-text').textContent = wave.label+' = ?';
+  const box = document.getElementById('sh-cmd'); box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash');
+  const laneW = sh.W/wave.words.length;
+  const order = shuffle(wave.words.map((_,i)=>i));
+  const size = clamp(laneW-18, 46, 62);
+  wave.words.forEach((w,i)=>{
+    sh.words.push({text:w.text, ok:w.ok, w:size, h:size, x:laneW*i+laneW/2, y:-size/2-order[i]*64, vy:44+sh.waveIdx*5, alive:true});
+  });
+  sh.waveIdx++;
+  shUpdateHud();
+}
+function shFire(){
+  if(!sh || !sh.running) return;
+  const now = performance.now();
+  if(now - sh.lastShot < 150) return;
+  sh.lastShot = now;
+  sh.bullets.push({x:sh.x, y:sh.H-14-SWORD_H});
+}
+function shUpdate(dt){
+  sh.time += dt;
+  const dir = (sh.keys.right?1:0)-(sh.keys.left?1:0);
+  if(dir) sh.x = clamp(sh.x+dir*320*dt, 24, sh.W-24);
+  sh.bullets.forEach(b=>{ b.y -= SH_BULLET_SPEED*dt; });
+  sh.bullets = sh.bullets.filter(b=>b.y>-20);
+  sh.words.forEach(w=>{ if(!w.alive) return; w.y += w.vy*dt; if(w.y-w.h/2 > sh.H) w.alive = false; });
+  for(let bi=sh.bullets.length-1; bi>=0; bi--){
+    const b = sh.bullets[bi];
+    for(const w of sh.words){
+      if(!w.alive || w.y < -w.h/2) continue;
+      if(Math.abs(b.x-w.x) <= w.w/2+4 && Math.abs(b.y-w.y) <= w.h/2+6){
+        sh.bullets.splice(bi,1);
+        w.alive = false;
+        if(w.ok){ sh.hits++; sh.fx.push({x:w.x, y:w.y, text:'+1 💎', color:'#7CFFB0', t:0}); }
+        else { sh.errors++; sh.lives--; sh.fx.push({x:w.x, y:w.y, text:'✗', color:'#FF8A7A', t:0}); }
+        shUpdateHud();
+        if(sh.lives<=0){ shEnd(false); return; }
+        break;
+      }
+    }
+  }
+  sh.fx.forEach(f=>{ f.t += dt; f.y -= 34*dt; });
+  sh.fx = sh.fx.filter(f=>f.t<0.9);
+  sh.words = sh.words.filter(w=>w.alive);
+  // sem o bloco certo na tela, os errados caem rápido para a próxima conta não demorar
+  if(sh.words.length && sh.words.every(w=>!w.ok)) sh.words.forEach(w=>{ w.vy = Math.max(w.vy, 360); });
+  if(sh.gap>0){ sh.gap -= dt; if(sh.gap<=0) shSpawnWave(); return; }
+  if(sh.words.length) return;
+  if(sh.waveIdx >= sh.waves.length){ shEnd(true); return; }
+  sh.gap = 0.8;
+}
+function shBlock(ctx, x, y, s, top, side, edge){
+  ctx.fillStyle = side; ctx.fillRect(x-s/2, y-s/2, s, s);
+  ctx.fillStyle = top; ctx.fillRect(x-s/2, y-s/2, s, s*0.32);
+  ctx.strokeStyle = edge; ctx.lineWidth = Math.max(2, s/14); ctx.strokeRect(x-s/2, y-s/2, s, s);
+}
+function shDraw(){
+  const ctx = shCtx, W = sh.W, H = sh.H;
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0E1633'); g.addColorStop(1,'#26315E');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  sh.stars.forEach(s=>{
+    ctx.globalAlpha = .4 + .35*Math.sin(sh.time*2+s.p);
+    ctx.fillStyle = '#fff'; ctx.fillRect(Math.round(s.x*W), Math.round(s.y*H), s.s, s.s);
+  });
+  ctx.globalAlpha = 1;
+  for(let x=0; x<W; x+=24){ shBlock(ctx, x+12, H-6, 24, '#5DB443', '#86582E', '#3B2612'); }
+
+  sh.words.forEach(w=>{
+    shBlock(ctx, w.x, w.y, w.w, '#A8A8A8', '#7C7C7C', '#1E1E1E');
+    ctx.fillStyle = 'rgba(0,0,0,.18)';
+    ctx.fillRect(w.x-w.w/2+6, w.y+2, 8, 8); ctx.fillRect(w.x+w.w/2-16, w.y-w.h/2+w.h*0.4, 8, 8);
+    ctx.font = '400 '+Math.round(w.h*0.62)+'px VT323, monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#1E1E1E'; ctx.fillText(w.text, w.x+2, w.y+4);
+    ctx.fillStyle = '#FFFFFF'; ctx.fillText(w.text, w.x, w.y+2);
+  });
+
+  sh.bullets.forEach(b=>shBlock(ctx, b.x, b.y, 12, '#7ED35C', '#86582E', '#1E1E1E'));
+
+  shSword(ctx, sh.x, H-14);
+
+  sh.fx.forEach(f=>{
+    ctx.globalAlpha = Math.max(0, 1-f.t/0.9);
+    ctx.fillStyle = f.color; ctx.font = '400 26px VT323, monospace';
+    ctx.fillText(f.text, f.x, f.y);
+  });
+  ctx.globalAlpha = 1;
+  if(sh.gap>0){
+    ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(0, H/2-26, W, 52);
+    ctx.fillStyle = '#FCEE4B'; ctx.font = '400 32px VT323, monospace';
+    ctx.fillText('Nova conta!', W/2, H/2+2);
+  }
+}
+function shLoop(ts){
+  if(!sh || !sh.running || sh.token!==shToken) return;
+  const dt = sh.lastTs ? Math.min(0.05,(ts-sh.lastTs)/1000) : 0;
+  sh.lastTs = ts;
+  shUpdate(dt);
+  if(!sh.running) return;
+  shDraw();
+  shRaf = requestAnimationFrame(shLoop);
+}
+function shEnd(won){
+  sh.running = false;
+  if(shRaf) cancelAnimationFrame(shRaf);
+  shDraw();
+  state.game.hits += sh.hits; state.game.errors += sh.errors; saveState();
+  document.getElementById('sh-over-title').textContent = won ? '💎 Blocos destruídos!' : '💔 Seus corações acabaram!';
+  document.getElementById('sh-over-text').textContent = 'Você acertou '+sh.hits+' de '+sh.waves.length+' contas e atingiu '+sh.errors+(sh.errors===1?' bloco errado.':' blocos errados.');
+  document.getElementById('sh-over').classList.add('show');
+}
+function shClose(){
+  if(sh){ sh.running = false; if(shRaf) cancelAnimationFrame(shRaf); }
+  document.getElementById('shooter').classList.remove('open');
+}
+(function(){
+  const wrap = document.getElementById('sh-wrap');
+  const lx = e=>e.clientX - wrap.getBoundingClientRect().left;
+  wrap.addEventListener('pointerdown', e=>{
+    if(!sh || !sh.running) return;
+    wrap.setPointerCapture(e.pointerId);
+    sh.x = clamp(lx(e), 24, sh.W-24);
+    shFire();
+  });
+  wrap.addEventListener('pointermove', e=>{
+    if(!sh || !sh.running || !wrap.hasPointerCapture(e.pointerId)) return;
+    sh.x = clamp(lx(e), 24, sh.W-24);
+  });
+  document.addEventListener('keydown', e=>{
+    if(!sh || !sh.running) return;
+    if(e.key==='ArrowLeft') sh.keys.left = true;
+    else if(e.key==='ArrowRight') sh.keys.right = true;
+    else if(e.key===' ' || e.key==='ArrowUp'){ e.preventDefault(); shFire(); }
+  });
+  document.addEventListener('keyup', e=>{
+    if(!sh) return;
+    if(e.key==='ArrowLeft') sh.keys.left = false;
+    if(e.key==='ArrowRight') sh.keys.right = false;
+  });
+  document.getElementById('sh-back').addEventListener('click', ()=>{ shClose(); advance(); });
+  document.getElementById('sh-again').addEventListener('click', ()=>startShooter(sh.step));
+  document.getElementById('sh-skip').addEventListener('click', ()=>{ shClose(); advance(); });
+  // a fonte pixelada carrega depois e muda a altura do topo: remede a área de jogo sempre que ela mudar
+  new ResizeObserver(()=>{
+    if(!sh || !shCtx || !document.getElementById('shooter').classList.contains('open')) return;
+    shSetupCanvas();
+    if(!sh.running) shDraw();
+  }).observe(wrap);
+})();
+
+/* ================= INÍCIO ================= */
+renderStart();
+</script>
+</body>
+</html>
