@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hulk Esmaga Frações</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@600;800;900&display=swap">
+<style>
+/* Visual de revista em quadrinhos: fundo roxo com pontinhos, verde do Hulk, letras grossas. Tema único de propósito. */
+:root{
+  --bg:#2A1B45; --bg2:#3B2763;
+  --green:#5BBF3A; --green-dk:#2F7A1E; --green-lt:#C9F2B4;
+  --purple:#6B3FA0; --purple-dk:#45266E;
+  --paper:#FFFDF5; --ink:#1A1426; --muted:#5D5470;
+  --yellow:#FFD23F; --red:#E5383B; --red-bg:#FDE2E2;
+  --display:'Bangers','Impact',system-ui,sans-serif;
+  --body:'Nunito','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--body);
+  background-image:radial-gradient(rgba(255,255,255,.07) 1.5px, transparent 1.6px);
+  background-size:14px 14px;
+  -webkit-tap-highlight-color:transparent;
+}
+.wrap{max-width:560px; margin:0 auto; padding:calc(env(safe-area-inset-top,0px) + 10px) 16px calc(env(safe-area-inset-bottom,0px) + 16px); display:flex; flex-direction:column; gap:10px; min-height:100vh}
+
+/* HUD */
+.hud{display:flex; gap:8px; align-items:stretch}
+.hbox{background:var(--paper); border:3px solid var(--ink); border-radius:12px; padding:4px 10px; display:flex; flex-direction:column; justify-content:center; box-shadow:3px 3px 0 var(--ink)}
+.hbox .v{font:400 26px/1 var(--display); letter-spacing:.03em; font-variant-numeric:tabular-nums}
+.hbox .l{font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; color:var(--muted)}
+.hbox.grow{flex:1}
+#lives{font-size:22px; letter-spacing:2px; color:var(--red)}
+#lives .off{color:#CFC8DA}
+
+/* Cena */
+.scene{position:relative; height:170px; border:3px solid var(--ink); border-radius:16px; overflow:hidden; box-shadow:4px 4px 0 var(--ink);
+  background:linear-gradient(#8FD3F4 0%, #CDEFFC 62%, #9C7A54 62%, #7E5E3E 100%)}
+.scene .city{position:absolute; left:0; right:0; bottom:38%; height:46px; display:flex; align-items:flex-end; gap:6px; padding:0 8px; opacity:.55}
+.scene .city i{display:block; background:#6E7FA0; width:34px; border-radius:3px 3px 0 0}
+#hulk{position:absolute; left:6%; bottom:6px; width:150px; height:150px; transform-origin:50% 100%}
+#hulk.idle{animation:breathe 1.6s ease-in-out infinite}
+@keyframes breathe{50%{transform:scaleY(1.025)}}
+#hulk.smash{animation:smash .7s cubic-bezier(.3,.7,.4,1)}
+@keyframes smash{0%{transform:none}30%{transform:translateY(-26px) rotate(-4deg)}55%{transform:translateY(4px) scale(1.06,.94)}100%{transform:none}}
+#armR{transform-origin:128px 92px; transform-box:view-box}
+#hulk.smash #armR{animation:punch .7s cubic-bezier(.3,.7,.4,1)}
+@keyframes punch{0%{transform:none}30%{transform:rotate(-70deg)}55%{transform:rotate(35deg) translateX(10px)}100%{transform:none}}
+#hulk.angry{animation:angry .5s linear}
+@keyframes angry{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+#hulk.angry .face{fill:#7FCB5F}
+#rock{position:absolute; right:10%; bottom:16px; font-size:64px; line-height:1; transition:transform .2s}
+#rock .em{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:30px; filter:drop-shadow(0 1px 0 #fff)}
+.chunk{position:absolute; font-size:26px; pointer-events:none; animation:fly .8s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r)); opacity:0}}
+.pow{position:absolute; right:6%; top:10px; font:400 44px/1 var(--display); color:var(--yellow); -webkit-text-stroke:2px var(--ink); paint-order:stroke fill; text-shadow:3px 3px 0 var(--ink); transform:rotate(-8deg) scale(0); pointer-events:none}
+.pow.show{animation:pow .9s ease-out forwards}
+@keyframes pow{20%{transform:rotate(-8deg) scale(1.15)}35%{transform:rotate(-8deg) scale(1)}80%{opacity:1}100%{transform:rotate(-8deg) scale(1); opacity:0}}
+.scene.shake{animation:shake .35s linear}
+@keyframes shake{25%{transform:translate(3px,-2px)}50%{transform:translate(-3px,2px)}75%{transform:translate(2px,1px)}}
+#lvlBadge{position:absolute; left:10px; top:8px; background:var(--purple); color:#fff; font:400 18px/1 var(--display); letter-spacing:.05em; padding:4px 10px; border-radius:8px; border:2px solid var(--ink)}
+
+/* Cartão do problema */
+.card{background:var(--paper); border:3px solid var(--ink); border-radius:16px; box-shadow:4px 4px 0 var(--ink); padding:14px 16px; display:flex; flex-direction:column; gap:10px}
+.timer{height:12px; border:2px solid var(--ink); border-radius:99px; overflow:hidden; background:#EDE7F6}
+.timer i{display:block; height:100%; width:100%; background:var(--green); transform-origin:left; transition:background .3s}
+.timer.low i{background:var(--red)}
+.trow{display:flex; justify-content:space-between; align-items:center; font-weight:900; font-size:13px; color:var(--muted)}
+#secs{font:400 22px/1 var(--display); color:var(--ink); font-variant-numeric:tabular-nums; min-width:28px; text-align:center}
+.tctl{display:flex; align-items:center; gap:6px}
+.tctl small{font-size:12px; font-weight:900; color:var(--muted)}
+.tbtn{width:44px; height:36px; border:3px solid var(--ink); border-radius:10px; background:var(--purple); color:#fff; font:900 22px/1 var(--body); box-shadow:2px 2px 0 var(--ink); cursor:pointer; padding:0}
+.tbtn:active{transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink)}
+.tbtn:disabled{background:#BDB4CC; cursor:not-allowed}
+.tbtn:focus-visible{outline:3px solid var(--yellow); outline-offset:2px}
+#ptext{font-size:clamp(18px,4.6vw,21px); line-height:1.4; font-weight:800; margin:0}
+#ptext b{color:var(--purple-dk); font-weight:900}
+#pq{font-size:clamp(18px,4.6vw,21px); line-height:1.35; font-weight:900; margin:0; color:var(--green-dk)}
+#pq u{text-decoration-thickness:3px}
+.grid{display:flex; flex-wrap:wrap; gap:3px; justify-content:center; padding:6px; background:#F4F0FA; border-radius:10px}
+.grid span{font-size:22px; line-height:1; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px}
+.grid span.hi{background:var(--green-lt); box-shadow:inset 0 0 0 2px var(--green)}
+.legend{font-size:13px; font-weight:800; color:var(--muted); text-align:center}
+.legend i{display:inline-block; width:14px; height:14px; border-radius:4px; background:var(--green-lt); box-shadow:inset 0 0 0 2px var(--green); vertical-align:-2px; margin-right:4px}
+.big{text-align:center; font-size:15px; font-weight:800; color:var(--muted)}
+.big .e{font-size:44px; display:block; line-height:1.1}
+
+.opts{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.opt{min-height:84px; border:3px solid var(--ink); border-radius:14px; background:#fff; box-shadow:3px 3px 0 var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:var(--body); color:var(--ink); padding:6px}
+.opt:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink)}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--yellow); outline-offset:2px}
+.opt.ok{background:var(--green-lt); border-color:var(--green-dk)}
+.opt.bad{background:var(--red-bg); border-color:var(--red)}
+.opt:disabled{cursor:default}
+.frac{display:inline-flex; flex-direction:column; align-items:center; font-weight:900; font-size:28px; line-height:1.05; font-variant-numeric:tabular-nums}
+.frac span:first-child{border-bottom:3px solid currentColor; padding:0 6px 2px}
+.frac span:last-child{padding-top:2px}
+.frac.sm{font-size:19px}
+.frac.sm span:first-child{border-bottom-width:2px}
+
+/* Explicação */
+.explain{background:#FFF6D6; border:3px dashed var(--ink); border-radius:14px; padding:12px 14px; font-size:16px; line-height:1.45; font-weight:700}
+.explain h3{margin:0 0 4px; font:400 24px/1 var(--display); letter-spacing:.04em; color:var(--red)}
+.explain .steps{margin:6px 0 0; padding-left:20px}
+.explain .tip{margin-top:6px; color:var(--green-dk); font-weight:900}
+
+.btn{font:400 24px/1 var(--display); letter-spacing:.05em; min-height:54px; padding:10px 22px; border:3px solid var(--ink); border-radius:14px; background:var(--green); color:#fff; -webkit-text-stroke:1px var(--ink); paint-order:stroke fill; box-shadow:3px 3px 0 var(--ink); cursor:pointer; width:100%}
+.btn:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink)}
+.btn.alt{background:var(--purple)}
+
+/* Telas */
+.screen{background:var(--paper); border:3px solid var(--ink); border-radius:16px; box-shadow:4px 4px 0 var(--ink); padding:18px; display:flex; flex-direction:column; gap:12px}
+.title{font:400 clamp(40px,11vw,58px)/.95 var(--display); letter-spacing:.03em; color:var(--green); -webkit-text-stroke:2px var(--ink); paint-order:stroke fill; text-shadow:4px 4px 0 var(--ink); margin:0; text-align:center}
+.screen p{margin:0; font-size:16px; line-height:1.5; font-weight:700}
+.screen ul{margin:0; padding-left:20px; font-size:15px; line-height:1.5; font-weight:700}
+.stats{display:flex; gap:10px}
+.stats div{flex:1; text-align:center; background:#F4F0FA; border-radius:12px; padding:8px}
+.stats .v{font:400 38px/1 var(--display); color:var(--purple-dk)}
+.stats .l{font-size:12px; font-weight:900; text-transform:uppercase; color:var(--muted)}
+.small{font-size:13px; color:var(--muted); text-align:center; font-weight:800}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hud" id="hud" hidden>
+    <div class="hbox grow"><span class="v" id="score">0</span><span class="l">pontos</span></div>
+    <div class="hbox"><span class="v" id="streak">0</span><span class="l">fúria 🔥</span></div>
+    <div class="hbox"><span id="lives"></span><span class="l">vidas</span></div>
+  </div>
+
+  <div class="scene" id="scene">
+    <div class="city"><i style="height:30px"></i><i style="height:44px"></i><i style="height:24px"></i><i style="height:38px"></i><i style="height:28px"></i><i style="height:46px"></i><i style="height:32px"></i><i style="height:40px"></i><i style="height:26px"></i><i style="height:36px"></i></div>
+    <span id="lvlBadge">NÍVEL 1</span>
+    <!-- Gigante verde desenhado em SVG -->
+    <svg id="hulk" class="idle" viewBox="0 0 200 200" aria-hidden="true">
+      <ellipse cx="100" cy="194" rx="62" ry="6" fill="rgba(0,0,0,.25)"/>
+      <!-- pernas -->
+      <path d="M70 140 L64 188 L88 188 L94 146 Z M106 146 L112 188 L136 188 L130 140 Z" fill="#4CAA2E"/>
+      <path d="M60 186 h30 v8 h-34z M110 186 h30 v8 h-34z" fill="#2F7A1E"/>
+      <!-- bermuda rasgada -->
+      <path d="M62 120 H138 L136 156 L124 150 L118 160 L108 150 L100 158 L92 150 L82 160 L76 150 L64 156 Z" fill="#6B3FA0"/>
+      <!-- braço esquerdo -->
+      <g id="armL"><path d="M58 76 C40 82 30 104 34 124 L50 124 C50 108 56 96 66 90 Z" fill="#4CAA2E"/><circle cx="41" cy="130" r="13" fill="#3F8F2A"/></g>
+      <!-- tronco -->
+      <path d="M56 70 C70 58 130 58 144 70 L140 124 C120 132 80 132 60 124 Z" fill="#5BBF3A"/>
+      <path d="M100 72 V118 M78 96 q22 8 44 0" stroke="#3F8F2A" stroke-width="3" fill="none"/>
+      <!-- braço direito (soco) -->
+      <g id="armR"><path d="M142 76 C160 82 170 104 166 124 L150 124 C150 108 144 96 134 90 Z" fill="#4CAA2E"/><circle cx="159" cy="130" r="13" fill="#3F8F2A"/></g>
+      <!-- cabeça -->
+      <rect class="face" x="78" y="26" width="44" height="42" rx="12" fill="#5BBF3A"/>
+      <path d="M76 38 L80 18 L88 26 L94 14 L100 24 L108 12 L112 24 L120 16 L124 38 L118 30 L82 30 Z" fill="#1A1426"/>
+      <path d="M84 41 L97 45 M116 41 L103 45" stroke="#1A1426" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="91" cy="48" r="3" fill="#fff"/><circle cx="109" cy="48" r="3" fill="#fff"/>
+      <rect x="88" y="56" width="24" height="7" rx="2" fill="#fff" stroke="#1A1426" stroke-width="2"/>
+      <path d="M94 56 v7 M100 56 v7 M106 56 v7" stroke="#1A1426" stroke-width="1.5"/>
+    </svg>
+    <div id="rock">🪨<span class="em" id="rockEm"></span></div>
+    <div class="pow" id="pow">ESMAGA!</div>
+  </div>
+
+  <!-- MENU -->
+  <div class="screen" id="vMenu">
+    <h1 class="title">HULK ESMAGA FRAÇÕES</h1>
+    <p>Leia o problema e escolha a fração certa entre as 4 opções. Você tem <b id="menuTime">10 segundos</b> para cada problema! (Use os botões <b>−</b> e <b>+</b> ao lado do tempo para mudar.)</p>
+    <ul>
+      <li>Acertou: o Hulk <b>esmaga</b> a pedra e você ganha pontos.</li>
+      <li>Acertos seguidos aumentam a <b>fúria</b> 🔥 e dão pontos extras.</li>
+      <li>Errou ou o tempo acabou: perde uma vida ❤️ e vê a explicação.</li>
+      <li>A cada 5 acertos você sobe de nível e os números ficam maiores, até 100!</li>
+    </ul>
+    <button class="btn" id="startBtn">COMEÇAR!</button>
+    <p class="small" id="bestTxt"></p>
+  </div>
+
+  <!-- JOGO -->
+  <div class="card" id="vGame" hidden>
+    <div class="trow">
+      <span>⏱️ Tempo <small id="tlim">(10 s)</small></span>
+      <span class="tctl">
+        <button class="tbtn" id="tMinus" aria-label="Diminuir o tempo de resposta">−</button>
+        <span id="secs">10</span>
+        <button class="tbtn" id="tPlus" aria-label="Aumentar o tempo de resposta">+</button>
+      </span>
+    </div>
+    <div class="timer" id="timer"><i id="tbar"></i></div>
+    <p id="ptext"></p>
+    <div id="visual"></div>
+    <p id="pq"></p>
+    <div class="opts" id="opts"></div>
+    <div class="explain" id="explain" hidden></div>
+    <button class="btn alt" id="nextBtn" hidden>PRÓXIMO PROBLEMA</button>
+  </div>
+
+  <!-- FIM -->
+  <div class="screen" id="vOver" hidden>
+    <h1 class="title">FIM DE JOGO!</h1>
+    <div class="stats">
+      <div><div class="v" id="oScore">0</div><div class="l">pontos</div></div>
+      <div><div class="v" id="oRight">0</div><div class="l">acertos</div></div>
+      <div><div class="v" id="oBest">0</div><div class="l">recorde</div></div>
+    </div>
+    <p id="oMsg"></p>
+    <button class="btn" id="againBtn">JOGAR DE NOVO</button>
+  </div>
+
+</div>
+
+<script>
+/* ===================== CONFIGURAÇÃO ===================== */
+const TIME_DEFAULT = 10;    // segundos para ler e responder (ajustável no jogo com − e +)
+const TIME_MIN = 5, TIME_MAX = 60, TIME_STEP = 5;
+const MAX_LIVES = 3;
+const MAX_N = 100;          // maior total possível
+const GRID_MAX = 24;        // até esse total, os emojis aparecem desenhados
+
+/* ===================== OBJETOS (emojis) =====================
+   e: emoji · n: nome no plural · f: feminino? · l: lugar ("___ tem N ...")
+   a: pares [característica, característica dos outros]
+   v: ações "verbo|complemento" → "comeu 5" / "deu 5 para a vizinha"           */
+const OBJ = [
+ {e:'🐶',n:'cachorros',f:0,l:'Um canil',a:[['são pretos','são brancos'],['são filhotes','são adultos']],v:['vacinou|','levou| para passear']},
+ {e:'🐱',n:'gatos',f:0,l:'Um abrigo',a:[['são rajados','são cinzentos'],['estão dormindo','estão brincando']],v:['adotou|','alimentou|']},
+ {e:'🐟',n:'peixes',f:0,l:'Um aquário',a:[['são vermelhos','são azuis'],['são pequenos','são grandes']],v:['vendeu|','alimentou|']},
+ {e:'🐔',n:'galinhas',f:1,l:'Um galinheiro',a:[['são brancas','são marrons'],['estão chocando ovos','estão ciscando']],v:['vendeu|','alimentou|']},
+ {e:'🐄',n:'vacas',f:1,l:'Uma fazenda',a:[['são malhadas','são marrons'],['estão no pasto','estão no curral']],v:['vendeu|','vacinou|']},
+ {e:'🐑',n:'ovelhas',f:1,l:'Um rebanho',a:[['são brancas','são pretas']],v:['tosou|','vendeu|']},
+ {e:'🐎',n:'cavalos',f:0,l:'Um haras',a:[['são marrons','são brancos'],['estão correndo','estão descansando']],v:['escovou|','vendeu|']},
+ {e:'🐰',n:'coelhos',f:0,l:'Um sítio',a:[['são brancos','são cinzentos']],v:['alimentou|','vendeu|']},
+ {e:'🐸',n:'sapos',f:0,l:'Uma lagoa',a:[['são verdes','são marrons'],['estão pulando','estão parados']],v:[]},
+ {e:'🦆',n:'patos',f:0,l:'Um lago',a:[['estão nadando','estão na margem']],v:['alimentou|']},
+ {e:'🐧',n:'pinguins',f:0,l:'Um zoológico',a:[['estão nadando','estão no gelo'],['são filhotes','são adultos']],v:[]},
+ {e:'🐢',n:'tartarugas',f:1,l:'Uma praia',a:[['são filhotes','são adultas']],v:['soltou| no mar']},
+ {e:'🦋',n:'borboletas',f:1,l:'Um jardim',a:[['são azuis','são amarelas']],v:['fotografou|']},
+ {e:'🐝',n:'abelhas',f:1,l:'Uma colmeia',a:[['estão voando','estão dentro da colmeia']],v:[]},
+ {e:'🐜',n:'formigas',f:1,l:'Um formigueiro',a:[['carregam folhas','carregam sementes']],v:[]},
+ {e:'🍎',n:'maçãs',f:1,l:'Uma cesta',a:[['são vermelhas','são verdes']],v:['comeu|','deu| para a vizinha']},
+ {e:'🍌',n:'bananas',f:1,l:'Um cacho',a:[['estão maduras','estão verdes']],v:['comeu|','vendeu|']},
+ {e:'🍊',n:'laranjas',f:1,l:'Uma caixa',a:[['estão doces','estão azedas']],v:['espremeu|','vendeu|']},
+ {e:'🍓',n:'morangos',f:0,l:'Uma bandeja',a:[['estão maduros','estão verdes']],v:['comeu|','guardou| na geladeira']},
+ {e:'🍉',n:'melancias',f:1,l:'Uma barraca da feira',a:[['estão inteiras','estão cortadas']],v:['vendeu|']},
+ {e:'🥕',n:'cenouras',f:1,l:'Uma horta',a:[['estão grandes','estão pequenas']],v:['colheu|','lavou|']},
+ {e:'🍪',n:'biscoitos',f:0,l:'Um pote',a:[['são de chocolate','são de baunilha']],v:['comeu|','deu| ao irmão']},
+ {e:'🧁',n:'cupcakes',f:0,l:'Uma confeitaria',a:[['têm granulado','têm confeitos coloridos']],v:['vendeu|','comeu|']},
+ {e:'🍕',n:'pedaços de pizza',f:0,l:'Uma mesa',a:[['são de queijo','são de calabresa']],v:['comeu|','guardou|']},
+ {e:'🥚',n:'ovos',f:0,l:'Uma caixa',a:[['são brancos','são vermelhos']],v:['usou| no bolo','cozinhou|']},
+ {e:'🍬',n:'balas',f:1,l:'Um saquinho',a:[['são de morango','são de uva']],v:['comeu|','deu| à amiga']},
+ {e:'🌻',n:'girassóis',f:0,l:'Um canteiro',a:[['estão abertos','estão fechados']],v:['regou|','colheu|']},
+ {e:'🌷',n:'tulipas',f:1,l:'Um jardim',a:[['são vermelhas','são amarelas']],v:['colheu|','regou|']},
+ {e:'🌳',n:'árvores',f:1,l:'Uma praça',a:[['têm frutos','estão sem frutos']],v:['plantou|']},
+ {e:'⚽',n:'bolas',f:1,l:'Uma escola',a:[['são de futebol','são de vôlei']],v:['encheu|','emprestou|']},
+ {e:'🎈',n:'balões',f:0,l:'Uma festa',a:[['são vermelhos','são azuis']],v:['encheu|','estourou|']},
+ {e:'🎁',n:'presentes',f:0,l:'Uma festa',a:[['têm laço vermelho','têm laço azul']],v:['abriu|','embrulhou|']},
+ {e:'🧸',n:'ursinhos',f:0,l:'Uma loja de brinquedos',a:[['são marrons','são brancos']],v:['vendeu|','embrulhou|']},
+ {e:'🦖',n:'dinossauros de brinquedo',f:0,l:'Uma coleção',a:[['são verdes','são marrons']],v:['deu| ao primo','guardou| na caixa']},
+ {e:'🚀',n:'foguetes de brinquedo',f:0,l:'Uma coleção',a:[['são grandes','são pequenos']],v:['lançou|']},
+ {e:'✏️',n:'lápis',f:0,l:'Um estojo',a:[['estão apontados','estão sem ponta']],v:['apontou|','emprestou|']},
+ {e:'🖍️',n:'gizes de cera',f:0,l:'Uma caixa',a:[['são de cores claras','são de cores escuras']],v:['usou|','emprestou|']},
+ {e:'📚',n:'livros',f:0,l:'Uma estante',a:[['são de aventura','são de ciências']],v:['leu|','emprestou|']},
+ {e:'🚗',n:'carros',f:0,l:'Um estacionamento',a:[['são vermelhos','são pretos']],v:['lavou|','consertou|']},
+ {e:'🚲',n:'bicicletas',f:1,l:'Uma loja',a:[['são de criança','são de adulto']],v:['vendeu|','consertou|']},
+ {e:'🚌',n:'ônibus',f:0,l:'Uma garagem',a:[['estão cheios','estão vazios']],v:['lavou|']},
+ {e:'👕',n:'camisetas',f:1,l:'Um varal',a:[['estão secas','estão molhadas']],v:['dobrou|','passou|']},
+ {e:'🧦',n:'meias',f:1,l:'Uma gaveta',a:[['são listradas','são lisas']],v:['lavou|','guardou|']},
+ {e:'⭐',n:'adesivos de estrela',f:0,l:'Um álbum',a:[['são dourados','são prateados']],v:['colou|','deu| à prima']},
+ {e:'🐚',n:'conchas',f:1,l:'Um balde',a:[['são brancas','são rosadas']],v:['achou| na praia','pintou|']},
+ {e:'🪁',n:'pipas',f:1,l:'Um parque',a:[['estão voando','estão no chão']],v:['soltou|','consertou|']},
+];
+const PEOPLE = ['Ana','Léo','Bia','Davi','Lucas','Malu','Theo','Sofia','Gabi','Pedro','Lara','Miguel','Clara','Heitor','Alice','João'];
+
+/* ===================== UTILIDADES ===================== */
+const $ = s => document.querySelector(s);
+const ri = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const gcd = (a,b) => b ? gcd(b, a%b) : a;
+const store = {
+  get(k,d){ try{ const v = localStorage.getItem('hulk-fracoes-'+k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem('hulk-fracoes-'+k, JSON.stringify(v)); }catch(e){} }
+};
+const fracHTML = (n,d,cls='') => `<span class="frac ${cls}"><span>${n}</span><span>${d}</span></span>`;
+const named = {2:'a metade (meio)',3:'um terço',4:'um quarto',5:'um quinto',10:'um décimo'};
+
+/* ===================== GERADOR DE PROBLEMAS ===================== */
+let lastObj = null;
+function makeProblem(level){
+  const maxN = Math.min(MAX_N, 8 + level*8);
+  let o; do { o = pick(OBJ); } while(o === lastObj); lastObj = o;
+  const N = ri(Math.min(5, maxN), maxN);
+  let k = ri(2, N-2);
+  // de vez em quando, praticar metade e terço
+  const r = Math.random();
+  if(r < 0.10 && N % 2 === 0) k = N/2;
+  else if(r < 0.18 && N % 3 === 0) k = N/3;
+
+  const kinds = ['A','C']; if(o.v.length) kinds.push('B');
+  const kind = pick(kinds);
+  const comp = Math.random() < 0.5;          // pergunta pelo complemento?
+  const d = o.f ? 'das' : 'dos', outros = o.f ? 'as outras' : 'os outros';
+  let text, q, given, askedLabel;
+  if(kind === 'B'){
+    const who = pick(PEOPLE), [vb, rest] = pick(o.v).split('|'), verb = vb + rest;
+    text = `${who} tinha <b>${N}</b> ${o.n} e ${vb} <b>${k}</b>${rest}.`;
+    q = comp ? `Que fração ${d} ${o.n} ${who} <u>não</u> ${verb}?` : `Que fração ${d} ${o.n} ${who} ${verb}?`;
+    given = `${who} ${verb}`; askedLabel = comp ? `${who} não ${verb}` : given;
+  } else {
+    const [a, b] = pick(o.a);
+    if(kind === 'A'){
+      text = `${o.l} tem <b>${N}</b> ${o.n}. <b>${k}</b> ${a}.`;
+      q = comp ? `Que fração ${d} ${o.n} <u>não</u> ${a}?` : `Que fração ${d} ${o.n} ${a}?`;
+      askedLabel = comp ? `não ${a}` : a;
+    } else {
+      text = `${o.l} tem <b>${N}</b> ${o.n}: <b>${k}</b> ${a} e ${outros} ${b}.`;
+      q = comp ? `Que fração ${d} ${o.n} ${b}?` : `Que fração ${d} ${o.n} ${a}?`;
+      askedLabel = comp ? b : a;
+    }
+    given = a;
+  }
+  const p = comp ? N - k : k;
+  return {o, N, k, p, comp, kind, text, q, given, askedLabel, options: makeOptions(p, N)};
+}
+function makeOptions(p, N){
+  const q = N - p, key = (a,b) => a + '/' + b;
+  const ans = {n:p, d:N, ok:true};
+  const pool = [];
+  const add = (n,d) => { if(n>0 && d>0 && !(n===p && d===N) && !pool.some(x=>x.n===n&&x.d===d)) pool.push({n,d,ok:false}); };
+  add(q, N);                 // confundir a parte pedida com a outra parte
+  const extra = [];
+  const push = (n,d) => { if(n>0 && d>0 && !(n===p && d===N) && !(n===q && d===N) && !extra.some(x=>x.n===n&&x.d===d)) extra.push({n,d,ok:false}); };
+  push(p, q); push(N, p); push(q, p); push(p+1, N); push(p-1, N); push(p, N+1); push(p, N-1);
+  const chosen = pool.concat(shuffle(extra)).slice(0, 3);
+  return shuffle([ans, ...chosen]);
+}
+
+/* ===================== ESTADO ===================== */
+let S, cur, tRaf = null, tEnd = 0, locked = false;
+let best = store.get('best', 0);
+let timeLimit = Math.min(TIME_MAX, Math.max(TIME_MIN, Number(store.get('time', TIME_DEFAULT)) || TIME_DEFAULT));
+
+function showTimeLimit(){
+  $('#tlim').textContent = `(${timeLimit} s)`;
+  $('#menuTime').textContent = `${timeLimit} segundos`;
+  $('#tMinus').disabled = timeLimit <= TIME_MIN;
+  $('#tPlus').disabled = timeLimit >= TIME_MAX;
+}
+function changeTime(delta){
+  const old = timeLimit;
+  timeLimit = Math.min(TIME_MAX, Math.max(TIME_MIN, timeLimit + delta));
+  if(timeLimit === old) return;
+  store.set('time', timeLimit);
+  // no problema atual, soma ou tira a diferença do tempo que falta (deixando pelo menos 1 s)
+  if(!locked && !$('#vGame').hidden){
+    const now = performance.now();
+    tEnd = Math.max(now + 1000, tEnd + (timeLimit - old)*1000);
+  }
+  showTimeLimit();
+}
+
+function newRun(){ S = {score:0, streak:0, lives:MAX_LIVES, right:0, level:1}; hud(); }
+function hud(){
+  $('#score').textContent = S.score;
+  $('#streak').textContent = S.streak;
+  let h=''; for(let i=0;i<MAX_LIVES;i++) h += i < S.lives ? '♥' : '<span class="off">♥</span>';
+  $('#lives').innerHTML = h;
+  $('#lvlBadge').textContent = 'NÍVEL ' + S.level;
+}
+function show(id){ ['vMenu','vGame','vOver'].forEach(v => $('#'+v).hidden = v !== id); $('#hud').hidden = id !== 'vGame'; }
+
+/* ===================== RODADA ===================== */
+function nextProblem(){
+  locked = false;
+  cur = makeProblem(S.level);
+  $('#ptext').innerHTML = cur.text;
+  $('#pq').innerHTML = cur.q;
+  $('#rockEm').textContent = cur.o.e;
+  // desenho dos objetos (até GRID_MAX); acima disso só o total
+  if(cur.N <= GRID_MAX){
+    const items = Array.from({length:cur.N}, (_,i) => `<span class="${i<cur.k?'hi':''}">${cur.o.e}</span>`).join('');
+    $('#visual').innerHTML = `<div class="grid" aria-hidden="true">${items}</div><div class="legend"><i></i>= ${cur.given}</div>`;
+  } else {
+    $('#visual').innerHTML = `<div class="big"><span class="e">${cur.o.e}</span>total: ${cur.N}</div>`;
+  }
+  const box = $('#opts'); box.innerHTML = '';
+  cur.options.forEach(op => {
+    const b = document.createElement('button'); b.className = 'opt';
+    b.innerHTML = fracHTML(op.n, op.d);
+    b.setAttribute('aria-label', `${op.n} de ${op.d}`);
+    b.onclick = () => answer(b, op.ok);
+    box.appendChild(b);
+  });
+  $('#explain').hidden = true; $('#nextBtn').hidden = true;
+  startTimer();
+}
+function startTimer(){
+  cancelAnimationFrame(tRaf);
+  tEnd = performance.now() + timeLimit*1000;
+  const bar = $('#tbar'), tm = $('#timer');
+  const tick = now => {
+    const left = Math.max(0, tEnd - now);
+    bar.style.transform = `scaleX(${Math.min(1, left/(timeLimit*1000))})`;
+    $('#secs').textContent = Math.ceil(left/1000);
+    tm.classList.toggle('low', left < 3000);
+    if(left <= 0){ timeout(); return; }
+    tRaf = requestAnimationFrame(tick);
+  };
+  tRaf = requestAnimationFrame(tick);
+}
+function stopTimer(){ cancelAnimationFrame(tRaf); }
+
+function answer(btn, ok){
+  if(locked) return; locked = true; stopTimer();
+  const btns = [...$('#opts').children];
+  btns.forEach(b => b.disabled = true);
+  if(ok){
+    btn.classList.add('ok');
+    S.streak++; S.right++;
+    const left = Math.max(0, tEnd - performance.now());
+    const pts = 10 + Math.min(S.streak-1, 10)*2 + Math.ceil(left/1000);
+    S.score += pts;
+    const lvl = Math.floor(S.right/5) + 1;
+    const up = lvl > S.level; S.level = lvl;
+    hud(); smash(up ? `NÍVEL ${lvl}!` : pick(['ESMAGA!','POW!','CRASH!','BOOM!']));
+    setTimeout(nextProblem, 1150);
+  } else {
+    btn.classList.add('bad');
+    btns.forEach((b,i) => { if(cur.options[i].ok) b.classList.add('ok'); });
+    miss('Ops! Não é essa.');
+  }
+}
+function timeout(){
+  if(locked) return; locked = true;
+  [...$('#opts').children].forEach((b,i) => { b.disabled = true; if(cur.options[i].ok) b.classList.add('ok'); });
+  miss('O tempo acabou!');
+}
+function miss(title){
+  S.streak = 0; S.lives--; hud(); angry();
+  const {N,k,p,comp,askedLabel,given} = cur;
+  let steps = `<li>O total é <b>${N}</b>, então o número de baixo (denominador) é <b>${N}</b>.</li>`;
+  if(comp) steps += `<li>${cap(given)}: ${k}. A pergunta quer os que ${askedLabel}: <b>${N} − ${k} = ${p}</b>.</li>`;
+  else steps += `<li>A pergunta quer os que ${askedLabel}: <b>${p}</b>. Esse é o número de cima (numerador).</li>`;
+  const g = gcd(p, N), rd = N/g;
+  let tip = '';
+  if(p/g === 1 && named[rd]) tip = `<div class="tip">💡 ${p}/${N} é o mesmo que ${named[rd]}!</div>`;
+  $('#explain').innerHTML = `<h3>${title}</h3>A resposta certa é ${fracHTML(p, N, 'sm')}<ol class="steps">${steps}</ol>${tip}`;
+  $('#explain').hidden = false;
+  if(S.lives <= 0){ $('#nextBtn').textContent = 'VER RESULTADO'; }
+  else $('#nextBtn').textContent = 'PRÓXIMO PROBLEMA';
+  $('#nextBtn').hidden = false;
+  $('#nextBtn').focus({preventScroll:true});
+  $('#explain').scrollIntoView({block:'nearest', behavior:'smooth'});
+}
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* ===================== ANIMAÇÕES ===================== */
+function replay(el, cls){ el.classList.remove(cls, 'idle'); void el.getBoundingClientRect(); el.classList.add(cls); }
+function smash(word){
+  const h = $('#hulk'); replay(h, 'smash');
+  setTimeout(() => {
+    $('#scene').classList.remove('shake'); void $('#scene').offsetWidth; $('#scene').classList.add('shake');
+    const rock = $('#rock'), sc = $('#scene').getBoundingClientRect(), rr = rock.getBoundingClientRect();
+    for(let i=0;i<7;i++){
+      const c = document.createElement('span'); c.className = 'chunk'; c.textContent = i%3 ? '🪨' : cur.o.e;
+      c.style.left = (rr.left - sc.left + rr.width/2 - 12) + 'px'; c.style.top = (rr.top - sc.top + rr.height/2 - 12) + 'px';
+      c.style.setProperty('--dx', ri(-90,90)+'px'); c.style.setProperty('--dy', ri(-110,-20)+'px'); c.style.setProperty('--r', ri(-200,200)+'deg');
+      $('#scene').appendChild(c); setTimeout(() => c.remove(), 850);
+    }
+    rock.style.transform = 'scale(0)'; setTimeout(() => rock.style.transform = '', 700);
+    const pow = $('#pow'); pow.textContent = word; pow.classList.remove('show'); void pow.offsetWidth; pow.classList.add('show');
+  }, 300);
+  setTimeout(() => { h.classList.remove('smash'); h.classList.add('idle'); }, 750);
+}
+function angry(){ const h = $('#hulk'); replay(h, 'angry'); setTimeout(() => { h.classList.remove('angry'); h.classList.add('idle'); }, 550); }
+
+/* ===================== TELAS ===================== */
+function start(){ newRun(); show('vGame'); nextProblem(); }
+function over(){
+  if(S.score > best){ best = S.score; store.set('best', best); }
+  $('#oScore').textContent = S.score; $('#oRight').textContent = S.right; $('#oBest').textContent = best;
+  $('#oMsg').textContent = S.right >= 20 ? 'Força máxima! Você é um gênio das frações! 💪' :
+                           S.right >= 8 ? 'Muito bem! O Hulk está orgulhoso. Tente bater o recorde!' :
+                           'Lembre: o número de baixo é o TOTAL e o de cima é a PARTE que a pergunta quer.';
+  show('vOver');
+}
+$('#startBtn').onclick = start;
+$('#againBtn').onclick = start;
+$('#nextBtn').onclick = () => { if(S.lives <= 0) over(); else nextProblem(); };
+document.addEventListener('visibilitychange', () => {
+  // ao voltar para a aba, recomeça a contagem do problema atual (sem perder vida)
+  if(!document.hidden && !$('#vGame').hidden && !locked) startTimer();
+});
+$('#tMinus').onclick = () => changeTime(-TIME_STEP);
+$('#tPlus').onclick = () => changeTime(TIME_STEP);
+showTimeLimit();
+$('#bestTxt').textContent = best ? `Recorde: ${best} pontos` : '';
+$('#rockEm').textContent = '🐶';
+</script>
+</body>
+</html>
