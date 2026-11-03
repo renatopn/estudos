@@ -1,0 +1,973 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Corrida Geográfica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: corrida em tela cheia (canvas) com o mundo do livro — montanhas, morros e chão de terra;
+   textos e perguntas abrem como uma folha de caderno por cima do jogo. Visual único (dia claro) de propósito. */
+:root{
+  --sky1:#7CC6EA; --sky2:#E3F5FB;
+  --ink:#1D2B3A; --muted:#566676;
+  --paper:#FFFCF3; --paper-edge:#E8DCC0;
+  --sun:#FFC83D; --sun-dk:#D99A12;
+  --river:#1D6FA8; --river-dk:#145482;
+  --grass:#4FA23A; --earth:#B9804A;
+  --ok:#2E8B4E; --ok-bg:#E2F4E8;
+  --bad:#C8413A; --bad-bg:#FBE6E3;
+  --hl:#FFE27A;
+  --veil:rgba(18,38,58,.55);
+  --display:'Baloo 2','Trebuchet MS',system-ui,sans-serif;
+  --body:'Atkinson Hyperlegible','Segoe UI',system-ui,sans-serif;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden}
+body{background:var(--sky1);color:var(--ink);font-family:var(--body);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+#stage{position:fixed;inset:0;touch-action:none}
+#cv{width:100%;height:100%;display:block}
+
+/* HUD */
+#hud{position:fixed;left:0;right:0;top:0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  padding-top:calc(env(safe-area-inset-top,0px) + 10px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  pointer-events:none;font-family:var(--display)}
+.hud-box{background:rgba(255,252,243,.88);border:2px solid var(--paper-edge);border-radius:14px;padding:4px 12px;display:flex;align-items:center;gap:10px}
+#score{font-size:28px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.lbl{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+#meter{display:flex;gap:3px}
+.pip{width:14px;height:14px;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:#CBD3DA}
+.pip.on{background:var(--sun)}
+#meter.ready .pip{background:var(--sun);animation:glow .6s ease-in-out infinite alternate}
+@keyframes glow{to{transform:scale(1.25)}}
+#lives{font-size:22px;color:var(--bad);letter-spacing:2px}
+#lives .gone{color:#CBD3DA}
+.hud-right{display:flex;gap:8px;align-items:center}
+#pauseBtn{pointer-events:auto;width:44px;height:44px;border-radius:12px;border:2px solid var(--paper-edge);background:var(--paper);font:800 18px var(--display);color:var(--ink);cursor:pointer}
+#hint{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);text-align:center;font:600 16px var(--display);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.45);pointer-events:none;transition:opacity .6s}
+#count{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font:800 min(30vw,180px)/1 var(--display);color:var(--paper);text-shadow:0 6px 0 var(--river-dk);pointer-events:none}
+
+/* Overlay / folhas */
+#ov{position:fixed;inset:0;background:var(--veil);display:flex;align-items:center;justify-content:center;
+  padding-top:calc(env(safe-area-inset-top,0px) + 12px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));user-select:text;-webkit-user-select:text}
+.sheet{background:var(--paper);border-radius:20px;width:100%;max-width:760px;max-height:100%;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 18px 50px rgba(0,0,0,.3);border:2px solid var(--paper-edge)}
+.sheet-head{padding:18px 22px 10px;display:flex;flex-direction:column;gap:4px;border-bottom:2px dashed var(--paper-edge)}
+.sheet-body{padding:16px 22px;overflow:auto;min-height:0;display:flex;flex-direction:column;gap:14px}
+.sheet-foot{padding:12px 22px 18px;border-top:2px dashed var(--paper-edge);display:flex;flex-direction:column;gap:10px}
+.chip{font:600 13px var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--river)}
+h1,h2{font-family:var(--display);font-weight:800;margin:0;line-height:1.1;text-wrap:balance}
+h1{font-size:clamp(34px,7vw,52px);color:var(--river-dk)}
+h2{font-size:clamp(24px,4.5vw,32px)}
+p{margin:0}
+.lead{font-size:18px;line-height:1.5;max-width:62ch}
+
+#readText{font-size:clamp(17px,1.2vw + 12px,20px);line-height:1.65;max-width:62ch;display:flex;flex-direction:column;gap:14px}
+.ans{border-radius:4px;transition:background .3s}
+.ans.hl{background:var(--hl);box-shadow:0 0 0 3px var(--hl);animation:pulse 1.2s ease-in-out 2}
+@keyframes pulse{50%{box-shadow:0 0 0 7px var(--hl)}}
+.fig{margin:0;padding:8px;background:#fff;border:2px solid var(--paper-edge);border-radius:12px;display:flex;flex-direction:column;gap:6px}
+.fig svg,#qFig svg{width:100%;height:auto;display:block;border-radius:6px}
+.fig svg{max-height:280px}
+.fig figcaption{font-size:15px;color:var(--muted);text-align:center}
+#qFig{background:#fff;border:2px solid var(--paper-edge);border-radius:12px;padding:6px;align-self:center;width:100%;max-width:520px}
+#qFig svg{max-height:min(220px,30vh)}
+#readHint{background:var(--bad-bg);border:2px solid var(--bad);border-radius:12px;padding:10px 14px;font-size:16px;line-height:1.4}
+#readHint b{display:block;font-family:var(--display);font-size:15px;color:var(--bad);letter-spacing:.03em}
+.bar{height:8px;border-radius:99px;background:#EDE3CB;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--river);border-radius:99px;transition:width .25s linear}
+
+.btn{font:800 19px var(--display);min-height:52px;padding:8px 22px;border-radius:14px;border:0;background:var(--river);color:#fff;cursor:pointer;box-shadow:0 4px 0 var(--river-dk);font-variant-numeric:tabular-nums}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--river-dk)}
+.btn:disabled{background:#AEB9C3;box-shadow:0 4px 0 #8E99A3;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--river-dk);box-shadow:none;border:2px solid var(--paper-edge)}
+.btn:focus-visible,.opt:focus-visible{outline:3px solid var(--sun-dk);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row .btn{flex:1 1 180px}
+
+#qText{font-family:var(--display);font-weight:600;font-size:clamp(20px,3.6vw,26px);line-height:1.25;text-wrap:balance}
+#opts{display:grid;gap:10px}
+.opt{font:400 18px/1.35 var(--body);text-align:left;padding:14px 16px;border-radius:14px;border:2px solid var(--paper-edge);background:#fff;color:var(--ink);cursor:pointer;display:flex;gap:12px;align-items:center}
+.opt .letter{flex:none;width:30px;height:30px;border-radius:50%;background:#EEF4F9;color:var(--river-dk);font:800 16px var(--display);display:flex;align-items:center;justify-content:center}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg)}
+.opt:disabled{cursor:default}
+#qFeed{min-height:26px;font:600 19px var(--display)}
+#qFeed.ok{color:var(--ok)} #qFeed.bad{color:var(--bad)}
+
+.topics{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px 14px;counter-reset:t}
+.topics li{counter-increment:t;display:flex;gap:8px;align-items:baseline;font-size:15px;line-height:1.3}
+.topics li::before{content:counter(t);flex:none;font:800 14px var(--display);color:var(--muted);width:20px;text-align:right}
+.topics li.done{color:var(--ok)}
+.topics li.done::after{content:"✓";font-weight:700}
+.topics li.next{font-weight:700;color:var(--river-dk)}
+.big{font:800 56px/1 var(--display);color:var(--river-dk);font-variant-numeric:tabular-nums}
+.stats{display:flex;gap:28px;flex-wrap:wrap}
+.stats div{display:flex;flex-direction:column;gap:2px}
+.small{font-size:14px;color:var(--muted)}
+@media (max-width:480px){.sheet-head,.sheet-body,.sheet-foot{padding-left:16px;padding-right:16px}.hud-box{padding:3px 8px;gap:6px}#score{font-size:22px}.pip{width:11px;height:11px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="stage"><canvas id="cv" aria-label="Corrida: toque para pular"></canvas></div>
+
+<div id="hud">
+  <div class="hud-box"><span id="score">0</span><span class="lbl">pontos</span></div>
+  <div class="hud-right">
+    <div class="hud-box" title="Estrelas até a super estrela"><div id="meter"></div></div>
+    <div class="hud-box"><span id="lives"></span></div>
+    <button id="pauseBtn" aria-label="Pausar">II</button>
+  </div>
+</div>
+<div id="hint">Toque na tela para pular</div>
+<div id="count" hidden></div>
+
+<div id="ov">
+  <!-- MENU -->
+  <div class="sheet" id="vMenu">
+    <div class="sheet-head">
+      <span class="chip">Geografia · Capítulos 8 a 12</span>
+      <h1>Corrida Geográfica</h1>
+    </div>
+    <div class="sheet-body">
+      <p class="lead">Toque na tela (ou aperte a barra de espaço) para pular. Pegue as <b>estrelas</b> e pule por cima das <b>bombas</b>. A cada 10 estrelas aparece a <b>super estrela</b>: ela vale 10 pontos e abre um texto da matéria com perguntas. Cada pergunta acertada de primeira vale mais 5 pontos. A cada 100 estrelas você ganha uma vida extra (até 4). Com o tempo as bombas aparecem em grupos e depois começam a se mexer!</p>
+      <div>
+        <p class="lbl" style="margin-bottom:8px">Textos da prova</p>
+        <ol class="topics" id="topics"></ol>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <div class="row">
+        <button class="btn" id="startBtn">Começar a corrida</button>
+      </div>
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <span class="small" id="bestTxt"></span>
+        <button class="btn ghost" id="resetBtn" style="flex:0 1 auto;min-height:40px;font-size:15px">Recomeçar os textos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEITURA -->
+  <div class="sheet" id="vRead" hidden>
+    <div class="sheet-head">
+      <span class="chip" id="readChip"></span>
+      <h2 id="readTitle"></h2>
+    </div>
+    <div class="sheet-body" id="readScroll">
+      <div id="readHint" hidden><b>Releia o trecho destacado em amarelo</b><span id="readHintQ"></span></div>
+      <div id="readText"></div>
+    </div>
+    <div class="sheet-foot">
+      <div class="bar"><i id="readBar"></i></div>
+      <button class="btn" id="readBtn" disabled></button>
+    </div>
+  </div>
+
+  <!-- PERGUNTA -->
+  <div class="sheet" id="vQuiz" hidden>
+    <div class="sheet-head">
+      <span class="chip" id="qChip"></span>
+      <div class="bar"><i id="qBar"></i></div>
+    </div>
+    <div class="sheet-body">
+      <div id="qFig" hidden></div>
+      <p id="qText"></p>
+      <div id="opts"></div>
+      <p id="qFeed" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <!-- RESUMO DO TEXTO -->
+  <div class="sheet" id="vSum" hidden>
+    <div class="sheet-head">
+      <span class="chip" id="sumChip"></span>
+      <h2 id="sumTitle">Texto concluído!</h2>
+    </div>
+    <div class="sheet-body">
+      <div class="stats">
+        <div><span class="big" id="sumFirst"></span><span class="lbl">de primeira</span></div>
+        <div><span class="big" id="sumPts"></span><span class="lbl">pontos ganhos</span></div>
+      </div>
+      <p class="lead" id="sumMsg"></p>
+    </div>
+    <div class="sheet-foot"><button class="btn" id="sumBtn">Continuar a corrida</button></div>
+  </div>
+
+  <!-- FIM -->
+  <div class="sheet" id="vOver" hidden>
+    <div class="sheet-head"><span class="chip">Bum!</span><h2>Fim da corrida</h2></div>
+    <div class="sheet-body">
+      <div class="stats">
+        <div><span class="big" id="overScore">0</span><span class="lbl">pontos</span></div>
+        <div><span class="big" id="overBest">0</span><span class="lbl">recorde</span></div>
+        <div><span class="big" id="overTexts">0</span><span class="lbl">textos estudados</span></div>
+      </div>
+      <p class="lead">Os textos que você já estudou ficam guardados. Na próxima super estrela, o jogo continua do próximo texto.</p>
+    </div>
+    <div class="sheet-foot"><div class="row"><button class="btn" id="againBtn">Correr de novo</button><button class="btn ghost" id="menuBtn1">Menu</button></div></div>
+  </div>
+
+  <!-- PAUSA -->
+  <div class="sheet" id="vPause" hidden style="max-width:420px">
+    <div class="sheet-head"><h2>Pausado</h2></div>
+    <div class="sheet-foot" style="border-top:0"><div class="row"><button class="btn" id="resumeBtn">Continuar</button><button class="btn ghost" id="menuBtn2">Menu</button></div></div>
+  </div>
+</div>
+
+<script>
+/* ====================== CONTEÚDO DA PROVA ====================== */
+/* [[chave|trecho]] marca onde está a resposta de cada pergunta. A primeira opção de cada pergunta é a correta (as opções são embaralhadas na tela). */
+const SECTIONS = [
+{ cap:"Capítulo 8 · Os elementos da paisagem", t:"Elementos naturais e construídos",
+  p:[
+  "Em uma paisagem podemos observar diversos elementos. [[nat|Os elementos naturais são aqueles feitos pela natureza, como rios, montanhas, florestas, o mar, a praia e o céu.]] [[con|Os elementos construídos pelo ser humano são, por exemplo, casas, prédios, estradas, pontes e plantações.]]",
+  "[[pnat|Quando os principais elementos de uma paisagem são naturais e não há interferência humana, ela é chamada de paisagem natural.]] [[ambos|Muitas paisagens têm, ao mesmo tempo, elementos naturais e elementos construídos pelo ser humano.]]",
+  {fig:"paisagens", k:"figpais", cap:"Observe as paisagens A e B."}
+  ],
+  q:[
+  {q:"Qual destes é um elemento NATURAL da paisagem?", o:["Rio","Prédio","Estrada","Ponte"], k:"nat"},
+  {q:"Qual destes é um elemento CONSTRUÍDO pelo ser humano?", o:["Plantação","Montanha","Floresta","Mar"], k:"con"},
+  {q:"Como se chama a paisagem em que os principais elementos são naturais, sem interferência humana?", o:["Paisagem natural","Paisagem construída","Paisagem urbana","Paisagem poluída"], k:"pnat"},
+  {q:"Observe a imagem. Qual das paisagens é natural, sem interferência humana?", fig:"paisagens", o:["A paisagem A","A paisagem B","As duas paisagens","Nenhuma das duas"], k:["figpais","pnat"]},
+  {q:"Na paisagem B da imagem, quais elementos foram construídos pelo ser humano?", fig:"paisagens", o:["Os prédios, a rua e a ponte","O rio e o céu","As nuvens","A grama e a árvore"], k:["figpais","con"]},
+  {q:"Na paisagem B, aparecem elementos naturais e construídos ao mesmo tempo. Isso é:", fig:"paisagens", o:["Comum em muitas paisagens","Impossível","Só acontece em florestas","Só acontece no mar"], k:"ambos"}
+  ]},
+{ cap:"Capítulo 8 · Os elementos da paisagem", t:"O ser humano e a natureza mudam a paisagem",
+  p:[
+  "O ser humano modifica as paisagens de muitas formas: [[humano|plantando alimentos, abrindo túneis e estradas, extraindo minérios e construindo pontes, viadutos, barragens, represas e edifícios]]. Ele também pode [[canal|canalizar a água dos rios, ou seja, fazer a água passar por canais ou valas]].",
+  "[[natureza|A natureza também provoca mudanças nas paisagens.]] [[estacoes|Podemos perceber isso nas estações do ano: as mesmas montanhas podem ficar verdes no verão e cobertas de neve no inverno.]]",
+  "[[lento|A ação do vento e da água também modifica as paisagens, mas essas mudanças acontecem lentamente, ao longo de milhões de anos. Por isso, quase não conseguimos percebê-las.]] [[falesia|No litoral, a água do mar desgasta as rochas e o solo, formando paredões chamados falésias.]] [[vento|O vento também desgasta e esculpe as rochas, dando novas formas a elas.]]"
+  ],
+  q:[
+  {q:"O que significa canalizar a água de um rio?", o:["Fazer a água passar por canais ou valas","Secar o rio","Construir uma ponte sobre o rio","Jogar lixo no rio"], k:"canal"},
+  {q:"Qual destas mudanças na paisagem é feita pelo SER HUMANO?", o:["Construir uma barragem","O vento esculpir as rochas","A neve cobrir as montanhas","O mar desgastar as falésias"], k:"humano"},
+  {q:"Como as estações do ano podem mudar a paisagem?", o:["As montanhas ficam verdes no verão e com neve no inverno","Fazem surgir prédios novos","Abrem túneis nas montanhas","Não mudam nada na paisagem"], k:"estacoes"},
+  {q:"As mudanças que o vento e a água causam nas paisagens acontecem:", o:["Lentamente, ao longo de milhões de anos","Em um único dia","Em uma semana","Nunca acontecem"], k:"lento"},
+  {q:"Na natureza, o que pode esculpir as rochas, dando novas formas a elas?", o:["O vento","Os carros","As placas","As pontes"], k:"vento"},
+  {q:"No litoral, o que desgasta as rochas e o solo, formando as falésias?", o:["A água do mar","Os carros","As plantações","Os prédios"], k:"falesia"}
+  ]},
+{ cap:"Capítulo 8 · Os elementos da paisagem", t:"Legenda e poluição visual",
+  p:[
+  "Uma paisagem pode ser representada em um desenho ou mapa usando símbolos. [[legenda|A legenda explica o que cada símbolo significa e ajuda a entender a representação.]] A legenda pode separar os elementos construídos pelo ser humano dos elementos da natureza.",
+  "[[rural|Uma paisagem com plantações, pastagens, matas e poucas casas é uma paisagem rural.]] Nela, [[natrep|a plantação, a pastagem, as casas, a ponte e as estradas são modificações feitas pelo ser humano; a mata e o rio são elementos naturais.]]",
+  {fig:"legenda", k:"figleg", cap:"Representação de uma paisagem rural, com legenda."},
+  "[[polvis|Uma paisagem é visualmente poluída quando há um grande número de anúncios, placas, faixas e outros elementos colocados de forma desordenada.]] [[efeitos|A poluição visual causa desconforto e mal-estar, como cansaço visual, dor de cabeça, irritação e estresse. Ela também esconde a arquitetura da cidade e pode distrair os motoristas, causando acidentes.]]",
+  {fig:"poluicao", k:"figpol", cap:"Compare as ruas A e B."},
+  "[[leis|Para resolver esse problema, alguns municípios criaram leis que proíbem outdoors e faixas de propaganda e definem regras para os letreiros das lojas.]] [[leisdef|Leis são regras que organizam a sociedade, dizendo o que é e o que não é permitido fazer.]]"
+  ],
+  q:[
+  {q:"Para que serve a legenda de um mapa ou desenho?", o:["Para explicar o que cada símbolo significa","Para decorar o mapa","Para mostrar a data do desenho","Para dizer quem fez o mapa"], k:"legenda"},
+  {q:"Uma paisagem com plantações, pastagens, matas e poucas casas é:", o:["Rural","Urbana","Poluída","Construída"], k:"rural"},
+  {q:"Pela legenda da imagem, quais elementos do desenho são NATURAIS?", fig:"legenda", o:["A mata e o rio","A plantação e a pastagem","As casas e a estrada","A ponte e a estrada"], k:["figleg","natrep"]},
+  {q:"Na imagem, o que nos ajuda a saber o que cada símbolo do desenho representa?", fig:"legenda", o:["A legenda","O rio","A estrada","O título do livro"], k:["figleg","legenda"]},
+  {q:"Quando uma paisagem é visualmente poluída?", o:["Quando tem muitos anúncios, placas e faixas desordenados","Quando tem muitas árvores","Quando está chovendo","Quando tem um rio limpo"], k:"polvis"},
+  {q:"Observe a imagem. Qual rua tem poluição visual?", fig:"poluicao", o:["A rua A, cheia de placas e anúncios","A rua B, com letreiros organizados","As duas ruas","Nenhuma das ruas"], k:["figpol","polvis"]},
+  {q:"A rua A da imagem pode ficar parecida com a rua B se a cidade:", fig:"poluicao", o:["Criar leis que proíbem outdoors e organizam os letreiros","Colocar mais propagandas","Cortar as árvores","Fechar as lojas"], k:"leis"},
+  {q:"Qual destes é um efeito da poluição visual nas pessoas?", o:["Dor de cabeça e estresse","Mais vontade de dormir cedo","Água mais limpa","Mais árvores na cidade"], k:"efeitos"},
+  {q:"Como alguns municípios resolveram a poluição visual?", o:["Criando leis que proíbem outdoors e faixas","Colocando mais outdoors","Fechando todas as lojas","Cortando as árvores"], k:"leis"},
+  {q:"O que são leis?", o:["Regras que organizam a sociedade, dizendo o que é e o que não é permitido","Placas de propaganda","Símbolos de um mapa","Tipos de paisagem"], k:"leisdef"}
+  ]},
+{ cap:"Capítulo 9 · O relevo", t:"O relevo e suas formas",
+  p:[
+  "[[superficie|A superfície terrestre é a parte do planeta onde vivemos.]] Ela é irregular: há lugares altos e baixos, áreas planas e onduladas. [[desgaste|Isso acontece porque a superfície vem sendo desgastada e modificada pelo vento, pela água da chuva, dos rios e dos mares, pelo calor do Sol e também pelo ser humano.]] [[relevo|As diferenças na forma da superfície da Terra recebem o nome de relevo.]]",
+  "[[planicie|Planície: terreno plano ou com pequenas ondulações, de grande extensão, geralmente mais baixo do que as terras ao seu redor.]]",
+  "[[montanha|Montanha: grande elevação do terreno, que se destaca do seu entorno.]] [[cordilheira|Um conjunto de montanhas é chamado de cordilheira.]]",
+  "[[morro|Morro: elevação de pequeno ou médio porte do terreno.]] [[serra|Um conjunto de morros forma uma serra.]]",
+  "[[vale|Vale: forma da superfície modelada por rios ou riachos, geralmente entre morros ou montanhas.]]",
+  "[[chapada|Chapada: forma de relevo elevada, com topo quase plano e laterais inclinadas, às vezes bem íngremes. Do topo dá para ter uma vista ampla da região.]]",
+  "O ser humano também ocupa o relevo: há cidades construídas em vales, em planícies e também nos morros.",
+  {fig:"relevo", k:"figrelevo", cap:"Algumas formas de relevo, indicadas pelas letras."}
+  ],
+  q:[
+  {q:"O que é relevo?", o:["As diferenças na forma da superfície da Terra","A água dos rios e mares","O conjunto de plantas de um lugar","O tempo que faz em um dia"], k:"relevo"},
+  {q:"Terreno plano ou com pequenas ondulações, de grande extensão e geralmente mais baixo que as terras ao redor. Que forma de relevo é essa?", o:["Planície","Montanha","Chapada","Serra"], k:"planicie"},
+  {q:"Um conjunto de montanhas é chamado de:", o:["Cordilheira","Serra","Vale","Planície"], k:"cordilheira"},
+  {q:"Um conjunto de morros forma uma:", o:["Serra","Cordilheira","Chapada","Lagoa"], k:"serra"},
+  {q:"O que é um morro?", o:["Uma elevação de pequeno ou médio porte do terreno","Uma grande elevação que se destaca muito","Um terreno plano e baixo","Um rio pequeno"], k:"morro"},
+  {q:"Forma de relevo modelada por rios ou riachos, geralmente entre morros ou montanhas:", o:["Vale","Chapada","Montanha","Planície"], k:"vale"},
+  {q:"Forma de relevo elevada, com topo quase plano e laterais inclinadas:", o:["Chapada","Vale","Planície","Morro"], k:"chapada"},
+  {q:"O que modifica a superfície da Terra ao longo dos anos?", o:["O vento, a água, o calor do Sol e o ser humano","Somente o ser humano","Somente os animais","Nada, ela nunca muda"], k:"desgaste"},
+  {q:"Na imagem, qual forma de relevo a letra A mostra (topo plano e laterais íngremes)?", fig:"relevo", o:["Chapada","Vale","Planície","Morro"], k:"figrelevo"},
+  {q:"Na imagem, qual letra mostra um vale, com um rio entre as elevações?", fig:"relevo", o:["Letra B","Letra A","Letra D","Letra E"], k:"figrelevo"},
+  {q:"Na imagem, a letra D mostra uma grande elevação que se destaca. Ela é:", fig:"relevo", o:["Uma montanha","Uma planície","Um vale","Uma lagoa"], k:"figrelevo"},
+  {q:"Na imagem, o que a letra E mostra?", fig:"relevo", o:["Uma planície","Uma montanha","Uma chapada","Uma serra"], k:"figrelevo"}
+  ]},
+{ cap:"Capítulo 10 · Os rios", t:"Os rios e suas partes",
+  p:[
+  "Vista do espaço, a Terra parece um planeta água. [[maior|A maior parte da superfície terrestre é coberta por água]], [[salgada|mas quase toda essa água está nos oceanos e mares e não serve para beber, porque é salgada.]] [[doce|No Brasil, a água doce que usamos vem principalmente dos rios e dos lagos]], e também do subsolo.",
+  "[[rio|Rio é uma corrente de água natural que segue em direção ao mar, a um lago ou a outro rio.]] [[lago|Lago é uma porção de água cercada de terra. Os lagos pequenos são chamados de lagoas.]] [[afluente|Um rio que despeja suas águas em outro rio é chamado de afluente.]] Cursos de água menores que um rio são chamados de riacho, córrego ou ribeirão.",
+  "As partes de um rio: [[nascente|a nascente é o lugar onde o rio começa]]; [[leito|o leito é o caminho por onde a água corre]]; [[margem|as margens são as terras dos lados do rio]]; [[foz|a foz é o lugar onde o rio termina, despejando suas águas no mar, em um lago ou em outro rio]].",
+  {fig:"rio", k:"figrio", cap:"As partes de um rio, indicadas pelas letras."},
+  "[[queda|Quando um rio passa por um terreno com desníveis, formam-se quedas-d'água, também chamadas de cascatas ou cachoeiras.]] [[catarata|Quando o volume do rio e o desnível são muito grandes, formam-se cataratas.]] [[iguacu|As Cataratas do Iguaçu ficam na fronteira do Brasil com a Argentina.]] Fronteira é a área perto do limite entre países."
+  ],
+  q:[
+  {q:"Por que não podemos beber a água dos oceanos e mares?", o:["Porque ela é salgada","Porque ela é muito fria","Porque ela é muito pouca","Porque ela é doce"], k:"salgada"},
+  {q:"No Brasil, de onde vem principalmente a água doce que usamos?", o:["Dos rios e lagos","Dos oceanos","Dos mares","Das geleiras"], k:"doce"},
+  {q:"Um rio que despeja suas águas em outro rio é chamado de:", o:["Afluente","Lagoa","Foz","Nascente"], k:"afluente"},
+  {q:"Como são chamados os lagos pequenos?", o:["Lagoas","Riachos","Cachoeiras","Afluentes"], k:"lago"},
+  {q:"O caminho por onde a água do rio corre é o:", o:["Leito","Margem","Foz","Nascente"], k:"leito"},
+  {q:"Na imagem, a letra A mostra o lugar onde o rio começa. Como ele se chama?", fig:"rio", o:["Nascente","Foz","Margem","Leito"], k:["figrio","nascente"]},
+  {q:"Na imagem, a letra E mostra onde o rio deságua no mar. Como se chama?", fig:"rio", o:["Foz","Nascente","Leito","Margem"], k:["figrio","foz"]},
+  {q:"Na imagem, a letra C mostra as terras dos lados do rio. Elas são as:", fig:"rio", o:["Margens","Nascentes","Fozes","Cachoeiras"], k:["figrio","margem"]},
+  {q:"Na imagem, o rio da letra D despeja suas águas no rio principal. Ele é um:", fig:"rio", o:["Afluente","Lago","Mar","Leito"], k:"figrio"},
+  {q:"Quando o volume do rio e o desnível do terreno são muito grandes, forma-se uma:", o:["Catarata","Lagoa","Planície","Margem"], k:"catarata"},
+  {q:"As Cataratas do Iguaçu ficam na fronteira do Brasil com qual país?", o:["Argentina","Chile","Peru","Venezuela"], k:"iguacu"}
+  ]},
+{ cap:"Capítulo 10 · Os rios", t:"A água no nosso dia a dia",
+  p:[
+  "Os rios são muito importantes porque fornecem a água necessária para nossa vida. [[usos|Usamos a água para cozinhar, fazer a higiene pessoal, limpar a casa e obter alimentos, como os peixes.]] [[navegacao|A água dos rios também é usada na navegação, para transportar pessoas e cargas.]]",
+  "[[irrigacao|As águas dos rios servem para a irrigação, isto é, para molhar o solo das plantações, principalmente onde chove pouco.]] [[hidreletrica|Elas também são usadas para produzir energia elétrica nas usinas hidrelétricas, que usam a força da água]].",
+  "Como a água chega à sua casa? [[bombas|Primeiro, a água é retirada dos rios e lagos por bombas]] e levada por canos até a [[estacao|estação de tratamento, onde passa por filtros que eliminam a sujeira]]. [[cloro|Depois ela é desinfetada com produtos como o cloro, que matam bactérias e outros seres invisíveis que podem causar doenças.]] [[reservatorio|Então a água vai para os reservatórios e é distribuída para as casas.]]",
+  {fig:"agua", k:"figagua", cap:"O caminho da água até as casas, em 4 etapas."},
+  "[[filtrar|Mesmo tratada, a água pode ter impurezas das caixas-d'água e dos encanamentos. Por isso, é preciso filtrar ou ferver a água antes de bebê-la.]] [[economia|Há previsões de que a água possa faltar em algumas regiões no futuro, por isso devemos usá-la sem desperdício]]: [[habitos|fechar a torneira ao escovar os dentes, tomar banhos curtos e não lavar a calçada com mangueira.]]"
+  ],
+  q:[
+  {q:"O que é irrigação?", o:["Molhar o solo das plantações","Transportar cargas pelo rio","Produzir energia elétrica","Pescar no rio"], k:"irrigacao"},
+  {q:"Onde a força da água é usada para produzir energia elétrica?", o:["Na usina hidrelétrica","Na estação de tratamento","Na caixa-d'água","No reservatório"], k:"hidreletrica"},
+  {q:"Para que serve a navegação nos rios?", o:["Para transportar pessoas e cargas","Para molhar as plantações","Para tratar a água","Para fazer chover"], k:"navegacao"},
+  {q:"Como a água é retirada dos rios e lagos para ir até as cidades?", o:["Por bombas","Com baldes","Pela chuva","Por caminhões de lixo"], k:"bombas"},
+  {q:"Para que serve o cloro no tratamento da água?", o:["Para matar bactérias que causam doenças","Para deixar a água colorida","Para esquentar a água","Para deixar a água salgada"], k:"cloro"},
+  {q:"Qual é a ordem certa do caminho da água até a sua casa?", o:["Rio → estação de tratamento → reservatório → casas","Casas → rio → reservatório → estação de tratamento","Reservatório → casas → rio → estação de tratamento","Estação de tratamento → casas → rio → reservatório"], k:["bombas","estacao","reservatorio"]},
+  {q:"Na imagem, o que acontece na construção de número 2?", fig:"agua", o:["A água é filtrada e recebe cloro","A água é salgada","A água vira energia elétrica","A água é jogada no mar"], k:["figagua","estacao","cloro"]},
+  {q:"Na imagem, para onde vai a água depois do reservatório (número 3)?", fig:"agua", o:["Para as casas","De volta para o rio","Para o mar","Para a nascente"], k:["figagua","reservatorio"]},
+  {q:"Mesmo tratada, por que devemos filtrar ou ferver a água antes de beber?", o:["Porque ela pode ter impurezas das caixas-d'água e dos encanamentos","Porque ela é salgada","Porque ela fica mais gelada","Porque assim ela rende mais"], k:"filtrar"},
+  {q:"Qual destas atitudes economiza água?", o:["Fechar a torneira ao escovar os dentes","Lavar a calçada com mangueira","Tomar banhos bem demorados","Deixar a torneira pingando"], k:"habitos"}
+  ]},
+{ cap:"Capítulo 11 · O tempo atmosférico e o clima", t:"Tempo atmosférico e clima",
+  p:[
+  "[[tempo|Tempo atmosférico são as condições da atmosfera de um lugar em um certo momento.]] [[varia|Ele pode mudar de um dia para o outro ou até de uma hora para outra. Exemplo: “De manhã estava frio, agora já estou sentindo calor!”]] O frio, o calor, o vento e a chuva determinam o tempo atmosférico.",
+  "[[clima|Clima é o conjunto das características que o tempo atmosférico de um lugar apresenta ao longo dos anos.]] [[depende|As características do clima dependem principalmente da variação da temperatura e da quantidade de chuva.]]",
+  "[[estacoes|O clima de uma região pode variar de acordo com as estações do ano: primavera, verão, outono e inverno.]] [[verao|No verão, as temperaturas geralmente são mais altas; no inverno, mais baixas.]] Há lugares no Brasil onde faz calor o ano inteiro e outros onde, em certas épocas, faz muito frio. [[seca|Há locais onde chove o ano todo e regiões que podem ficar sem chuva durante anos.]]",
+  "[[simbolos|Para registrar o tempo atmosférico, usamos símbolos simples, que representam o tempo ensolarado, chuvoso, nublado, ventando, quente, frio ou ameno.]]",
+  {fig:"simbolos", k:"figsimb", cap:"Símbolos usados para registrar o tempo."}
+  ],
+  q:[
+  {q:"As condições da atmosfera de um lugar em um certo momento são chamadas de:", o:["Tempo atmosférico","Clima","Relevo","Vegetação"], k:"tempo"},
+  {q:"O conjunto das características do tempo de um lugar ao longo dos anos é o:", o:["Clima","Tempo atmosférico","Relevo","Estação"], k:"clima"},
+  {q:"“De manhã estava frio, agora já estou sentindo calor!” Essa frase fala de:", o:["Tempo atmosférico, que muda de uma hora para outra","Clima, que é igual o ano todo","Relevo","Vegetação"], k:"varia"},
+  {q:"As características do clima dependem principalmente:", o:["Da temperatura e da quantidade de chuva","Da quantidade de prédios","Do número de rios","Das estradas"], k:"depende"},
+  {q:"Quais são as estações do ano?", o:["Primavera, verão, outono e inverno","Manhã, tarde e noite","Chuva, sol e vento","Janeiro, julho e dezembro"], k:"estacoes"},
+  {q:"Em que estação as temperaturas geralmente são mais altas?", o:["Verão","Inverno","Outono","Nenhuma"], k:"verao"},
+  {q:"Sobre a chuva no Brasil, é correto dizer:", o:["Há lugares onde chove o ano todo e lugares que ficam muito tempo sem chuva","Chove igual em todo o Brasil","Nunca chove no Brasil","Só chove no inverno"], k:"seca"},
+  {q:"Na imagem, qual símbolo representa o tempo chuvoso?", fig:"simbolos", o:["O símbolo B","O símbolo A","O símbolo C","O símbolo D"], k:["figsimb","simbolos"]},
+  {q:"Na imagem, que tempo o símbolo C representa?", fig:"simbolos", o:["Nublado","Ensolarado","Chuvoso","Ventando"], k:["figsimb","simbolos"]},
+  {q:"Na imagem, que tempo o símbolo D representa?", fig:"simbolos", o:["Ventando","Chuvoso","Ensolarado","Nublado"], k:["figsimb","simbolos"]}
+  ]},
+{ cap:"Capítulo 11 · O tempo atmosférico e o clima", t:"Previsão do tempo e climas do Brasil",
+  p:[
+  "[[antigo|O ser humano observa o tempo atmosférico desde tempos muito antigos.]] Hoje existem equipamentos que ajudam na previsão do tempo. Eles ficam na superfície da Terra e nas altas camadas da atmosfera.",
+  "[[satelite|Os satélites meteorológicos ficam no espaço e captam e enviam dados sobre a formação de nuvens e tempestades.]] [[boia|As boias meteorológicas ficam nos oceanos e monitoram a temperatura e o sal da água.]] [[navio|Os navios laboratório monitoram os oceanos e medem a temperatura do ar e a velocidade dos ventos.]] [[estacaomet|As estações meteorológicas, em terra, registram de hora em hora a temperatura, a umidade e a velocidade do vento.]]",
+  "[[meteoro|A meteorologia é a ciência que estuda os fenômenos da atmosfera. Os cientistas que trabalham nela são os meteorologistas.]] [[importancia|A previsão do tempo é importante para avisar a população sobre tempestades e furacões, e ajuda os agricultores, os aviões e o setor de energia.]]",
+  "[[climasbr|Os principais tipos de clima do Brasil são: equatorial úmido, equatorial semiúmido, semiárido, tropical, tropical de altitude e subtropical.]] [[equatorial|O clima equatorial domina a região amazônica, no Norte.]] [[semiarido|O semiárido fica no sertão do Nordeste, onde chove pouco.]] [[df|O Distrito Federal tem clima tropical, com uma época de chuvas e outra de seca.]] [[subtropical|O clima subtropical, com invernos mais frios, fica no Sul.]]"
+  ],
+  q:[
+  {q:"Qual equipamento fica no espaço e envia dados sobre nuvens e tempestades?", o:["Satélite meteorológico","Boia meteorológica","Navio laboratório","Estação meteorológica"], k:"satelite"},
+  {q:"Qual equipamento fica nos oceanos e mede a temperatura e o sal da água?", o:["Boia meteorológica","Satélite meteorológico","Estação meteorológica","Usina hidrelétrica"], k:"boia"},
+  {q:"Em terra, qual equipamento registra de hora em hora a temperatura, a umidade e o vento?", o:["Estação meteorológica","Boia meteorológica","Estação de tratamento","Usina hidrelétrica"], k:"estacaomet"},
+  {q:"Como se chama a ciência que estuda os fenômenos da atmosfera?", o:["Meteorologia","Geologia","Astronomia","Biologia"], k:"meteoro"},
+  {q:"Por que a previsão do tempo é importante?", o:["Avisa sobre tempestades e ajuda agricultores e aviões","Serve para construir prédios","Serve para tratar a água","Não tem importância"], k:"importancia"},
+  {q:"Qual é o clima do Distrito Federal?", o:["Tropical","Equatorial úmido","Subtropical","Semiárido"], k:"df"},
+  {q:"Qual clima fica no sertão do Nordeste, onde chove pouco?", o:["Semiárido","Equatorial úmido","Subtropical","Tropical de altitude"], k:"semiarido"},
+  {q:"Em qual região do Brasil está o clima subtropical, com invernos mais frios?", o:["Sul","Norte","Nordeste","Centro-Oeste"], k:"subtropical"}
+  ]},
+{ cap:"Capítulo 12 · A vegetação", t:"A vegetação e sua destruição",
+  p:[
+  "[[fatores|As paisagens têm características próprias por causa de vários fatores, como o relevo, a hidrografia, o clima e a vegetação.]] [[vegnat|O conjunto de plantas que nascem e crescem em um lugar sem a interferência do ser humano é chamado de vegetação natural.]] [[depende|A vegetação natural depende principalmente do clima, do relevo e do solo.]]",
+  "[[espalham|O vento, a água da chuva e a dos rios espalham as sementes das plantas, para que elas germinem em lugares diferentes. Os animais também ajudam nesse processo.]] [[germinar|Germinar quer dizer brotar, dar origem a uma nova planta.]] [[animais|As aves levam sementes para longe dentro dos frutos, outros animais deixam sementes nas fezes, algumas sementes grudam no pelo, e animais como os esquilos enterram sementes.]] [[gralha|A gralha-azul enterra as sementes para comer depois, e algumas brotam antes que ela volte.]]",
+  "[[destruicao|O ser humano destrói a vegetação natural para desenvolver a agricultura, a pecuária e as cidades.]] [[animaisperde|Isso pode acabar com espécies de animais que dependem da vegetação para se alimentar e se abrigar.]] [[solo|A retirada da vegetação prejudica rios e lagos e empobrece o solo, que fica sem proteção e é levado pela água da chuva.]] [[queimada|As queimadas na Floresta Amazônica também contribuem para a poluição do ar.]]"
+  ],
+  q:[
+  {q:"O que é vegetação natural?", o:["Plantas que nascem e crescem sem a interferência do ser humano","Plantas cultivadas em uma horta","Árvores plantadas nas praças","Plantas de plástico"], k:"vegnat"},
+  {q:"A vegetação natural depende principalmente:", o:["Do clima, do relevo e do solo","Das estradas e pontes","Dos prédios","Da poluição visual"], k:"depende"},
+  {q:"O que quer dizer germinar?", o:["Brotar, dar origem a uma nova planta","Cortar uma árvore","Molhar o solo","Queimar a floresta"], k:"germinar"},
+  {q:"Quem espalha as sementes das plantas na natureza?", o:["O vento, a água e os animais","Somente as pessoas","Somente os carros","Ninguém, elas não se espalham"], k:"espalham"},
+  {q:"O que a gralha-azul faz com as sementes?", o:["Enterra para comer depois, e algumas brotam","Come todas na hora","Joga no rio","Leva para o ninho para sempre"], k:"gralha"},
+  {q:"Por que o ser humano destrói a vegetação natural?", o:["Para a agricultura, a pecuária e as cidades","Para proteger os animais","Para limpar os rios","Para melhorar o solo"], k:"destruicao"},
+  {q:"O que acontece com o solo quando a vegetação é retirada?", o:["Fica pobre e sem proteção, e a chuva o leva embora","Fica mais rico","Fica coberto de neve","Não acontece nada"], k:"solo"},
+  {q:"As queimadas na Floresta Amazônica contribuem para:", o:["A poluição do ar","A limpeza dos rios","O aumento das florestas","A formação de montanhas"], k:"queimada"}
+  ]},
+{ cap:"Capítulo 12 · A vegetação", t:"A vegetação natural do Brasil",
+  p:[
+  "[[florestas|As florestas são formações em que se destacam as árvores, próximas umas das outras.]] [[amazonica|A Floresta Amazônica é uma das florestas mais importantes do mundo e abriga grande variedade de plantas e animais.]] [[atlantica|A Mata Atlântica ocupava quase todo o litoral do Brasil, mas hoje existe só em pequenas áreas.]]",
+  "[[cocais|A Mata dos Cocais é formada por palmeiras, como o babaçu e a carnaúba, e fica no Maranhão e no Piauí.]] [[araucarias|A Mata de Araucárias, onde predomina o pinheiro-do-paraná, ficava no Sul: Paraná, Santa Catarina e Rio Grande do Sul.]] [[pinhao|A semente do pinheiro-do-paraná é o pinhão.]] Grande parte dessa mata foi derrubada para usar a madeira.",
+  "Em outras formações, as árvores não são as plantas principais. [[cerrado|O Cerrado tem árvores de troncos retorcidos e arbustos e ocupa o Centro-Oeste, inclusive o Distrito Federal.]] [[caatinga|A Caatinga aparece no clima semiárido do Nordeste, e suas plantas perdem as folhas na seca.]] [[campos|Os Campos são uma vegetação rasteira, de capim e grama, típica do Rio Grande do Sul.]]",
+  "[[litoranea|A vegetação litorânea é formada pelas Restingas, na areia das praias, e pelos Manguezais, perto da foz dos rios.]] [[pantaneira|A vegetação pantaneira, do Pantanal, é uma mistura de espécies do Cerrado, dos Campos e das florestas.]]"
+  ],
+  q:[
+  {q:"Qual floresta abriga grande variedade de plantas e animais e é uma das mais importantes do mundo?", o:["Floresta Amazônica","Mata dos Cocais","Mata de Araucárias","Campos"], k:"amazonica"},
+  {q:"Qual mata ocupava quase todo o litoral do Brasil e hoje existe só em pequenas áreas?", o:["Mata Atlântica","Floresta Amazônica","Caatinga","Cerrado"], k:"atlantica"},
+  {q:"O babaçu e a carnaúba são palmeiras típicas de qual vegetação?", o:["Mata dos Cocais","Mata de Araucárias","Campos","Caatinga"], k:"cocais"},
+  {q:"Em qual mata predomina o pinheiro-do-paraná?", o:["Mata de Araucárias","Mata Atlântica","Mata dos Cocais","Cerrado"], k:"araucarias"},
+  {q:"Qual é a semente do pinheiro-do-paraná?", o:["Pinhão","Castanha","Coco","Babaçu"], k:"pinhao"},
+  {q:"Vegetação de árvores com troncos retorcidos e arbustos, que ocupa o Centro-Oeste e o Distrito Federal:", o:["Cerrado","Caatinga","Campos","Manguezal"], k:"cerrado"},
+  {q:"Qual vegetação aparece no clima semiárido e tem plantas que perdem as folhas na seca?", o:["Caatinga","Cerrado","Mata Atlântica","Campos"], k:"caatinga"},
+  {q:"Vegetação rasteira, de capim e grama, típica do Rio Grande do Sul:", o:["Campos","Cerrado","Restinga","Mata dos Cocais"], k:"campos"},
+  {q:"A vegetação litorânea é formada por:", o:["Restingas e Manguezais","Cerrado e Caatinga","Campos e Cocais","Araucárias e pinheiros"], k:"litoranea"},
+  {q:"A vegetação do Pantanal é uma mistura de espécies:", o:["Do Cerrado, dos Campos e das florestas","Só da Caatinga","Só dos Manguezais","Da neve e do deserto"], k:"pantaneira"}
+  ]}
+];
+
+/* ====================== UTILIDADES ====================== */
+const $ = s => document.querySelector(s);
+const rand = (a,b) => a + Math.random()*(b-a);
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const store = {
+  get(k,d){ try{ const v = localStorage.getItem('corrida-geo-'+k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem('corrida-geo-'+k, JSON.stringify(v)); }catch(e){} }
+};
+const md = s => s.replace(/\[\[(\w+)\|(.+?)\]\]/g, '<span class="ans" data-k="$1">$2</span>');
+const plain = s => s.replace(/\[\[\w+\|(.+?)\]\]/g, '$1');
+const isFig = p => typeof p === 'object';
+const FIG_WORDS = 15; // uma imagem "vale" ~15 palavras no tempo de leitura
+const countWords = s => isFig(s) ? FIG_WORDS : plain(s).trim().split(/\s+/).length;
+
+/* ====================== IMAGENS (SVG) ====================== */
+const mk = (x,y,t) => `<circle cx="${x}" cy="${y}" r="11" fill="#FFFCF3" stroke="#1D2B3A" stroke-width="2"/><text x="${x}" y="${y+5}" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="15" fill="#1D2B3A">${t}</text>`;
+const tree = (x,y,s=1) => `<rect x="${x-2*s}" y="${y}" width="${4*s}" height="${12*s}" fill="#8A5A36"/><circle cx="${x}" cy="${y}" r="${10*s}" fill="#2F7D32"/>`;
+const house = (x,y) => `<rect x="${x}" y="${y}" width="22" height="16" fill="#E9D5B0" stroke="#7A5A3A"/><polygon points="${x-3},${y} ${x+11},${y-11} ${x+25},${y}" fill="#C8413A"/><rect x="${x+8}" y="${y+7}" width="6" height="9" fill="#7A5A3A"/>`;
+const cloudS = (cx,cy,f) => `<g fill="${f}"><circle cx="${cx-13}" cy="${cy}" r="10"/><circle cx="${cx}" cy="${cy-7}" r="14"/><circle cx="${cx+13}" cy="${cy}" r="10"/><rect x="${cx-13}" y="${cy}" width="26" height="10"/></g>`;
+const wins = (x,y,cols,rows) => { let s=''; for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) s += `<rect x="${x+c*10}" y="${y+r*12}" width="6" height="7" fill="#EAF6FB"/>`; return s; };
+const tx = (x,y,t,extra='') => `<text x="${x}" y="${y}" font-family="Atkinson Hyperlegible,Segoe UI,sans-serif" font-size="11" fill="#1D2B3A" ${extra}>${t}</text>`;
+const sign = (x,y,w,h,c,t) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/><text x="${x+w/2}" y="${y+h/2+3.5}" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="10" fill="#fff">${t}</text>`;
+const svg = (vb, label, body) => `<svg viewBox="${vb}" role="img" aria-label="${label}" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+const rays = (cx,cy) => [...Array(8)].map((_,i)=>{ const a=i*Math.PI/4; return `<line x1="${cx+22*Math.cos(a)}" y1="${cy+22*Math.sin(a)}" x2="${cx+30*Math.cos(a)}" y2="${cy+30*Math.sin(a)}" stroke="#E0A800" stroke-width="3" stroke-linecap="round"/>`; }).join('');
+
+const FIGS = {
+paisagens: svg('0 0 360 160', 'Duas paisagens: A, com montanhas, mata e rio; B, com prédios, rua, ponte e carro, além do rio e de uma árvore', `
+  <rect width="172" height="160" fill="#CDEBF7"/>
+  <polygon points="0,112 38,48 70,92 104,36 146,98 172,84 172,160 0,160" fill="#9BB7CF"/>
+  <polygon points="104,36 96,50 104,46 112,51" fill="#fff"/>
+  <rect y="108" width="172" height="52" fill="#6FAE5A"/>
+  <path d="M0,138 C40,126 70,152 110,138 S160,128 172,134" stroke="#3E8FC7" stroke-width="10" fill="none"/>
+  ${tree(18,98)}${tree(40,104,1.2)}${tree(128,98)}${tree(152,104,1.2)}${tree(70,118,0.9)}
+  <rect x="188" width="172" height="160" fill="#CDEBF7"/>
+  <rect x="196" y="42" width="30" height="68" fill="#B8C4D0"/>${wins(199,48,3,5)}
+  <rect x="230" y="22" width="34" height="88" fill="#D9C7A8"/>${wins(234,28,3,7)}
+  <rect x="268" y="56" width="26" height="54" fill="#C9A86A"/>${wins(270,62,2,4)}
+  <rect x="298" y="34" width="32" height="76" fill="#B8C4D0"/>${wins(301,40,3,6)}
+  <rect x="188" y="108" width="172" height="52" fill="#9CC48A"/>
+  <rect x="188" y="110" width="172" height="14" fill="#6B7280"/><path d="M190,117 H360" stroke="#fff" stroke-width="2" stroke-dasharray="8 6"/>
+  <rect x="318" y="109" width="24" height="9" rx="3" fill="#D9483B"/><circle cx="324" cy="119" r="3" fill="#1D2B3A"/><circle cx="337" cy="119" r="3" fill="#1D2B3A"/>
+  <rect x="188" y="138" width="172" height="12" fill="#3E8FC7"/>
+  <rect x="262" y="128" width="18" height="30" fill="#8A5A36"/><path d="M262,131 V155 M280,131 V155" stroke="#5C3B22" stroke-width="2"/>
+  ${tree(346,96,0.9)}
+  ${mk(16,16,'A')}${mk(204,16,'B')}`),
+
+legenda: svg('0 0 360 180', 'Desenho de uma paisagem rural com legenda: plantação, pastagem, mata, rio, casa, estrada e ponte', `
+  <rect width="240" height="180" fill="#E4F1D3"/>
+  <rect x="10" y="10" width="84" height="64" fill="#EBD67E"/>${[18,27,36,45,54,63].map(y=>`<path d="M14,${y} H90" stroke="#B39B3C" stroke-width="2"/>`).join('')}
+  <rect x="10" y="108" width="84" height="62" fill="#B9DE8E"/>${[[22,124],[46,132],[70,122],[30,152],[58,156],[80,146]].map(([x,y])=>`<path d="M${x-4},${y-4} L${x},${y} L${x+4},${y-4}" stroke="#5E9A3A" stroke-width="2" fill="none"/>`).join('')}
+  ${[[165,20],[186,14],[208,24],[228,16],[172,42],[196,46],[220,44],[160,62],[184,66],[210,66]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="10" fill="#2F7D32"/>`).join('')}
+  <rect y="86" width="240" height="10" fill="#9AA3AD"/>
+  <path d="M128,0 C110,50 150,120 118,180" stroke="#3E8FC7" stroke-width="12" fill="none"/>
+  <rect x="114" y="82" width="28" height="18" fill="#8A5A36"/>
+  ${house(166,120)}${house(200,140)}
+  <rect x="248" y="0" width="112" height="180" fill="#FFFCF3" stroke="#E8DCC0" stroke-width="2"/>
+  <text x="304" y="19" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="14" fill="#145482">Legenda</text>
+  <rect x="256" y="29" width="18" height="11" fill="#EBD67E"/><path d="M257,34.5 H273" stroke="#B39B3C" stroke-width="2"/>${tx(280,38,'Plantação')}
+  <rect x="256" y="49" width="18" height="11" fill="#B9DE8E"/>${tx(280,58,'Pastagem')}
+  <circle cx="265" cy="74" r="6" fill="#2F7D32"/>${tx(280,78,'Mata')}
+  <path d="M256,94 H274" stroke="#3E8FC7" stroke-width="6"/>${tx(280,98,'Rio')}
+  <rect x="259" y="111" width="12" height="9" fill="#E9D5B0" stroke="#7A5A3A"/><polygon points="257,111 265,104 273,111" fill="#C8413A"/>${tx(280,118,'Casa')}
+  <rect x="256" y="132" width="18" height="6" fill="#9AA3AD"/>${tx(280,138,'Estrada')}
+  <rect x="258" y="150" width="14" height="10" fill="#8A5A36"/>${tx(280,158,'Ponte')}`),
+
+poluicao: svg('0 0 360 170', 'Duas ruas: A, com muitas placas, faixas e anúncios misturados; B, com poucos letreiros organizados e uma árvore', `
+  <rect width="172" height="170" fill="#CDEBF7"/><rect x="8" y="34" width="156" height="108" fill="#E7D8BE"/>${wins(16,100,15,1)}
+  <rect y="142" width="172" height="28" fill="#A9AFB6"/>
+  ${sign(26,6,120,26,'#8338EC','COMPRE JÁ!')}${sign(12,40,52,22,'#E63946','OFERTA')}${sign(58,36,44,30,'#FFB703','50%')}${sign(96,44,64,20,'#2A9D8F','LIQUIDA')}
+  ${sign(8,72,156,14,'#F4A261','PROMOÇÃO • PROMOÇÃO')}${sign(18,92,40,20,'#06D6A0','GRÁTIS')}${sign(64,90,46,26,'#EF476F','SÓ HOJE')}${sign(116,94,40,18,'#118AB2','AQUI')}
+  ${sign(144,104,24,38,'#E63946','!!')}${sign(30,118,56,16,'#FFB703','VENDE-SE')}
+  <rect x="188" width="172" height="170" fill="#CDEBF7"/><rect x="196" y="34" width="156" height="108" fill="#E7D8BE"/>${wins(206,44,14,4)}
+  <rect x="188" y="142" width="172" height="28" fill="#A9AFB6"/>
+  ${sign(204,96,62,14,'#1D6FA8','Padaria')}${sign(282,96,62,14,'#1D6FA8','Livraria')}
+  <rect x="216" y="114" width="20" height="28" fill="#7A5A3A"/><rect x="304" y="114" width="20" height="28" fill="#7A5A3A"/>
+  ${tree(270,128,1.3)}
+  ${mk(16,154,'A')}${mk(204,154,'B')}`),
+
+relevo: svg('0 0 360 180', 'Formas de relevo: A chapada, B vale com rio, C morro, D montanha com neve no topo e E planície com rio', `
+  <rect width="360" height="180" fill="#CDEBF7"/>
+  <path d="M0,180 L0,150 L18,150 L32,62 L102,62 L116,140 Q128,150 140,140 Q178,90 214,140 L222,140 L266,28 L308,146 L360,146 L360,180 Z" fill="#7DB86A"/>
+  <path d="M18,150 L32,62 M102,62 L116,140" stroke="#A0703E" stroke-width="3" fill="none"/>
+  <path d="M32,62 H102" stroke="#5E9A3A" stroke-width="3"/>
+  <polygon points="266,28 257,52 262,47 267,53 271,47 275,52" fill="#fff"/>
+  <ellipse cx="128" cy="145" rx="10" ry="3" fill="#3E8FC7"/>
+  <path d="M312,156 C326,151 336,161 360,155" stroke="#3E8FC7" stroke-width="4" fill="none"/>
+  ${tree(330,136,0.6)}${tree(345,138,0.6)}
+  ${mk(67,44,'A')}${mk(128,118,'B')}${mk(177,98,'C')}${mk(292,34,'D')}${mk(334,118,'E')}`),
+
+rio: svg('0 0 360 200', 'Um rio que nasce na montanha (A), corre pelo leito (B), tem margens (C), recebe um afluente (D) e deságua no mar (E)', `
+  <rect width="360" height="200" fill="#A9D18E"/>
+  <polygon points="0,100 0,30 42,4 84,44 134,100" fill="#9BB7CF"/><polygon points="42,4 34,14 42,11 50,15" fill="#fff"/>
+  <path d="M282,200 Q298,166 328,150 Q344,142 360,136 V200 Z" fill="#3E8FC7"/>
+  <text x="332" y="190" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="13" fill="#fff">Mar</text>
+  <path d="M62,48 C80,88 48,112 98,130 S172,118 210,140 S262,172 300,182" stroke="#3E8FC7" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M262,6 C252,58 242,104 210,140" stroke="#3E8FC7" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <circle cx="62" cy="48" r="6" fill="#1D6FA8"/>
+  ${tree(36,150)}${tree(192,172)}${tree(300,100)}${tree(160,92)}
+  ${mk(34,56,'A')}${mk(158,133,'B')}${mk(118,170,'C')}${mk(274,64,'D')}${mk(282,156,'E')}`),
+
+agua: svg('0 0 360 150', 'Caminho da água: 1 bomba retira água do lago; 2 estação de tratamento; 3 reservatório; 4 casas', `
+  <rect width="360" height="150" fill="#EAF6FB"/>
+  <rect y="118" width="360" height="32" fill="#A9D18E"/>
+  <ellipse cx="38" cy="124" rx="34" ry="12" fill="#3E8FC7"/>
+  <path d="M82,111 H300" stroke="#8A99A8" stroke-width="5"/>
+  ${[100,196,268].map(x=>`<polygon points="${x},105 ${x+9},111 ${x},117" fill="#566676"/>`).join('')}
+  <rect x="64" y="103" width="18" height="15" rx="2" fill="#6B7280"/>
+  <rect x="118" y="76" width="60" height="42" fill="#D9DEE3" stroke="#8A99A8" stroke-width="2"/>
+  <rect x="124" y="90" width="20" height="24" fill="#5FA9D6"/><rect x="152" y="90" width="20" height="24" fill="#5FA9D6"/>
+  <path d="M216,118 L222,80 M244,118 L238,80" stroke="#6B7280" stroke-width="4"/>
+  <rect x="208" y="46" width="44" height="34" rx="6" fill="#9BB7CF" stroke="#6B7280" stroke-width="2"/>
+  ${house(282,101)}${house(318,101)}
+  ${mk(38,92,'1')}${mk(148,60,'2')}${mk(230,30,'3')}${mk(306,74,'4')}`),
+
+simbolos: svg('0 0 360 110', 'Quatro símbolos do tempo: A sol, B nuvem com gotas de chuva, C nuvens cinzentas, D linhas de vento', `
+  <rect width="360" height="110" fill="#FFFFFF"/>
+  <circle cx="45" cy="66" r="16" fill="#FFC83D"/>${rays(45,66)}
+  ${cloudS(135,60,'#9AA8B5')}<path d="M125,80 l-3,11 M137,82 l-3,11 M149,80 l-3,11" stroke="#3E8FC7" stroke-width="3" stroke-linecap="round"/>
+  ${cloudS(214,72,'#B8C2CC')}${cloudS(236,58,'#8E9AA6')}
+  <path d="M284,52 H326 q10,0 10,-8 q0,-8 -8,-7 M278,66 H342 M286,80 H322 q10,0 10,8 q0,8 -8,7" stroke="#566676" stroke-width="3" fill="none" stroke-linecap="round"/>
+  ${mk(45,16,'A')}${mk(135,16,'B')}${mk(225,16,'C')}${mk(315,16,'D')}`)
+};
+const figHTML = p => `<figure class="fig ans" data-k="${p.k}">${FIGS[p.fig]}<figcaption>${p.cap}</figcaption></figure>`;
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const fmt = s => Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+
+/* Divide cada texto em partes curtas (1 ou 2 parágrafos, ~50+ palavras).
+   Cada parte leva só as perguntas cujas respostas estão nela. */
+const PART_MIN_WORDS = 50;
+const keysOf = p => isFig(p) ? [p.k] : [...p.matchAll(/\[\[(\w+)\|/g)].map(m => m[1]);
+const PARTS = [];
+SECTIONS.forEach((S, si) => {
+  const qsFor = ps => { const ks = new Set(ps.flatMap(keysOf)); return S.q.filter(q => (Array.isArray(q.k) ? q.k : [q.k]).every(k => ks.has(k))); };
+  const chunks = []; let chunk = [], words = 0;
+  S.p.forEach((p, i) => {
+    chunk.push(p); words += countWords(p);
+    // uma imagem fica sempre na mesma parte do parágrafo que vem antes dela
+    if(words >= PART_MIN_WORDS && !isFig(S.p[i+1]) && qsFor(chunk).length){ chunks.push(chunk); chunk = []; words = 0; }
+  });
+  if(chunk.length){
+    if(chunks.length && !qsFor(chunk).length) chunks[chunks.length-1].push(...chunk);
+    else chunks.push(chunk);
+  }
+  chunks.forEach((ps, i) => PARTS.push({si, cap:S.cap, t:S.t, part:i+1, parts:chunks.length, p:ps, q:qsFor(ps)}));
+});
+const N = PARTS.length;
+
+let progress = store.get('progress-v3', {next:0, done:[]});
+if(!progress || typeof progress.next!=='number' || !Array.isArray(progress.done)) progress = {next:0, done:[]};
+progress.next = clamp(progress.next, 0, N-1);
+progress.done = progress.done.filter(i => i >= 0 && i < N);
+let best = store.get('best', 0);
+
+/* ====================== JOGO ====================== */
+const cv = $('#cv'), ctx = cv.getContext('2d');
+const H = 400, GY = 330, GRAV = 2300, JUMP = 840;
+let SC = 1, W = 800, VH = 400, OY = 0;
+function resize(){
+  const dpr = Math.min(window.devicePixelRatio||1, 2);
+  const r = cv.getBoundingClientRect();
+  cv.width = Math.max(1, Math.round(r.width*dpr));
+  cv.height = Math.max(1, Math.round(r.height*dpr));
+  SC = Math.min(cv.height/H, cv.width/640);
+  W = cv.width/SC; VH = cv.height/SC; OY = (VH-H)*0.75;
+}
+window.addEventListener('resize', resize); resize();
+
+let mode = 'menu';
+let G, P, ents, parts;
+function resetRun(){
+  G = {t:0, speed:300, scroll:0, score:0, since:0, stars:0, stage:0, superPending:false, lives:3, spawnIn:500};
+  P = {x:90, y:GY, vy:0, ground:true, inv:0, buf:0};
+  ents = []; parts = [];
+  updateHud();
+}
+
+function jump(){ P.buf = 0.15; hideHint(); }
+let hintTimer = null;
+function hideHint(){ $('#hint').style.opacity = 0; }
+
+/* Dificuldade (pelo tempo de corrida, sem contar as leituras):
+   até 20 s, 1 bomba; até 45 s, até 2 lado a lado; depois, até 3;
+   a partir de 70 s, as bombas começam a subir e descer (até metade da altura do salto). */
+const MAX_LIVES = 4, LIFE_EVERY = 100, BOMB_GAP = 32;
+const MAX_AMP = (JUMP*JUMP/(2*GRAV))/2; // metade da altura máxima do pulo (~77)
+function difficulty(t){
+  return { maxN: t<20 ? 1 : t<45 ? 2 : 3, move: t<70 ? 0 : Math.min(1, (t-70)/50) };
+}
+const STAGE_MSG = ['', 'Atenção: bombas em dupla!', 'Cuidado: até 3 bombas!', 'As bombas começaram a se mexer!'];
+function starRow(x){
+  const n = 3 + Math.floor(Math.random()*3);           // 3 a 5 estrelas
+  const low = Math.random() < 0.4;                      // fileira baixa: pega correndo
+  const base = low ? 34 : rand(88,128);
+  for(let i=0;i<n;i++){
+    const arc = low ? 0 : Math.sin(Math.PI*i/(n-1))*22;
+    ents.push({type:'star', x:x+i*34, y:GY-base-arc, r:12});
+  }
+  return (n-1)*34;
+}
+function bombGroup(x){
+  const d = difficulty(G.t);
+  const n = 1 + Math.floor(Math.random()*d.maxN);
+  const moving = d.move>0 && Math.random() < 0.35 + 0.45*d.move;
+  const amp = moving ? MAX_AMP*(0.4 + 0.6*d.move) : 0;
+  const ph = rand(0, Math.PI*2), w = rand(2.2, 3.2);
+  for(let i=0;i<n;i++) ents.push({type:'bomb', x:x+i*BOMB_GAP, y:GY-15, base:GY-15, amp, ph, w, r:15});
+  return (n-1)*BOMB_GAP;
+}
+function spawn(){
+  const x = W + 40;
+  if(G.superPending && !ents.some(e=>e.type==='super')){
+    ents.push({type:'super', x, y:GY-112, r:24}); return 0;
+  }
+  if(Math.random() < 0.55) return starRow(x);
+  const w = bombGroup(x);
+  if(Math.random() < 0.55){ // estrelas por cima das bombas
+    const cx = x + w/2;
+    for(let i=-1;i<=1;i++) ents.push({type:'star', x:cx+i*30, y:GY-138-(i===0?12:0), r:12});
+  }
+  return w;
+}
+
+function burst(x,y,color,n,spd){
+  for(let i=0;i<n;i++){ const a=rand(0,Math.PI*2), v=rand(spd*0.3,spd); parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:rand(.4,.8),max:.8,color,size:rand(2,5)}); }
+}
+function popText(x,y,txt,color){ parts.push({x,y,vx:0,vy:-60,life:.9,max:.9,txt,color}); }
+
+function hitTest(e,pad){
+  const x0=P.x-13, x1=P.x+13, y0=P.y-62, y1=P.y-2;
+  const cx=clamp(e.x,x0,x1), cy=clamp(e.y,y0,y1), dx=e.x-cx, dy=e.y-cy;
+  return dx*dx+dy*dy < (e.r+pad)*(e.r+pad);
+}
+
+function update(dt){
+  G.t += dt;
+  G.speed = Math.min(560, 300 + G.t*4);
+  const dx = G.speed*dt; G.scroll += dx;
+  if(P.buf>0) P.buf -= dt;
+  if(P.ground && P.buf>0){ P.vy = -JUMP; P.ground = false; P.buf = 0; }
+  P.vy += GRAV*dt; P.y += P.vy*dt;
+  if(P.y >= GY){ P.y = GY; P.vy = 0; P.ground = true; }
+  if(P.inv>0) P.inv -= dt;
+
+  G.spawnIn -= dx;
+  if(G.spawnIn <= 0){ const w = spawn(); G.spawnIn = w + G.speed*rand(0.8,1.3); }
+
+  const d = difficulty(G.t), stage = (d.maxN-1) + (d.move>0 ? 1 : 0);
+  if(stage > G.stage){ G.stage = stage; popText(W/2, 150, STAGE_MSG[stage], '#C8413A'); }
+
+  for(const e of ents){
+    e.x -= dx;
+    if(e.dead) continue;
+    if(e.type==='bomb'){
+      if(e.amp) e.y = e.base - e.amp*(0.5 - 0.5*Math.cos(e.ph + G.t*e.w));
+      if(P.inv<=0 && hitTest(e,-4)){
+        e.dead = true; G.lives--; P.inv = 1.6;
+        burst(e.x,e.y,'#FF8A3D',26,320); burst(e.x,e.y,'#3A3F47',14,200);
+        updateHud();
+        if(G.lives<=0){ gameOver(); return; }
+      }
+    } else if(hitTest(e,6)){
+      e.dead = true;
+      if(e.type==='star'){
+        G.score += 1; G.since++; G.stars++;
+        burst(e.x,e.y,'#FFC83D',10,180); popText(e.x,e.y-16,'+1','#B37A00');
+        if(G.stars % LIFE_EVERY === 0){
+          if(G.lives < MAX_LIVES){ G.lives++; popText(P.x+60, GY-200, '+1 vida! ♥', '#C8413A'); burst(P.x, P.y-40, '#C8413A', 18, 220); }
+          else popText(P.x+60, GY-200, 'Vidas no máximo!', '#C8413A');
+        }
+        if(G.since>=10){ G.since = 0; G.superPending = true; popText(P.x+80,GY-170,'Super estrela chegando!','#145482'); }
+        updateHud();
+      } else {
+        G.score += 10; G.superPending = false;
+        burst(e.x,e.y,'#FFC83D',30,300); burst(e.x,e.y,'#FFFFFF',14,220); popText(e.x,e.y-26,'+10','#B37A00');
+        updateHud();
+        mode = 'study';
+        setTimeout(openStudy, 450);
+      }
+    }
+  }
+  ents = ents.filter(e => e.x > -80 && !e.dead);
+}
+
+function updateParts(dt){
+  for(const p of parts){ p.life -= dt; p.x += p.vx*dt; p.y += p.vy*dt; if(!p.txt) p.vy += 500*dt; }
+  parts = parts.filter(p => p.life > 0);
+}
+
+/* ---------- desenho ---------- */
+const tri = u => 1 - 2*Math.abs(u - Math.floor(u) - 0.5);
+function drawStar(x,y,r,rot,fill,stroke){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(rot); ctx.beginPath();
+  for(let i=0;i<10;i++){ const rr = i%2 ? r*0.45 : r, a = -Math.PI/2 + i*Math.PI/5; ctx.lineTo(Math.cos(a)*rr, Math.sin(a)*rr); }
+  ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = stroke; ctx.stroke(); ctx.restore();
+}
+function cloud(x,y,s){
+  ctx.beginPath(); ctx.arc(x,y,18*s,0,Math.PI*2); ctx.arc(x+20*s,y-10*s,22*s,0,Math.PI*2); ctx.arc(x+44*s,y,18*s,0,Math.PI*2); ctx.rect(x,y,44*s,18*s); ctx.fill();
+}
+function draw(time){
+  ctx.setTransform(1,0,0,1,0,0);
+  const g = ctx.createLinearGradient(0,0,0,cv.height);
+  g.addColorStop(0,'#6DBFE6'); g.addColorStop(0.75,'#DDF3FA'); g.addColorStop(1,'#DDF3FA');
+  ctx.fillStyle = g; ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.setTransform(SC,0,0,SC,0,OY*SC);
+  const sc = G.scroll;
+
+  // sol
+  ctx.fillStyle = 'rgba(255,214,90,.35)'; ctx.beginPath(); ctx.arc(W-90,70,46,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#FFD65A'; ctx.beginPath(); ctx.arc(W-90,70,30,0,Math.PI*2); ctx.fill();
+  // nuvens
+  ctx.fillStyle = 'rgba(255,255,255,.9)';
+  for(let i=0;i<5;i++){ const span=W+200; const x=((i*260 - sc*0.06) % span + span) % span - 100; cloud(x, 40+ (i*37)%70, 0.8+(i%3)*0.25); }
+  // cordilheira ao fundo
+  ctx.fillStyle = '#9BB7CF'; ctx.beginPath(); ctx.moveTo(0,GY);
+  for(let x=0;x<=W+8;x+=8){ const wx=x+sc*0.12; ctx.lineTo(x, GY-70-110*tri(wx/300)-35*tri(wx/113+.3)); }
+  ctx.lineTo(W,GY); ctx.fill();
+  // neve nos picos
+  ctx.fillStyle = '#F4F8FB';
+  for(let x=0;x<=W;x+=4){ const wx=x+sc*0.12, h=110*tri(wx/300)+35*tri(wx/113+.3); if(h>118){ ctx.fillRect(x, GY-70-h, 4, (h-118)*0.9); } }
+  // morros (serra) no meio
+  ctx.fillStyle = '#6FAE5A'; ctx.beginPath(); ctx.moveTo(0,GY);
+  for(let x=0;x<=W+8;x+=8){ const wx=x+sc*0.35; ctx.lineTo(x, GY-30-28*(Math.sin(wx/130)+1)-14*Math.sin(wx/47+1)); }
+  ctx.lineTo(W,GY); ctx.fill();
+  // rio no vale (faixa)
+  ctx.fillStyle = '#5FA9D6'; ctx.fillRect(0,GY-6,W,6);
+  // chão
+  ctx.fillStyle = '#B9804A'; ctx.fillRect(-2,GY,W+4,VH-GY-OY+20);
+  ctx.fillStyle = '#4FA23A'; ctx.fillRect(-2,GY,W+4,9);
+  ctx.fillStyle = '#9A6738';
+  for(let i=0;i<14;i++){ const span=W+60; const x=((i*83 - sc) % span + span) % span - 30; ctx.fillRect(x, GY+20+(i*13)%40, 10, 3); }
+
+  // entidades
+  for(const e of ents){
+    if(e.type==='bomb'){
+      ctx.fillStyle='#232A35'; ctx.beginPath(); ctx.arc(e.x,e.y,e.r,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#4A5566'; ctx.beginPath(); ctx.arc(e.x-5,e.y-5,4,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#232A35'; ctx.fillRect(e.x-4,e.y-e.r-4,8,6);
+      ctx.strokeStyle='#7A5A3A'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(e.x,e.y-e.r-4); ctx.quadraticCurveTo(e.x+6,e.y-e.r-12,e.x+10,e.y-e.r-10); ctx.stroke();
+      const f = 3+2*Math.sin(time/60); ctx.fillStyle='#FF8A3D'; ctx.beginPath(); ctx.arc(e.x+10,e.y-e.r-10,f,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#FFE27A'; ctx.beginPath(); ctx.arc(e.x+10,e.y-e.r-10,f*0.5,0,Math.PI*2); ctx.fill();
+    } else if(e.type==='star'){
+      drawStar(e.x, e.y + Math.sin(time/250+e.x/40)*3, e.r, Math.sin(time/400)*0.2, '#FFC83D', '#D99A12');
+    } else {
+      const pulse = 1 + 0.08*Math.sin(time/120);
+      ctx.fillStyle='rgba(255,226,122,.45)'; ctx.beginPath(); ctx.arc(e.x,e.y,e.r*1.9*pulse,0,Math.PI*2); ctx.fill();
+      drawStar(e.x, e.y, e.r*pulse, time/600, '#FFB703', '#B86E00');
+      ctx.fillStyle='#7A3E00'; ctx.font='800 15px "Baloo 2", sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('10', e.x, e.y+2);
+    }
+  }
+  drawPlayer();
+  // partículas
+  for(const p of parts){
+    ctx.globalAlpha = clamp(p.life/p.max,0,1);
+    if(p.txt){ ctx.fillStyle=p.color; ctx.font='800 20px "Baloo 2", sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(p.txt,p.x,p.y); }
+    else { ctx.fillStyle=p.color; ctx.fillRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size); }
+  }
+  ctx.globalAlpha = 1;
+}
+function drawPlayer(){
+  if(P.inv>0 && Math.floor(P.inv*12)%2===0) return;
+  ctx.save(); ctx.translate(P.x, P.y);
+  const ph = G.scroll/16, run = P.ground ? Math.sin(ph) : 0;
+  ctx.lineCap = 'round';
+  // pernas
+  ctx.strokeStyle = '#8A5A36'; ctx.lineWidth = 6;
+  const f1 = P.ground ? [10*run, -2] : [9,-8], f2 = P.ground ? [-10*run, -2] : [-6,-5];
+  ctx.beginPath(); ctx.moveTo(3,-22); ctx.lineTo(f1[0]+3,f1[1]); ctx.moveTo(-3,-22); ctx.lineTo(f2[0]-3,f2[1]); ctx.stroke();
+  ctx.fillStyle = '#2B2F36';
+  ctx.beginPath(); ctx.ellipse(f1[0]+6,f1[1]+1,6,3.5,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(f2[0]-1,f2[1]+1,6,3.5,0,0,Math.PI*2); ctx.fill();
+  // mochila
+  ctx.fillStyle = '#D9483B'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(-20,-48,10,22,3) : ctx.rect(-20,-48,10,22); ctx.fill();
+  // corpo
+  ctx.fillStyle = '#1F8A8A'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(-11,-50,22,28,6) : ctx.rect(-11,-50,22,28); ctx.fill();
+  ctx.fillStyle = '#C9A86A'; ctx.fillRect(-11,-26,22,7);
+  // braço
+  ctx.strokeStyle = '#8A5A36'; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(2,-44); ctx.lineTo(P.ground ? 10-8*run : 14, P.ground ? -30 : -50); ctx.stroke();
+  // cabeça
+  ctx.fillStyle = '#8A5A36'; ctx.beginPath(); ctx.arc(2,-60,10,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#1D2B3A'; ctx.beginPath(); ctx.arc(7,-61,1.8,0,Math.PI*2); ctx.fill();
+  // chapéu de explorador
+  ctx.fillStyle = '#C9A86A'; ctx.beginPath(); ctx.ellipse(2,-67,15,3.5,0,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(2,-67,9,Math.PI,0); ctx.fill();
+  ctx.fillStyle = '#7A5A3A'; ctx.fillRect(-7,-69,18,2.5);
+  ctx.restore();
+}
+
+let last = 0;
+function frame(ts){
+  const dt = Math.min(0.033, last ? (ts-last)/1000 : 0); last = ts;
+  if(mode==='play') update(dt);
+  else if(mode==='menu') G.scroll += 60*dt;
+  updateParts(dt);
+  draw(ts);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ---------- HUD ---------- */
+const meter = $('#meter');
+for(let i=0;i<10;i++){ const s=document.createElement('span'); s.className='pip'; meter.appendChild(s); }
+function updateHud(){
+  $('#score').textContent = G.score;
+  [...meter.children].forEach((p,i)=>p.classList.toggle('on', i<G.since));
+  meter.classList.toggle('ready', G.superPending);
+  let h=''; for(let i=0;i<Math.max(3,G.lives);i++) h += i<G.lives ? '♥' : '<span class="gone">♥</span>';
+  $('#lives').innerHTML = h;
+}
+resetRun();
+
+/* ---------- controles ---------- */
+$('#stage').addEventListener('pointerdown', e => { if(mode==='play'){ e.preventDefault(); jump(); } });
+window.addEventListener('keydown', e => {
+  if(mode==='play' && (e.code==='Space' || e.code==='ArrowUp')){ e.preventDefault(); jump(); }
+  else if(e.code==='KeyP' || e.code==='Escape'){ if(mode==='play') pause(); else if(mode==='paused') resume(); }
+});
+$('#pauseBtn').addEventListener('pointerdown', e => e.stopPropagation());
+$('#pauseBtn').addEventListener('click', () => { if(mode==='play') pause(); else if(mode==='paused') resume(); });
+document.addEventListener('visibilitychange', () => { if(document.hidden && mode==='play') pause(); });
+
+/* ---------- telas ---------- */
+const VIEWS = ['vMenu','vRead','vQuiz','vSum','vOver','vPause'];
+function show(id){ $('#ov').hidden = false; VIEWS.forEach(v => $('#'+v).hidden = v!==id); }
+function hideOv(){ $('#ov').hidden = true; }
+
+function renderMenu(){
+  $('#topics').innerHTML = SECTIONS.map((s,si) => {
+    const idxs = PARTS.map((p,i)=>p.si===si ? i : -1).filter(i=>i>=0);
+    const got = idxs.filter(i=>progress.done.includes(i)).length;
+    const cls = got===idxs.length ? 'done' : (PARTS[progress.next].si===si ? 'next' : '');
+    return `<li class="${cls}">${s.t}${got && got<idxs.length ? ` (${got}/${idxs.length})` : ''}</li>`;
+  }).join('');
+  $('#bestTxt').textContent = best ? `Recorde: ${best} pontos` : '';
+}
+function countdown(){
+  mode = 'count'; hideOv();
+  const el = $('#count'); el.hidden = false; let n = 3; el.textContent = n;
+  const step = () => { n--; if(n>0){ el.textContent = n; setTimeout(step, 650); } else { el.hidden = true; last = 0; mode = 'play'; } };
+  setTimeout(step, 650);
+}
+function pause(){ mode = 'paused'; show('vPause'); }
+function resume(){ countdown(); }
+function goMenu(){ mode = 'menu'; resetRun(); renderMenu(); show('vMenu'); }
+function gameOver(){
+  mode = 'over';
+  if(G.score > best){ best = G.score; store.set('best', best); }
+  $('#overScore').textContent = G.score; $('#overBest').textContent = best; $('#overTexts').textContent = progress.done.length + '/' + N;
+  setTimeout(()=>show('vOver'), 600);
+}
+
+$('#startBtn').onclick = () => { resetRun(); $('#hint').style.opacity = 1; countdown(); };
+$('#againBtn').onclick = () => { resetRun(); countdown(); };
+$('#resumeBtn').onclick = resume;
+$('#menuBtn1').onclick = goMenu; $('#menuBtn2').onclick = goMenu;
+let resetArmed = false;
+$('#resetBtn').onclick = () => {
+  const b = $('#resetBtn');
+  if(!resetArmed){ resetArmed = true; b.textContent = 'Toque de novo para confirmar'; setTimeout(()=>{ resetArmed=false; b.textContent='Recomeçar os textos'; }, 3000); return; }
+  resetArmed = false; b.textContent = 'Recomeçar os textos';
+  progress = {next:0, done:[]}; store.set('progress-v3', progress); renderMenu();
+};
+
+/* ====================== ESTUDO ====================== */
+let cur = null, tmr = null;
+function startTimer(sec, label, onClick){
+  clearInterval(tmr);
+  const btn = $('#readBtn'), bar = $('#readBar'), total = sec*1000, end = Date.now()+total;
+  btn.disabled = true; btn.onclick = onClick;
+  const tick = () => {
+    const left = Math.max(0, end-Date.now());
+    bar.style.width = (100*(1-left/total)) + '%';
+    if(left<=0){ clearInterval(tmr); btn.disabled = false; btn.textContent = label; }
+    else btn.textContent = `${label} (${fmt(Math.ceil(left/1000))})`;
+  };
+  tick(); tmr = setInterval(tick, 250);
+}
+function renderText(keys){
+  const S = PARTS[cur.idx];
+  $('#readChip').textContent = S.parts > 1 ? `${S.cap} · Parte ${S.part} de ${S.parts}` : S.cap;
+  $('#readTitle').textContent = S.t;
+  $('#readText').innerHTML = S.p.map(p => isFig(p) ? figHTML(p) : `<p>${md(p)}</p>`).join('');
+  if(keys) $('#readText').querySelectorAll('.ans').forEach(el => { if(keys.includes(el.dataset.k)) el.classList.add('hl'); });
+}
+function openStudy(){
+  cur = {idx: progress.next, qi: 0, first: 0, pts: 10, missed: false, order: null};
+  const S = PARTS[cur.idx];
+  renderText(null);
+  $('#readHint').hidden = true;
+  show('vRead'); $('#readScroll').scrollTop = 0;
+  const words = S.p.reduce((a,p)=>a+countWords(p),0);
+  startTimer(clamp(Math.round(words/4.4),8,24), 'Já li! Ir para as perguntas', showQuestion);
+}
+function showQuestion(){
+  clearInterval(tmr);
+  const S = PARTS[cur.idx], q = S.q[cur.qi];
+  $('#qChip').textContent = `${S.t} · Pergunta ${cur.qi+1} de ${S.q.length}`;
+  $('#qBar').style.width = (100*cur.qi/S.q.length) + '%';
+  $('#qText').textContent = q.q;
+  const qf = $('#qFig'); qf.hidden = !q.fig; qf.innerHTML = q.fig ? FIGS[q.fig] : '';
+  $('#qFeed').textContent = ''; $('#qFeed').className = '';
+  const opts = shuffle(q.o.map((t,i)=>({t, ok:i===0})));
+  const box = $('#opts'); box.innerHTML = '';
+  opts.forEach((o,i) => {
+    const b = document.createElement('button'); b.className = 'opt'; b.id = 'opt'+i;
+    b.innerHTML = `<span class="letter">${i+1}</span><span></span>`; b.lastChild.textContent = o.t;
+    b.onclick = () => answer(b, o.ok);
+    box.appendChild(b);
+  });
+  show('vQuiz');
+}
+function answer(btn, ok){
+  $('#opts').querySelectorAll('.opt').forEach(b => b.disabled = true);
+  const fb = $('#qFeed');
+  if(ok){
+    btn.classList.add('ok');
+    if(!cur.missed){ cur.first++; cur.pts += 5; G.score += 5; updateHud(); fb.textContent = 'Isso mesmo! +5 pontos'; }
+    else fb.textContent = 'Isso mesmo! Agora você acertou.';
+    fb.className = 'ok';
+    setTimeout(nextQuestion, 1100);
+  } else {
+    btn.classList.add('bad');
+    fb.textContent = 'Não é essa. Vamos reler o texto.'; fb.className = 'bad';
+    cur.missed = true;
+    setTimeout(reread, 1300);
+  }
+}
+function reread(){
+  const q = PARTS[cur.idx].q[cur.qi];
+  const keys = Array.isArray(q.k) ? q.k : [q.k];
+  renderText(keys);
+  $('#readHint').hidden = false; $('#readHintQ').textContent = q.q;
+  show('vRead');
+  const first = $('#readText .hl');
+  requestAnimationFrame(() => { if(first) first.scrollIntoView({block:'center', behavior:'smooth'}); });
+  const words = [...$('#readText').querySelectorAll('.hl')].reduce((a,el)=>a+el.textContent.trim().split(/\s+/).length,0);
+  startTimer(clamp(Math.round(words/3.75),3,8), 'Voltar para a pergunta', showQuestion);
+}
+function nextQuestion(){
+  cur.qi++; cur.missed = false;
+  if(cur.qi >= PARTS[cur.idx].q.length) finishSection(); else showQuestion();
+}
+const partName = P => P.parts > 1 ? `“${P.t}” (parte ${P.part} de ${P.parts})` : `“${P.t}”`;
+function finishSection(){
+  const S = PARTS[cur.idx], firstAll = progress.done.length < N;
+  if(!progress.done.includes(cur.idx)) progress.done.push(cur.idx);
+  progress.next = (cur.idx+1) % N;
+  store.set('progress-v3', progress);
+  $('#sumChip').textContent = `${progress.done.length} de ${N} partes estudadas`;
+  $('#sumTitle').textContent = S.parts > 1 ? `Parte ${S.part} de ${S.parts} concluída!` : 'Texto concluído!';
+  $('#sumFirst').textContent = `${cur.first}/${S.q.length}`;
+  $('#sumPts').textContent = '+' + cur.pts;
+  let msg = `Próxima leitura: ${partName(PARTS[progress.next])}. Junte mais 10 estrelas para abrir.`;
+  if(firstAll && progress.done.length === N) msg = 'Parabéns! Você estudou todo o conteúdo da prova. Os textos vão recomeçar do primeiro para você revisar.';
+  $('#sumMsg').textContent = msg;
+  show('vSum');
+}
+$('#sumBtn').onclick = () => { renderMenu(); countdown(); };
+
+renderMenu();
+show('vMenu');
+</script>
