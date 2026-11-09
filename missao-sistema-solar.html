@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#120f2e">
+<title>Missão Sistema Solar</title>
+<style>
+:root{
+  --bg:#120f2e; --bg2:#1e1a4a; --card:#262158; --card2:#322c70; --line:#4a4394;
+  --text:#fff; --muted:#c3bee8; --gold:#ffd24a; --ok:#35c97c; --ok-d:#17693f;
+  --bad:#ff6b6b; --bad-d:#7c2530; --cyan:#59d4ff; --btn:#6c4df0; --btn-d:#4a2fbd;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text);font-size:17px;line-height:1.35;
+  background:var(--bg) radial-gradient(circle at 80% 8%,#3a2d86 0,transparent 42%);
+  background-attachment:fixed;
+}
+body::before{content:"";position:fixed;inset:0;z-index:-1;opacity:.75;background-image:
+  radial-gradient(1.4px 1.4px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 28% 72%,#fff,transparent),
+  radial-gradient(1.6px 1.6px at 44% 32%,#fff,transparent),radial-gradient(1px 1px at 62% 86%,#fff,transparent),
+  radial-gradient(1.4px 1.4px at 76% 48%,#fff,transparent),radial-gradient(1px 1px at 90% 22%,#fff,transparent),
+  radial-gradient(1.2px 1.2px at 8% 58%,#fff,transparent),radial-gradient(1px 1px at 52% 8%,#fff,transparent),
+  radial-gradient(1.2px 1.2px at 94% 70%,#fff,transparent)}
+#app{max-width:560px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 16px 28px;min-height:100dvh;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation}
+h1,h2,h3,p{margin:0}
+
+/* início */
+.hero{text-align:center;padding:12px 0 14px}
+.hero .big{font-size:52px;line-height:1;display:block;margin-bottom:4px}
+.hero h1{font-size:30px;font-weight:900;letter-spacing:-.3px}
+.hero p{color:var(--muted);margin-top:3px;font-size:15px}
+.overall{background:var(--card);border-radius:14px;padding:11px 13px;margin-bottom:12px}
+.overall .row{display:flex;justify-content:space-between;font-weight:800;font-size:15px;margin-bottom:6px}
+.bar{height:9px;border-radius:9px;background:#120f2e;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:9px}
+.cta{display:block;width:100%;min-height:54px;padding:12px 16px;border-radius:15px;font-weight:900;font-size:18px;background:var(--btn);box-shadow:0 5px 0 var(--btn-d);margin-bottom:12px;text-align:center}
+.cta:active{transform:translateY(3px);box-shadow:0 2px 0 var(--btn-d)}
+.cta.gold{background:var(--gold);color:#2b2100;box-shadow:0 5px 0 #b48a12}
+.cta.gold:active{box-shadow:0 2px 0 #b48a12}
+.cta.red{background:#e2506a;box-shadow:0 5px 0 #98283e}
+.cta.red:active{box-shadow:0 2px 0 #98283e}
+.cta.soft{background:var(--card2);box-shadow:0 5px 0 #1b1745}
+.cta.soft:active{box-shadow:0 2px 0 #1b1745}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two .cta{font-size:16px}
+.lesson{margin-top:12px}
+.lesson>h2{font-size:15px;color:var(--gold);margin:0 0 7px;font-weight:900}
+.topic{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--card);border-radius:12px;padding:10px 12px;margin-bottom:7px;min-height:56px}
+.topic:active{background:var(--card2)}
+.topic .ic{font-size:24px;width:30px;text-align:center;flex:none}
+.topic .mid{flex:1;min-width:0}
+.topic .nm{font-weight:800;font-size:15.5px;display:block;margin-bottom:5px}
+.topic .bar{height:6px}
+.topic .st{flex:none;font-size:12px;font-weight:800;padding:3px 7px;border-radius:9px;background:#120f2e;color:var(--muted)}
+.topic .st.g{color:#071d11;background:var(--ok)}
+.topic .st.y{color:#2b2100;background:var(--gold)}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;color:var(--muted);font-size:13px}
+.link{background:none;color:var(--muted);text-decoration:underline;padding:8px 0;font-size:13px}
+
+/* jogo */
+.top{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.iconbtn{flex:none;width:42px;height:42px;border-radius:12px;background:var(--card);font-size:18px;font-weight:900}
+.top .ttl{flex:1;min-width:0;font-weight:800;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .combo{flex:none;font-weight:900;color:var(--gold);font-size:15px}
+.track{position:relative;display:flex;justify-content:space-between;align-items:center;background:var(--card);border-radius:14px;padding:9px 9px 18px;margin-bottom:12px}
+.track::before{content:"";position:absolute;left:18px;right:18px;top:21px;border-top:2px dashed var(--line)}
+.pl{position:relative;width:24px;height:24px;border-radius:50%;opacity:.38;display:flex;justify-content:center}
+.pl.on{opacity:1}
+.pl.now{box-shadow:0 0 0 3px var(--gold)}
+.pl small{position:absolute;top:27px;font-size:9.5px;font-weight:800;color:var(--muted);white-space:nowrap}
+.pl.now small{color:var(--gold)}
+.tagline{color:var(--cyan);font-size:13px;font-weight:800;margin-bottom:5px}
+.qtext{font-size:20px;font-weight:800;line-height:1.28;margin-bottom:13px}
+.qimg{display:flex;justify-content:center;margin:-3px 0 12px}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{width:100%;min-height:54px;text-align:left;padding:11px 14px;border-radius:13px;background:var(--card2);font-size:17px;font-weight:700;box-shadow:0 3px 0 #1b1745;display:flex;align-items:center;gap:10px}
+.opt:active{transform:translateY(2px);box-shadow:0 1px 0 #1b1745}
+.opt.ok{background:var(--ok);color:#06200f;box-shadow:none}
+.opt.bad{background:var(--bad);color:#2f0508;box-shadow:none}
+.opt.dim{opacity:.48}
+.opt.sel{outline:3px solid var(--gold);outline-offset:-3px}
+.opt[disabled]{cursor:default}
+.opts.vf{flex-direction:row}
+.opts.vf .opt{justify-content:center;font-size:19px;font-weight:900;min-height:70px}
+.opts.img{display:grid;grid-template-columns:1fr 1fr}
+.opts.img .opt{justify-content:center;min-height:96px}
+.check{margin-top:13px}
+.slots{display:flex;flex-direction:column;gap:6px;margin-bottom:11px}
+.slot{min-height:42px;padding:7px 11px;border-radius:10px;border:2px dashed var(--line);display:flex;align-items:center;gap:9px;font-weight:800;width:100%;text-align:left;background:none}
+.slot b{color:var(--gold);width:18px;flex:none}
+.slot.fill{background:var(--card);border-style:solid;border-color:var(--cyan)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:46px;padding:9px 13px;border-radius:11px;background:var(--card2);font-weight:800;box-shadow:0 3px 0 #1b1745}
+.chip[disabled]{opacity:.22;box-shadow:none}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.match .col{display:flex;flex-direction:column;gap:8px}
+.mi{width:100%;flex:1;min-height:58px;padding:8px 10px;border-radius:11px;background:var(--card2);font-weight:750;font-size:15px;text-align:left;line-height:1.22}
+.mi.left{background:#37509c}
+.mi.sel{outline:3px solid var(--gold);outline-offset:-3px}
+.mi.ok{background:var(--ok);color:#06200f}
+.mi.bad{background:var(--bad);color:#2f0508}
+.mi[disabled]{cursor:default}
+.hint{font-size:14px;color:var(--muted);margin-bottom:10px;font-weight:600}
+.sortcard{background:var(--card);border-radius:14px;padding:18px 14px;text-align:center;font-size:21px;font-weight:900;margin-bottom:11px;min-height:78px;display:flex;align-items:center;justify-content:center}
+.sortcount{text-align:center;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:700}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bins .opt{justify-content:center;text-align:center;min-height:68px;font-weight:900}
+
+/* resposta */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:5;padding:14px 16px max(14px,env(safe-area-inset-bottom));border-radius:20px 20px 0 0;animation:up .16s ease-out;box-shadow:0 -8px 28px rgba(0,0,0,.45)}
+.sheet.good{background:var(--ok-d)}
+.sheet.oops{background:var(--bad-d)}
+.sheet .in{max-width:528px;margin:0 auto}
+.sheet h3{font-size:21px;font-weight:900;margin-bottom:3px}
+.sheet p{font-size:16px;margin-bottom:7px}
+.sheet .right{font-weight:800}
+.sheet .stop{background:rgba(0,0,0,.24);border-radius:10px;padding:7px 10px;font-size:14.5px;font-weight:700;margin-bottom:9px}
+.sheet .cta{margin:4px 0 0;background:#fff;color:#1a1640;box-shadow:0 4px 0 rgba(0,0,0,.35)}
+.spacer{height:230px;flex:none}
+@keyframes up{from{transform:translateY(40%);opacity:.3}to{transform:none;opacity:1}}
+
+/* fim */
+.end{text-align:center;padding:16px 0 10px}
+.end .big{font-size:58px;display:block;line-height:1.1}
+.end h1{font-size:27px;font-weight:900;margin:5px 0 4px}
+.end .stars{font-size:36px;letter-spacing:4px;margin:5px 0}
+.end p{color:var(--muted)}
+.grade{font-size:58px;font-weight:900;color:var(--gold);line-height:1.1}
+.box{background:var(--card);border-radius:14px;padding:12px 14px;margin:14px 0;text-align:left}
+.box h3{font-size:15px;margin-bottom:6px;color:var(--gold);font-weight:900}
+.box li{margin:4px 0;font-size:15.5px}
+.box ul{margin:0;padding-left:18px}
+
+/* cola */
+.tabs{display:flex;gap:6px;margin-bottom:11px}
+.tab{flex:1;min-height:44px;border-radius:11px;background:var(--card);font-weight:800;font-size:14.5px}
+.tab.on{background:var(--gold);color:#2b2100}
+.note{background:var(--card);border-radius:12px;padding:11px 13px;margin-bottom:8px;font-size:16px}
+.note b{color:var(--gold)}
+.note h3{font-size:15px;color:var(--cyan);margin-bottom:3px;font-weight:900}
+.moons{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;font-size:12.5px;font-weight:800}
+.moons svg{display:block;margin:0 auto 3px}
+.pltable{width:100%;border-collapse:collapse;font-size:14.5px}
+.pltable td{padding:4px 2px;border-top:1px solid var(--line);vertical-align:top}
+.pltable td:first-child{font-weight:800;white-space:nowrap;padding-right:10px;color:var(--gold)}
+.pltable tr:first-child td{border-top:0}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ===== CONTEÚDO (apostila de Ciências, Lições 1, 2 e 3) ===== */
+const TOPICS=[
+ {id:'astros',l:1,ic:'✨',nm:'Universo e astros'},
+ {id:'sistema',l:1,ic:'☀️',nm:'Sistema Solar e órbita'},
+ {id:'mov',l:1,ic:'🔄',nm:'Rotação e translação'},
+ {id:'tipos',l:1,ic:'🪨',nm:'Rochosos e gasosos'},
+ {id:'cada',l:1,ic:'🪐',nm:'Cada um dos planetas'},
+ {id:'expl',l:1,ic:'🚀',nm:'Exploração e Plutão'},
+ {id:'luas',l:2,ic:'🌑',nm:'Satélites naturais'},
+ {id:'aster',l:2,ic:'☄️',nm:'Asteroides e crateras'},
+ {id:'meteoro',l:2,ic:'🔥',nm:'Meteoros e meteoritos'},
+ {id:'cometa',l:2,ic:'🌠',nm:'Cometas e chuva de meteoros'},
+ {id:'luzlua',l:3,ic:'🌙',nm:'A luz da Lua e a revolução'},
+ {id:'fases',l:3,ic:'🌓',nm:'As quatro fases'},
+ {id:'hora',l:3,ic:'🕗',nm:'O horário de cada fase'},
+ {id:'semana',l:3,ic:'📅',nm:'A semana e o mês'},
+];
+const LESSONS={1:'Lição 1 · Os astros maiores',2:'Lição 2 · Outros astros',3:'Lição 3 · As fases da Lua'};
+const PLANETS=[
+ ['Mercúrio','#a9a39b','o menor planeta e o mais perto do Sol.'],
+ ['Vênus','#e8b56a','o planeta mais quente de todos.'],
+ ['Terra','#3e8fc7','o único com ar respirável e água líquida.'],
+ ['Marte','#d0553a','o planeta vermelho, cheio de ferrugem.'],
+ ['Júpiter','#d9a066','o maior planeta, com uma mancha vermelha.'],
+ ['Saturno','#e8cf8a','o único com anéis bem visíveis.'],
+ ['Urano','#8fd3e0','azulado e faz a rotação “deitado”.'],
+ ['Netuno','#4f75dc','o mais distante do Sol.'],
+];
+const ORDEM=PLANETS.map(p=>p[0]);
+const VOLUME=['Mercúrio','Marte','Vênus','Terra','Netuno','Urano','Saturno','Júpiter'];
+const Q=[];
+const add=o=>Q.push(o);
+const M=(t,q,a,w,x,e)=>add({k:'mc',t,q,a,w,x,...e});
+const VF=(t,q,v,x)=>add({k:'vf',t,q,v,x});
+const OR=(t,q,seq,x)=>add({k:'or',t,q,seq,x});
+const LI=(t,q,pairs,x)=>add({k:'li',t,q,pairs,x});
+const CL=(t,q,bins,items,x)=>add({k:'cl',t,q,bins,items,x});
+const MU=(t,q,yes,no,x)=>add({k:'mu',t,q,yes,no,x});
+
+/* ---------- LIÇÃO 1 ---------- */
+M('astros','O <b>Universo</b> é:','tudo o que existe: o espaço, o tempo e a matéria',['somente o Sol e os oito planetas','somente as estrelas que vemos à noite','somente a Terra e tudo o que há nela'],'Universo é tudo o que existe, inclusive a Terra.');
+M('astros','Qual é a diferença entre astro <b>luminoso</b> e <b>iluminado</b>?','O luminoso tem luz própria; o iluminado recebe luz das estrelas',['O luminoso é pequeno; o iluminado é sempre muito grande','O luminoso só brilha de dia; o iluminado só brilha à noite','O luminoso recebe luz do Sol; o iluminado produz a sua luz'],'Luminoso produz e emite luz (estrelas). Iluminado só recebe luz (planetas e luas).');
+CL('astros','Esse astro é <b>luminoso</b> ou <b>iluminado</b>?',['💡 Luminoso','🔦 Iluminado'],[['O Sol',0],['A Terra',1],['A Lua',1],['Uma estrela no céu',0],['O planeta Vênus',1]],'Só as estrelas, como o Sol, têm luz própria.');
+M('astros','Qual é a estrela mais próxima de nós?','O Sol',['A Lua','Vênus','Júpiter'],'O Sol é uma estrela e é a mais próxima de nós. A Lua e Vênus não são estrelas.');
+VF('astros','Durante o dia, as estrelas desaparecem do céu.',false,'Elas continuam no céu, mas a luz do Sol é tão forte que não vemos o brilho delas.');
+VF('astros','Algumas estrelas que vemos à noite são maiores que o Sol.',true,'Elas parecem pequenas só porque estão muito distantes.');
+VF('astros','Os planetas produzem a sua própria luz.',false,'Planetas são astros iluminados: recebem a luz das estrelas.');
+M('astros','Que força mantém os planetas girando ao redor do Sol?','A gravidade',['A rotação','A luz','O calor'],'A gravidade do Sol atrai os astros e os mantém por perto.');
+M('astros','Jogamos uma bola para cima e ela cai no chão. Por quê?','A gravidade puxa tudo para o centro do planeta',['O vento sempre empurra a bola para baixo','O Sol empurra a bola de volta para o chão','A rotação da Terra faz a bola descer'],'É a gravidade da Terra que puxa tudo para o centro do planeta.');
+M('astros','Complete: “A ___ é o planeta em que moramos.”','Terra, com letra maiúscula',['terra, com letra minúscula','Tanto faz maiúscula ou minúscula','TERRA, só com letras maiúsculas'],'<b>Terra</b> é o planeta. <b>terra</b> é o que colocamos no vaso para plantar.');
+M('astros','Complete: “Coloquei ___ no vaso para plantar uma semente.”','terra, com letra minúscula',['Terra, com letra maiúscula','Tanto faz maiúscula ou minúscula','TERRA, só com letras maiúsculas'],'<b>terra</b> com minúscula é a do vaso. <b>Terra</b> com maiúscula é o planeta.');
+
+M('sistema','Por que o Sistema Solar tem esse nome?','Porque o Sol está no centro dele',['Porque todos os planetas têm luz própria','Porque o Sol é o único astro que existe nele','Porque ele fica dentro do Sol'],'“Solar” quer dizer “do Sol”.');
+M('sistema','Como se chama o caminho que um astro faz ao redor de outro?','Órbita',['Rotação','Geoide','Eixo'],'Cada planeta tem a sua própria órbita, por isso eles não se esbarram.');
+M('sistema','A Terra é um pouco achatada, como uma tangerina. Esse formato se chama:','geoide',['órbita','cubo','eixo'],'Geoide é o formato da Terra.');
+LI('sistema','Ligue cada nome ao seu significado.',[['Universo','Tudo o que existe'],['Sistema Solar','O Sol e os astros em sua órbita'],['Geoide','Formato da Terra'],['Sistema estelar','Uma estrela e os astros ao seu redor']],'Esse é o exercício 5 da apostila!');
+OR('sistema','Coloque os planetas em ordem, do <b>mais perto</b> para o <b>mais longe</b> do Sol.',ORDEM,'Mercúrio, Vênus, Terra, Marte, Júpiter, Saturno, Urano e Netuno.');
+OR('sistema','Agora em ordem de <b>tamanho</b>, do <b>menor</b> para o <b>maior</b>.',VOLUME,'Mercúrio, Marte, Vênus, Terra, Netuno, Urano, Saturno e Júpiter.');
+M('sistema','Qual é o terceiro planeta a partir do Sol?','Terra',['Vênus','Marte','Júpiter'],'Mercúrio, Vênus, <b>Terra</b>.');
+M('sistema','Qual planeta vem logo depois de Marte?','Júpiter',['Terra','Saturno','Urano'],'Marte, <b>Júpiter</b>, Saturno. Entre Marte e Júpiter fica o Cinturão de Asteroides.');
+M('sistema','Quantos planetas tem o Sistema Solar?','8',['7','9','10'],'São oito. Plutão virou planeta-anão.');
+VF('sistema','Todos os planetas têm formato aproximadamente esférico, como uma bola.',true,'Eles têm tamanhos diferentes, mas todos têm formato parecido com o de uma bola.');
+VF('sistema','Os planetas são maiores que as estrelas.',false,'Planetas são os maiores astros iluminados, mas são muito menores que as estrelas.');
+M('sistema','Um <b>sistema estelar</b> é:','uma estrela e os astros ao seu redor',['um grupo de planetas sem nenhuma estrela','o caminho que uma estrela faz no céu','um outro nome para o Universo inteiro'],'O Sistema Solar é um sistema estelar cuja estrela é o Sol.');
+
+M('mov','A <b>rotação</b> é o movimento do planeta:','girando em torno de si mesmo, como um pião',['girando ao redor do Sol, percorrendo a órbita','caindo em direção ao centro do Sol','passando na frente de outro planeta'],'Rotação: em torno de si mesmo, do próprio eixo.');
+M('mov','A <b>translação</b> é o movimento do planeta:','girando ao redor do Sol, percorrendo a órbita',['girando em torno de si mesmo, como um pião','caindo em direção ao centro do Sol','passando na frente de outro planeta'],'Translação: ao redor do Sol.');
+M('mov','O que dá origem aos <b>dias e às noites</b>?','A rotação',['A translação','A gravidade','A revolução lunar'],'O Sol só ilumina metade do planeta de cada vez. Com a rotação, cada lado recebe luz em um momento.');
+M('mov','O que dá origem aos <b>anos</b>?','A translação',['A rotação','A gravidade','A revolução lunar'],'Um ano é uma volta completa ao redor do Sol.');
+M('mov','Na Terra, um <b>dia</b> dura cerca de:','24 horas',['12 horas','7 dias','365 horas'],'Um dia é o tempo de uma rotação da Terra: cerca de 24 horas.');
+M('mov','Na Terra, um <b>ano</b> dura:','365 dias',['24 dias','28 dias','88 dias'],'Um ano é o tempo de uma translação da Terra: 365 dias.');
+M('mov','Por que é noite de um lado da Terra enquanto é dia do outro?','O Sol só ilumina metade do planeta de cada vez',['O Sol se apaga em uma parte do dia','A Lua esconde o Sol todas as noites','A Terra para de girar durante a noite'],'A Terra gira, e cada lado recebe a luz do Sol em um momento.');
+M('mov','Em qual planeta o ano dura <b>mais</b> tempo?','Netuno: 165 anos',['Mercúrio: 88 dias','Júpiter: cerca de 12 anos','Saturno: cerca de 30 anos'],'Netuno tem o ano mais longo: 165 anos da Terra.');
+M('mov','Em qual planeta o ano dura <b>menos</b> tempo?','Mercúrio: 88 dias',['Netuno: 165 anos','Vênus: 225 dias','Terra: 365 dias'],'Mercúrio dá a volta no Sol mais rapidamente: 88 dias.');
+M('mov','Por que cada planeta tem um ano de duração diferente?','Porque as órbitas têm tamanhos diferentes',['Porque cada planeta tem uma cor diferente','Porque alguns planetas não têm gravidade','Porque cada planeta tem um Sol diferente'],'Quanto maior a órbita, maior o caminho até completar a volta.');
+M('mov','Uma criança tem 8 anos. Quantas voltas a Terra já deu ao redor do Sol desde que ela nasceu?','8 voltas',['24 voltas','365 voltas','1 volta'],'Cada ano é uma volta da Terra ao redor do Sol.');
+M('mov','Por que, em Netuno, nenhum ser humano teria sequer um ano de vida?','Porque um ano lá dura 165 anos da Terra',['Porque não existe nenhum ano em Netuno','Porque um ano lá dura só 88 dias da Terra','Porque Netuno não gira ao redor do Sol'],'Uma volta de Netuno demora mais do que uma pessoa vive.');
+VF('mov','Se você morasse em Mercúrio, seria “mais velho” do que é na Terra.',true,'O ano lá é muito curto (88 dias), então você teria muito mais “anos” de vida.');
+LI('mov','Ligue cada movimento ao que ele causa.',[['Rotação','Dias e noites'],['Translação','Anos'],['Em torno de si','Como um pião'],['Ao redor do Sol','Percorre a órbita']],'Rotação = em torno de si. Translação = ao redor do Sol.');
+
+CL('tipos','Esse planeta é <b>rochoso</b> ou <b>gasoso</b>?',['🪨 Rochoso','💨 Gasoso'],[['Mercúrio',0],['Júpiter',1],['Terra',0],['Urano',1],['Saturno',1],['Vênus',0],['Netuno',1],['Marte',0]],'Os 4 primeiros são rochosos. Os 4 últimos são gasosos.');
+M('tipos','Quais são os planetas <b>rochosos</b>?','Mercúrio, Vênus, Terra e Marte',['Júpiter, Saturno, Urano e Netuno','Mercúrio, Terra, Júpiter e Netuno','Vênus, Marte, Saturno e Urano'],'São os quatro primeiros a partir do Sol.');
+M('tipos','Quais são os planetas <b>gasosos</b>?','Júpiter, Saturno, Urano e Netuno',['Mercúrio, Vênus, Terra e Marte','Marte, Júpiter, Saturno e Urano','Vênus, Terra, Urano e Netuno'],'São os quatro últimos a partir do Sol.');
+M('tipos','Qual é a diferença entre planeta rochoso e gasoso?','O rochoso tem solo; o gasoso não tem solo para pousar',['O rochoso tem anéis; o gasoso nunca tem anéis','O rochoso é maior; o gasoso é bem menor','O rochoso tem luz própria; o gasoso não tem'],'Rochosos são menores e feitos de rochas. Gasosos são feitos principalmente de gases.');
+VF('tipos','Um foguete pode pousar no solo de Júpiter.',false,'Júpiter é gasoso e não tem solo onde pousar.');
+VF('tipos','Todos os planetas gasosos têm anéis.',true,'Todos têm, mas só os de Saturno são bem visíveis.');
+M('tipos','Por que os anéis de Saturno são os mais visíveis?','São feitos de partículas de gelo, que refletem a luz',['Saturno é o maior planeta do Sistema Solar','Saturno é o planeta mais perto do Sol','Os anéis de Saturno produzem luz própria'],'O gelo reflete a luz, por isso esses anéis aparecem mais.');
+M('tipos','Do que são formados os planetas gasosos?','Principalmente de gases, como o ar',['Principalmente de rochas e pedras','Principalmente de água líquida','Principalmente de gelo e poeira'],'Por isso eles não têm solo.');
+
+LI('cada','Ligue cada planeta à sua característica.',[['Mercúrio','O menor e o mais perto do Sol'],['Vênus','O mais quente'],['Terra','Tem ar respirável e água líquida'],['Marte','Planeta vermelho']],'Esses são os quatro rochosos.');
+LI('cada','Ligue cada planeta à sua característica.',[['Júpiter','O maior, com mancha vermelha'],['Saturno','Anéis de gelo bem visíveis'],['Urano','Faz a rotação “deitado”'],['Netuno','O último a ser descoberto']],'Esses são os quatro gasosos.');
+M('cada','Qual é o <b>menor</b> planeta?','Mercúrio',['Marte','Terra','Vênus'],'Mercúrio é o menor e o mais perto do Sol.');
+M('cada','Qual é o <b>maior</b> planeta?','Júpiter',['Saturno','Netuno','Urano'],'Júpiter é o gigante gasoso.');
+M('cada','Qual é o planeta <b>mais quente</b>?','Vênus',['Mercúrio','Marte','Terra'],'Vênus chega a 470 °C. Mercúrio é o mais perto do Sol, mas não é o mais quente!');
+M('cada','Mercúrio é o mais perto do Sol, mas <b>Vênus</b> é o mais quente. Por quê?','Os gases ao redor de Vênus seguram o calor do Sol',['Vênus tem luz própria e produz calor','Vênus é o maior dos planetas rochosos','Vênus gira mais rápido que Mercúrio'],'São os gases do efeito estufa.');
+M('cada','Por que Marte é chamado de “planeta vermelho”?','O solo dele é cheio de ferrugem',['Ele é muito quente, como o fogo','Ele reflete a cor vermelha do Sol','Ele tem uma tempestade vermelha'],'A ferrugem deixa o solo de Marte avermelhado.');
+M('cada','A mancha vermelha de Júpiter é:','uma imensa tempestade',['um grande vulcão','um lago de ferrugem','uma cratera gigante'],'Júpiter é gasoso: a mancha é uma imensa tempestade.');
+M('cada','Por que Urano e Netuno têm cor azulada?','Porque têm muito gás metano',['Porque são cobertos de água','Porque refletem o céu da Terra','Porque são muito quentes'],'O gás metano deixa os dois planetas azulados.');
+M('cada','Qual planeta faz a rotação “deitado”?','Urano',['Netuno','Saturno','Terra'],'Urano gira de um modo bem diferente dos outros.');
+M('cada','Qual foi o último planeta a ser descoberto?','Netuno',['Urano','Plutão','Saturno'],'Netuno é o mais distante, por isso foi o último.');
+M('cada','Qual é o único planeta com ar respirável e água líquida?','Terra',['Marte','Vênus','Saturno'],'Isso permite que haja vida na Terra.');
+M('cada','Por muito tempo, acharam que este planeta era uma estrela:','Vênus',['Netuno','Urano','Terra'],'Vênus é fácil de ver de manhãzinha e à tardinha.');
+M('cada','Na apostila, qual planeta é apontado como o mais próximo de nós?','Marte',['Júpiter','Mercúrio','Netuno'],'A apostila diz que Marte é o planeta mais próximo de nós e o único que já recebeu rovers.');
+MU('cada','Toque nos <b>5 planetas</b> que podem ser vistos no céu sem telescópio.',['Mercúrio','Vênus','Marte','Júpiter','Saturno'],['Urano','Netuno'],'Urano e Netuno são os únicos que não são visíveis no céu noturno.');
+VF('cada','Mercúrio é o planeta mais quente porque é o mais perto do Sol.',false,'O mais quente é Vênus, por causa dos gases que seguram o calor.');
+
+M('expl','Em quais astros o ser humano já pisou?','Na Terra e na Lua',['Na Terra e em Marte','Na Lua e em Vênus','Em todos os planetas'],'Nunca uma pessoa esteve em outro planeta.');
+M('expl','Como sabemos tanto sobre os planetas?','Por telescópios, satélites e sondas espaciais',['Porque astronautas já visitaram todos eles','Porque os planetas enviam sinais para nós','Porque dá para ver tudo sem nenhum aparelho'],'Esses equipamentos já tiraram muitas fotografias dos planetas.');
+M('expl','Como se chamam os robôs que exploram Marte?','Rovers',['Sondas','Satélites','Telescópios'],'Os rovers tiram fotos e coletam amostras do solo.');
+M('expl','O que é um <b>exoplaneta</b>?','Um planeta que orbita outra estrela, fora do Sistema Solar',['Um planeta que fica entre Marte e Júpiter','Um planeta muito menor do que a Lua','Um planeta que não gira ao redor de nada'],'Exoplanetas orbitam outras estrelas, não o Sol.');
+M('expl','Qual sonda foi a primeira a alcançar Plutão?','New Horizons',['Rover','Halley','Bendegó'],'Lançada em 2006, ela viajou mais de 9 anos até chegar lá.');
+M('expl','Plutão é considerado:','um planeta-anão',['o nono planeta','um cometa','um satélite natural'],'Desde 2006 ele é chamado de planeta-anão.');
+VF('expl','Plutão deixou de existir em 2006.',false,'Ele continua existindo. Só passou a ser chamado de planeta-anão.');
+VF('expl','Plutão é menor que a Lua.',true,'Esse é um dos motivos de ele ser um planeta-anão.');
+MU('expl','Toque nos <b>3 motivos</b> de Plutão ser um planeta-anão.',['É muito menor que os outros planetas','Sua órbita é muito diferente','Sua órbita não é livre de outros objetos'],['Ele deixou de existir','Ele é feito só de gases','Ele tem luz própria'],'Esses são os três motivos da apostila. Plutão continua existindo!');
+
+/* ---------- LIÇÃO 2 ---------- */
+M('luas','Um <b>satélite natural</b> (ou lua) é:','um astro rochoso que gira ao redor de um planeta',['uma estrela pequena que gira ao redor do Sol','uma máquina que o ser humano mandou ao espaço','um pedaço de gelo com uma cauda brilhante'],'Satélites naturais são luas: astros rochosos em órbita de planetas.');
+M('luas','Qual planeta tem <b>mais luas</b>, segundo a NASA?','Saturno, com 145 confirmadas até 2024',['Júpiter, com 28 confirmadas até 2024','Terra, com 2 confirmadas até 2024','Marte, com 75 confirmadas até 2024'],'Saturno: 145 luas confirmadas até 2024.');
+M('luas','Quais planetas <b>não têm</b> satélites naturais?','Mercúrio e Vênus',['Terra e Marte','Júpiter e Saturno','Urano e Netuno'],'Só esses dois não têm satélites.');
+VF('luas','Todas as luas do Sistema Solar têm formato esférico.',false,'A nossa Lua é esférica, mas alguns satélites têm formato irregular.');
+VF('luas','Os satélites naturais têm luz própria.',false,'Só as estrelas têm luz própria.');
+M('luas','Por que as luas ficam girando ao redor dos planetas?','Por causa da força da gravidade deles',['Por causa da luz que vem das estrelas','Por causa do vento que existe no espaço','Por causa do calor que vem do Sol'],'A gravidade dos planetas mantém as luas em órbita.');
+M('luas','Complete: “Cada ___ de Júpiter gira ao redor desse planeta.”','lua, com letra minúscula',['Lua, com letra maiúscula','Tanto faz maiúscula ou minúscula','LUA, só com letras maiúsculas'],'<b>Lua</b>, com maiúscula, é só a da Terra. As outras são <b>luas</b>.');
+M('luas','Além dos planetas, em volta de que mais pode haver luas?','Dos planetas-anões',['Dos cometas','Das estrelas','Dos meteoros'],'Planetas e planetas-anões podem ter satélites naturais.');
+
+M('aster','Os <b>asteroides</b> são:','astros menores, de formato irregular, como rochas',['astros grandes e redondos que têm luz própria','nuvens de gás ao redor dos planetas gasosos','luas de gelo que orbitam planetas distantes'],'Asteroides são parecidos com rochas e pedras.');
+M('aster','O Cinturão de Asteroides fica entre:','Marte e Júpiter',['Terra e Marte','Júpiter e Saturno','Urano e Netuno'],'A maioria dos asteroides fica nessa região.');
+M('aster','Como se forma uma <b>cratera</b>?','Um astro cai sobre outro e deixa um buraco',['Um vulcão de gelo explode no espaço','A chuva cava um buraco no solo','O Sol derrete uma parte do solo'],'Asteroides podem sair do cinturão e cair sobre outros astros.');
+M('aster','Por que os planetas gasosos não têm crateras?','Porque eles não têm solo',['Porque são muito quentes','Porque ficam muito longe do Sol','Porque nenhum asteroide chega lá'],'Sem solo, não há onde ficar o buraco.');
+VF('aster','A Lua tem várias crateras.',true,'Elas foram formadas pela queda de meteoros.');
+VF('aster','Um asteroide pode bater em outro asteroide.',true,'E parte deles pode sair do cinturão.');
+VF('aster','A Cratera de Barringer fica no Brasil.',false,'Ela fica no Arizona, nos Estados Unidos.');
+M('aster','Quanto mede o diâmetro da Cratera de Barringer?','1,2 km',['5,36 km','50 km','2 km'],'Ela tem 1,2 km de diâmetro e cerca de 50 mil anos.');
+
+OR('meteoro','Coloque em ordem o caminho da rocha, do espaço até o chão.',['Asteroide','Meteoro','Meteorito'],'No espaço: asteroide. Pegando fogo na atmosfera: meteoro. No chão: meteorito.');
+M('meteoro','O <b>meteoro</b> é:','um asteroide que entra na atmosfera e pega fogo',['uma estrela que cai do céu em direção à Terra','um pedaço de rocha que já chegou ao chão','um astro de gelo que forma uma cauda'],'Ele pega fogo por causa do atrito com o ar.');
+M('meteoro','O <b>meteorito</b> é:','a parte do meteoro que alcança o chão',['um asteroide que ainda está no cinturão','um astro de gelo com uma longa cauda','a poeira que o cometa deixa na órbita'],'Se uma parte não é destruída e chega ao chão, é um meteorito.');
+M('meteoro','Por que o meteoro pega fogo?','Por causa do atrito com o ar da atmosfera',['Por causa do calor que vem da Lua','Por causa da luz de outras estrelas','Por causa da água dos oceanos'],'A atmosfera é o ar que envolve a Terra.');
+M('meteoro','Uma “estrela cadente” é, de verdade:','um meteoro',['uma estrela caindo','um planeta-anão','um satélite natural'],'As estrelas são enormes e não caem do céu.');
+VF('meteoro','Uma estrela cadente é uma estrela que cai do céu.',false,'É um meteoro: um asteroide que entrou na atmosfera e pegou fogo.');
+M('meteoro','O que pode acontecer com um meteoro pequeno em chamas?','Ele pode ser totalmente destruído',['Ele se transforma em uma estrela','Ele volta para o Cinturão de Asteroides','Ele se transforma em um cometa'],'Por isso muitas rochas nem chegam ao chão.');
+M('meteoro','Qual é o maior meteorito encontrado no Brasil?','Bendegó',['Halley','Barringer','New Horizons'],'Halley é um cometa, e Barringer é uma cratera.');
+M('meteoro','Em qual estado o Bendegó foi encontrado, em 1784?','Bahia',['Rio de Janeiro','Arizona','Distrito Federal'],'Foi encontrado na Bahia. Hoje está no Museu Nacional do Rio de Janeiro.');
+VF('meteoro','O Bendegó foi destruído no incêndio do Museu Nacional, em 2018.',false,'Ele resistiu ao incêndio.');
+M('meteoro','Quanto pesa o Bendegó?','5,36 toneladas',['5 quilos','1,2 tonelada','75 toneladas'],'Ele pesa 5,36 toneladas e mede 2 m de comprimento.');
+LI('meteoro','Ligue cada astro à sua descrição.',[['Estrela','Único que emite luz'],['Planeta','Esférico, orbita uma estrela'],['Satélite natural','Rochoso, orbita um planeta'],['Meteorito','Atinge o solo da Terra']],'Esse é o exercício 1 da Lição 2.');
+
+M('cometa','Os <b>cometas</b> são formados de:','gelo e poeira',['fogo e gás','ferro e pedra','água e areia'],'E têm uma órbita muito longa ao redor do Sol.');
+M('cometa','Por que se forma uma <b>cauda</b> quando o cometa se aproxima do Sol?','O calor do Sol derrete parte do gelo',['O vento do espaço empurra a poeira','O cometa pega fogo no ar da Terra','A gravidade da Lua puxa o cometa'],'O gelo derrete com o calor e forma uma linda cauda.');
+M('cometa','Qual é o cometa mais conhecido?','Halley',['Bendegó','Barringer','New Horizons'],'O registro mais antigo dele é de 240 a.C., na China.');
+M('cometa','O Halley demora quanto tempo para dar uma volta no Sol?','Mais de 75 anos',['Cerca de 28 dias','Exatamente 365 dias','Mais de 165 anos'],'Ele só pode ser visto quando se aproxima da Terra.');
+M('cometa','Em que ano será a próxima aparição do Halley?','2061',['2026','2006','2184'],'De 2026 até lá, faltam 35 anos.');
+M('cometa','Quando acontece uma <b>chuva de meteoros</b>?','Quando a Terra passa pelo rastro de um cometa',['Quando chove muito durante a noite','Quando várias estrelas caem ao mesmo tempo','Quando a Lua passa na frente do Sol'],'O cometa deixa rastros de poeira na sua órbita.');
+M('cometa','Por que dá para <b>prever</b> uma chuva de meteoros?','Ela acontece quando a Terra passa por um rastro conhecido',['Ela acontece sempre que a Lua está cheia','Ela acontece todas as noites, sem exceção','Ela acontece sempre que o céu está nublado'],'Existe até um calendário de chuvas de meteoros.');
+LI('cometa','Ligue cada nome à sua descrição.',[['Cinturão de Asteroides','Região com milhares de asteroides'],['Halley','Cometa mais conhecido'],['Chuva de meteoros','Vem depois da passagem de um cometa'],['Barringer','Cratera no Arizona']],'O exercício 3 da Lição 2 é parecido com este.');
+LI('cometa','Ligue cada astro à sua descrição.',[['Asteroide','Rocha de formato irregular'],['Cometa','Gelo e poeira, com cauda'],['Meteoro','Pega fogo na atmosfera'],['Meteorito','Pedaço que chega ao chão']],'Compare sempre esses quatro: eles se confundem bastante!');
+VF('cometa','Asteroides são feitos de gelo e poeira, e cometas são feitos de rocha.',false,'É o contrário: asteroide é rocha; cometa é gelo e poeira.');
+
+/* ---------- LIÇÃO 3 ---------- */
+M('luzlua','De onde vem a luz que vemos na Lua?','Do Sol: ela reflete a luz, como um espelho',['Da própria Lua: ela tem luz própria','Da Terra: ela ilumina a Lua de noite','Das outras estrelas que ficam perto dela'],'A Lua é um astro iluminado.');
+M('luzlua','A Lua é um astro:','iluminado',['luminoso','gasoso','estelar'],'Ela não tem luz própria: reflete a luz do Sol.');
+M('luzlua','Como se chama o movimento da Lua em torno da Terra?','Revolução lunar',['Revolução solar','Translação solar','Rotação lunar'],'Esse movimento dura cerca de um mês.');
+M('luzlua','Quanto tempo dura a revolução lunar?','Cerca de 28 dias',['Cerca de 7 dias','Cerca de 24 horas','Cerca de 365 dias'],'São mais ou menos 28 dias, ou 4 semanas.');
+VF('luzlua','A órbita da Lua ao redor da Terra se chama revolução solar.',false,'O nome certo é revolução <b>lunar</b>.');
+VF('luzlua','A Lua é um astro luminoso, pois ela brilha muito.',false,'A Lua é iluminada: ela reflete a luz do Sol.');
+VF('luzlua','A Lua é o único satélite natural da Terra.',true,'A Terra tem só uma lua: a Lua.');
+M('luzlua','Quanto da Lua o Sol ilumina?','Sempre a metade dela',['Sempre ela inteira','Só um quarto dela','Nenhuma parte dela'],'A Lua é esférica, por isso o Sol sempre ilumina metade dela.');
+M('luzlua','Por que a Lua é comparada a um <b>espelho</b>?','Porque ela reflete a luz do Sol',['Porque ela é feita de vidro','Porque ela é lisa e brilhante','Porque nela vemos a nossa imagem'],'Ela não produz luz: só reflete.');
+
+M('fases','Quais são as 4 fases principais da Lua?','Nova, Crescente, Cheia e Minguante',['Cheia, Vazia, Pequena e Grande','Nova, Velha, Cheia e Vazia','Crescente, Grande, Cheia e Pequena'],'Essa é a ordem em que elas acontecem.');
+OR('fases','Coloque as fases em ordem, começando pela Lua nova.',['Nova','Crescente','Cheia','Minguante'],'Nova → Crescente → Cheia → Minguante → Nova outra vez.');
+M('fases','Qual é esta fase da Lua, como a vemos no Brasil?','Cheia',['Nova','Crescente','Minguante'],'Toda a face está iluminada.',{img:'cheia'});
+M('fases','Qual é esta fase da Lua, como a vemos no Brasil?','Nova',['Cheia','Crescente','Minguante'],'Nenhuma parte da face iluminada aparece para nós.',{img:'nova'});
+M('fases','Qual é esta fase da Lua, como a vemos no Brasil?','Crescente',['Cheia','Nova','Minguante'],'No Brasil, a Lua crescente fica com a parte clara à esquerda e parece um C.',{img:'crescente'});
+M('fases','Qual é esta fase da Lua, como a vemos no Brasil?','Minguante',['Cheia','Nova','Crescente'],'No Brasil, a Lua minguante fica com a parte clara à direita.',{img:'minguante'});
+M('fases','Toque na <b>Lua cheia</b>.','@cheia',['@nova','@crescente','@minguante'],'A Lua cheia tem toda a face iluminada.',{imgs:1});
+M('fases','Toque na <b>Lua nova</b>.','@nova',['@cheia','@crescente','@minguante'],'Na Lua nova não vemos nenhuma parte iluminada.',{imgs:1});
+M('fases','<b>Minguar</b> quer dizer:','diminuir',['brilhar','crescer','girar'],'Na fase minguante, a parte iluminada fica menor a cada dia.');
+M('fases','Em qual fase a parte iluminada fica <b>maior</b> a cada dia?','Crescente',['Minguante','Cheia','Nova'],'Depois da crescente vem a cheia.');
+M('fases','Em qual fase a parte iluminada fica <b>menor</b> a cada dia?','Minguante',['Crescente','Cheia','Nova'],'Minguar é diminuir.');
+M('fases','Em qual fase não vemos nenhuma parte iluminada?','Nova',['Cheia','Crescente','Minguante'],'A Lua está lá, mas não conseguimos vê-la.');
+M('fases','Por que acontecem as fases da Lua?','Nem sempre vemos toda a sua face iluminada',['A Lua aumenta e diminui de tamanho','A Terra faz sombra na Lua todo dia','A Lua apaga e acende a sua própria luz'],'A Lua continua inteira. Muda só a parte iluminada que vemos.');
+VF('fases','As fases da Lua acontecem porque ela diminui e aumenta de tamanho.',false,'A Lua não muda de tamanho. Muda a parte iluminada que vemos.');
+VF('fases','As fases da Lua acontecem porque nem sempre vemos toda a face dela iluminada pelo Sol.',true,'Exatamente o que está na apostila.');
+VF('fases','As principais fases da Lua são Cheia, Vazia, Pequena e Grande.',false,'São Nova, Crescente, Cheia e Minguante.');
+M('fases','Depois da Lua cheia, qual fase vem?','Minguante',['Crescente','Nova','Cheia de novo'],'Nova → Crescente → Cheia → <b>Minguante</b>.');
+M('fases','Depois da Lua minguante, qual fase vem?','Nova',['Crescente','Cheia','Minguante de novo'],'Depois da minguante, o ciclo recomeça na nova.');
+LI('fases','Ligue cada fase ao que vemos.',[['Cheia','Toda a face iluminada'],['Nova','Nenhuma parte iluminada'],['Crescente','Parte maior a cada dia'],['Minguante','Parte menor a cada dia']],'Essa tabela é a base da Lição 3.');
+
+M('hora','Qual fase da Lua pode ser vista <b>só à noite e de madrugada</b>?','Cheia',['Nova','Crescente','Minguante'],'Exercício 5 da apostila: a Lua cheia.');
+M('hora','Quando a Lua <b>crescente</b> pode ser vista?','De tarde e de noite',['De madrugada e de manhã','Só ao meio-dia','Só de madrugada'],'Crescente: tarde e noite.');
+M('hora','Quando a Lua <b>minguante</b> pode ser vista?','De madrugada e de manhã',['De tarde e de noite','Só ao meio-dia','Só de tarde'],'Minguante: madrugada e manhã.');
+M('hora','Em que período a Lua <b>nova</b> está no céu?','Durante o dia, mas não conseguimos vê-la',['Durante a noite, bem redondinha','De madrugada, como um pedacinho','O dia inteiro, toda iluminada'],'Ela está no céu de dia, com a face iluminada virada para longe de nós.');
+LI('hora','Ligue cada fase ao horário.',[['Cheia','Noite e madrugada'],['Crescente','Tarde e noite'],['Minguante','Madrugada e manhã'],['Nova','Dia, mas não a vemos']],'Por isso, às vezes vemos a Lua de dia e às vezes de noite.');
+VF('hora','Às vezes vemos a Lua de dia e às vezes de noite.',true,'Cada fase tem o seu horário.');
+VF('hora','De manhã, nunca é possível ver a Lua no céu.',false,'A Lua minguante pode ser vista de madrugada e de manhã.');
+M('hora','Bia viu a Lua de manhã, no caminho da escola. Qual fase pode ser?','Minguante',['Cheia','Crescente','Nova'],'A minguante aparece de madrugada e de manhã.');
+M('hora','Ana viu a Lua no fim da tarde, com um pedacinho iluminado que aumenta a cada dia. Qual é a fase?','Crescente',['Cheia','Minguante','Nova'],'A crescente aparece à tarde e à noite.');
+
+M('semana','Por que a semana tem sete dias?','Porque a cada sete dias a Lua muda de fase',['Porque a Terra gira sete vezes por mês','Porque existem sete planetas visíveis','Porque a Lua fica sete dias sem aparecer'],'Nova → quarto crescente → cheia → quarto minguante → nova.');
+M('semana','De quantos em quantos dias a Lua muda de fase?','A cada 7 dias',['A cada 1 dia','A cada 14 dias','A cada 28 dias'],'Por isso a semana tem sete dias.');
+VF('semana','Cada fase da Lua dura exatamente sete dias.',false,'Totalmente cheia ela fica só um dia. O certo é: a cada sete dias ela muda de fase.');
+M('semana','Por quantos dias a Lua fica <b>totalmente cheia</b>?','Por um dia',['Por sete dias','Por quinze dias','Por um mês'],'E também só por um dia não vemos nada dela: a Lua nova.');
+M('semana','O tempo entre duas fases iguais da Lua define:','o mês',['o ano','a hora','o século'],'Por exemplo: de uma Lua cheia até a Lua cheia seguinte.');
+M('semana','Por que “quarto crescente” e “quarto minguante” têm esse nome?','Vemos metade da parte iluminada: um quarto da Lua',['Vemos a Lua quatro vezes no mesmo dia','A Lua aparece só durante quatro horas','A fase acontece em uma quarta-feira'],'Metade da metade iluminada é um quarto da superfície.');
+M('semana','Hoje é Lua nova. Depois de 7 dias, qual será a fase?','Quarto crescente',['Lua cheia','Quarto minguante','Lua nova'],'Nova + 7 dias = quarto crescente.');
+M('semana','Hoje é Lua nova. Depois de 14 dias, qual será a fase?','Lua cheia',['Quarto crescente','Quarto minguante','Lua nova'],'Nova + 7 = crescente. Crescente + 7 = cheia.');
+M('semana','Se a Lua tivesse luz própria, como as estrelas, ela teria fases?','Não: brilharia inteira o tempo todo',['Sim: ela teria o dobro de fases','Sim: ela mudaria de tamanho','Sim: as fases seriam iguais às de hoje'],'As fases existem porque ela só reflete a luz do Sol.');
+OR('semana','Complete o caminho: Lua cheia, depois de 7 em 7 dias, até voltar à cheia.',['Cheia','Quarto minguante','Nova','Quarto crescente'],'Cheia → quarto minguante → nova → quarto crescente → cheia de novo.');
+
+/* ===== UTILITÁRIOS ===== */
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const app=$('#app');
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const hash=s=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return (h>>>0).toString(36)};
+const qid=q=>hash(q.t+q.q+(q.a||'')+(q.img||'')+(q.pairs?q.pairs[0][0]:''));
+Q.forEach(q=>q.id=qid(q));
+const topic=id=>TOPICS.find(t=>t.id===id);
+
+function moon(p,s=72){
+  const r=s/2-2,c=s/2,lit='#ffe27a',dark='#3a3550';
+  let f='';
+  if(p==='cheia')f=`<circle cx="${c}" cy="${c}" r="${r}" fill="${lit}"/>`;
+  if(p==='crescente')f=`<path d="M${c},${c-r} A${r},${r} 0 0 0 ${c},${c+r} Z" fill="${lit}"/>`;
+  if(p==='minguante')f=`<path d="M${c},${c-r} A${r},${r} 0 0 1 ${c},${c+r} Z" fill="${lit}"/>`;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" role="img" aria-label="Lua ${p}"><circle cx="${c}" cy="${c}" r="${r}" fill="${dark}" stroke="#8d86c7" stroke-width="1.5"/>${f}</svg>`;
+}
+const NOMES={cheia:'Cheia',nova:'Nova',crescente:'Crescente',minguante:'Minguante'};
+const fmt=s=>s[0]==='@'?moon(s.slice(1),70):s;
+const plain=s=>s[0]==='@'?'Lua '+NOMES[s.slice(1)].toLowerCase():s;
+
+const KEY='missao-sistema-solar-v1';
+let save={q:{}};
+try{const r=localStorage.getItem(KEY);if(r)save=JSON.parse(r);if(!save.q)save={q:{}}}catch(e){}
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}};
+let muted=false;try{muted=localStorage.getItem(KEY+'-mudo')==='1'}catch(e){}
+
+let actx;
+function beep(notes){
+  if(muted)return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==='suspended')actx.resume();
+    let t=actx.currentTime;
+    notes.forEach(([f,d])=>{
+      const o=actx.createOscillator(),g=actx.createGain();
+      o.type='triangle';o.frequency.value=f;
+      g.gain.setValueAtTime(.13,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+      o.connect(g).connect(actx.destination);o.start(t);o.stop(t+d);t+=d*.75;
+    });
+  }catch(e){}
+}
+const sndOk=()=>beep([[660,.1],[880,.15]]);
+const sndBad=()=>beep([[240,.2]]);
+const sndWin=()=>beep([[523,.12],[659,.12],[784,.12],[1046,.28]]);
+
+/* ===== PROGRESSO ===== */
+const stat=q=>save.q[q.id];
+const mastered=q=>{const s=stat(q);return !!s&&s.last===true};
+const missed=()=>Q.filter(q=>{const s=stat(q);return s&&s.last===false});
+function topicInfo(id){
+  const qs=Q.filter(q=>q.t===id);
+  const seen=qs.filter(stat).length,ok=qs.filter(mastered).length,pct=Math.round(ok/qs.length*100);
+  let label='Novo',cls='';
+  if(seen){label=pct>=80?'Dominado':pct+'%';cls=pct>=80?'g':'y'}
+  return {total:qs.length,seen,ok,pct,label,cls};
+}
+/* prioridade: errou por último > nunca viu > visto há mais tempo */
+function pick(pool,n){
+  const rank=q=>{const s=stat(q);if(!s)return 1;if(s.last===false)return 0;return 2+(s.n||0)};
+  return shuffle(pool).sort((a,b)=>rank(a)-rank(b)).slice(0,n);
+}
+
+/* ===== TELA INICIAL ===== */
+function home(){
+  S=null;
+  const ok=Q.filter(mastered).length,errs=missed().length,pct=Math.round(ok/Q.length*100);
+  let h=`<div class="hero"><span class="big">🚀</span><h1>Missão Sistema Solar</h1><p>Revisão de Ciências · Lições 1, 2 e 3</p></div>
+  <div class="overall"><div class="row"><span>Perguntas dominadas</span><span>${ok} de ${Q.length}</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>
+  <button class="cta" data-go="quick">🚀 Decolar: missão rápida</button>`;
+  if(errs)h+=`<button class="cta red" data-go="errs">🎯 Treinar meus erros (${errs})</button>`;
+  h+=`<div class="two"><button class="cta gold" data-go="exam">🏁 Prova final</button><button class="cta soft" data-go="cola">📋 Cola rápida</button></div>`;
+  [1,2,3].forEach(l=>{
+    h+=`<div class="lesson"><h2>${LESSONS[l]}</h2>`;
+    TOPICS.filter(t=>t.l===l).forEach(t=>{
+      const i=topicInfo(t.id);
+      h+=`<button class="topic" data-topic="${t.id}"><span class="ic">${t.ic}</span><span class="mid"><span class="nm">${t.nm}</span><span class="bar" style="display:block"><i style="width:${i.pct}%"></i></span></span><span class="st ${i.cls}">${i.label}</span></button>`;
+    });
+    h+='</div>';
+  });
+  h+=`<div class="foot"><button class="link" data-go="mute">${muted?'🔇 Som desligado':'🔊 Som ligado'}</button><button class="link" id="reset">Apagar progresso</button></div>`;
+  app.innerHTML=h;
+  window.scrollTo(0,0);
+  $$('[data-go]').forEach(b=>b.onclick=()=>{
+    const g=b.dataset.go;
+    if(g==='quick')startMission({mode:'quick'});
+    if(g==='errs')startMission({mode:'errs'});
+    if(g==='exam')startMission({mode:'exam'});
+    if(g==='cola')cola(1);
+    if(g==='mute'){muted=!muted;try{localStorage.setItem(KEY+'-mudo',muted?'1':'0')}catch(e){}home()}
+  });
+  $$('[data-topic]').forEach(b=>b.onclick=()=>startMission({mode:'topic',topic:b.dataset.topic}));
+  const rs=$('#reset');
+  rs.onclick=()=>{
+    if(rs.dataset.arm){save={q:{}};persist();home()}
+    else{rs.dataset.arm='1';rs.textContent='Toque de novo para apagar'}
+  };
+}
+
+/* ===== MISSÃO ===== */
+let S=null;
+function startMission(cfg){
+  let queue,title;
+  if(cfg.mode==='quick'){queue=pick(Q,8);title='Missão rápida'}
+  if(cfg.mode==='errs'){queue=shuffle(missed()).slice(0,8);title='Treinar meus erros'}
+  if(cfg.mode==='topic'){queue=pick(Q.filter(q=>q.t===cfg.topic),8);title=topic(cfg.topic).nm}
+  if(cfg.mode==='exam'){
+    /* 20 questões, distribuídas entre todos os temas */
+    const out=[];
+    const byT=TOPICS.map(t=>pick(Q.filter(q=>q.t===t.id),3));
+    TOPICS.forEach((t,i)=>out.push(byT[i].shift()));
+    const rest=shuffle(byT.flat());
+    queue=shuffle(out.concat(rest).slice(0,20));
+    title='Prova final';
+  }
+  if(!queue.length){home();return}
+  S={cfg,title,queue,goal:queue.length,done:0,answered:0,correct:0,errors:0,combo:0,best:0,wrong:new Set(),cur:null,exam:cfg.mode==='exam'};
+  next();
+}
+const reached=()=>Math.min(8,Math.floor((S.exam?S.answered:S.done)*8/S.goal));
+function trackHTML(){
+  const r=reached();
+  return `<div class="track">${PLANETS.map((p,i)=>{
+    const now=i===Math.min(r,7)&&r<8;
+    return `<span class="pl ${i<r||r>=8||now?'on':''} ${now?'now':''}" style="background:${p[1]}"><small>${i<r?'✓':now?p[0].slice(0,3):''}</small></span>`;
+  }).join('')}</div>`;
+}
+function head(){
+  const prog=S.exam?`${S.answered+1}/${S.goal}`:`${S.done}/${S.goal}`;
+  return `<div class="top"><button class="iconbtn" id="quit" aria-label="Voltar ao início">✕</button><span class="ttl">${S.title} · ${prog}</span><span class="combo">${S.combo>=2?'🔥 '+S.combo:''}</span></div>${trackHTML()}`;
+}
+function next(){
+  if(!S.queue.length){finish();return}
+  S.cur=S.queue.shift();
+  S.locked=false;
+  const q=S.cur,t=topic(q.t);
+  let body='';
+  if(q.k==='mc')body=renderMC(q);
+  if(q.k==='vf')body=renderVF(q);
+  if(q.k==='or')body=renderOR(q);
+  if(q.k==='li')body=renderLI(q);
+  if(q.k==='cl')body=renderCL(q);
+  if(q.k==='mu')body=renderMU(q);
+  app.innerHTML=`${head()}<div class="tagline">${t.ic} ${t.nm}</div><div class="qtext">${q.q}</div><div id="body">${body}</div><div class="spacer"></div>`;
+  window.scrollTo(0,0);
+  $('#quit').onclick=home;
+  ({mc:bindMC,vf:bindVF,or:bindOR,li:bindLI,cl:bindCL,mu:bindMU})[q.k](q);
+}
+function resolve(ok,rightText){
+  if(S.locked)return;
+  S.locked=true;
+  const q=S.cur;
+  const st=save.q[q.id]||{n:0,ok:0};
+  st.n++;if(ok)st.ok++;st.last=ok;save.q[q.id]=st;persist();
+  const before=reached();
+  S.answered++;
+  if(ok){S.correct++;S.done++;S.combo++;S.best=Math.max(S.best,S.combo);sndOk()}
+  else{
+    S.errors++;S.combo=0;S.wrong.add(q.t);sndBad();
+    if(!S.exam)S.queue.splice(Math.min(2,S.queue.length),0,q);
+  }
+  const after=reached();
+  let stop='';
+  if(!S.exam&&ok&&after>before){const p=PLANETS[after-1];stop=`<div class="stop">🚀 Chegou a <b>${p[0]}</b>: ${p[2]}</div>`}
+  const good=['Isso aí!','Mandou bem!','Certinho!','Muito bem!','Na mosca!'];
+  const title=ok?(S.combo>=3?`🔥 ${S.combo} seguidas!`:'✅ '+good[Math.floor(Math.random()*good.length)]):'💡 Quase lá!';
+  const retry=!ok&&!S.exam?'Essa pergunta volta daqui a pouco.':'';
+  const sheet=document.createElement('div');
+  sheet.className='sheet '+(ok?'good':'oops');
+  sheet.innerHTML=`<div class="in"><h3>${title}</h3>${!ok&&rightText?`<p class="right">Resposta: ${rightText}</p>`:''}<p>${q.x}${retry?' <i>'+retry+'</i>':''}</p>${stop}<button class="cta" id="cont">Continuar ➜</button></div>`;
+  document.body.appendChild(sheet);
+  $('#cont').onclick=()=>{sheet.remove();next()};
+}
+
+/* múltipla escolha */
+function renderMC(q){
+  const img=q.img?`<div class="qimg">${moon(q.img,104)}</div>`:'';
+  const op=shuffle([q.a,...q.w]);
+  return `${img}<div class="opts ${q.imgs?'img':''}">${op.map(o=>`<button class="opt" data-v="${encodeURIComponent(o)}" ${o[0]==='@'?`aria-label="${plain(o)}"`:''}>${fmt(o)}</button>`).join('')}</div>`;
+}
+function bindMC(q){
+  $$('.opt').forEach(b=>b.onclick=()=>{
+    if(S.locked)return;
+    const v=decodeURIComponent(b.dataset.v),ok=v===q.a;
+    $$('.opt').forEach(x=>{
+      const xv=decodeURIComponent(x.dataset.v);
+      x.disabled=true;
+      if(xv===q.a)x.classList.add('ok');
+      else if(x===b)x.classList.add('bad');
+      else x.classList.add('dim');
+    });
+    resolve(ok,plain(q.a));
+  });
+}
+/* verdadeiro ou falso */
+function renderVF(){return `<div class="hint">Essa frase é verdadeira ou falsa?</div><div class="opts vf"><button class="opt" data-v="1">✅ Verdadeiro</button><button class="opt" data-v="0">❌ Falso</button></div>`}
+function bindVF(q){
+  $$('.opt').forEach(b=>b.onclick=()=>{
+    if(S.locked)return;
+    const v=b.dataset.v==='1',ok=v===q.v;
+    $$('.opt').forEach(x=>{x.disabled=true;if((x.dataset.v==='1')===q.v)x.classList.add('ok');else if(x===b)x.classList.add('bad');else x.classList.add('dim')});
+    resolve(ok,q.v?'Verdadeiro':'Falso');
+  });
+}
+/* ordenar */
+function renderOR(){return `<div class="hint">Toque nos itens na ordem certa. Tocou errado? Toque na linha para desfazer.</div><div class="slots" id="slots"></div><div class="chips" id="chips"></div><button class="cta check" id="chk" style="display:none">Conferir</button>`}
+function bindOR(q){
+  let order=shuffle(q.seq);
+  if(order.join()===q.seq.join())order=[...order.slice(1),order[0]];
+  const picked=[];
+  const draw=()=>{
+    $('#slots').innerHTML=q.seq.map((_,i)=>`<button class="slot ${picked[i]!=null?'fill':''}" data-i="${i}"><b>${i+1}</b>${picked[i]!=null?order[picked[i]]:''}</button>`).join('');
+    $('#chips').innerHTML=order.map((o,i)=>`<button class="chip" data-i="${i}" ${picked.includes(i)?'disabled':''}>${o}</button>`).join('');
+    $('#chk').style.display=picked.length===q.seq.length?'block':'none';
+    $$('.slot').forEach(s=>s.onclick=()=>{if(S.locked)return;const i=+s.dataset.i;if(i<picked.length){picked.splice(i,1);draw()}});
+    $$('.chip').forEach(c=>c.onclick=()=>{if(S.locked)return;picked.push(+c.dataset.i);draw()});
+  };
+  draw();
+  $('#chk').onclick=()=>{
+    const ans=picked.map(i=>order[i]);
+    const ok=ans.join()===q.seq.join();
+    $('#chk').style.display='none';
+    $$('.slot').forEach((s,i)=>{s.style.borderColor=ans[i]===q.seq[i]?'var(--ok)':'var(--bad)'});
+    resolve(ok,q.seq.join(' → '));
+  };
+}
+/* ligar */
+function renderLI(q){
+  const L=shuffle(q.pairs.map(p=>p[0])),R=shuffle(q.pairs.map(p=>p[1]));
+  return `<div class="hint">Toque em um item azul e depois na descrição dele.</div><div class="match"><div class="col">${L.map(x=>`<button class="mi left" data-l="${encodeURIComponent(x)}">${x}</button>`).join('')}</div><div class="col">${R.map(x=>`<button class="mi" data-r="${encodeURIComponent(x)}">${x}</button>`).join('')}</div></div>`;
+}
+function bindLI(q){
+  const map=Object.fromEntries(q.pairs);
+  let sel=null,miss=0,left=q.pairs.length;
+  $$('[data-l]').forEach(b=>b.onclick=()=>{
+    if(S.locked||b.disabled)return;
+    $$('[data-l]').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');sel=b;
+  });
+  $$('[data-r]').forEach(b=>b.onclick=()=>{
+    if(S.locked||b.disabled||!sel)return;
+    const l=decodeURIComponent(sel.dataset.l),r=decodeURIComponent(b.dataset.r);
+    if(map[l]===r){
+      [sel,b].forEach(x=>{x.classList.remove('sel');x.classList.add('ok');x.disabled=true});
+      sel=null;left--;beep([[700,.07]]);
+      if(!left)resolve(miss===0,'');
+    }else{
+      miss++;b.classList.add('bad');sndBad();
+      setTimeout(()=>b.classList.remove('bad'),350);
+    }
+  });
+}
+/* classificar */
+function renderCL(q){return `<div class="sortcount" id="scount"></div><div class="sortcard" id="scard"></div><div class="bins">${q.bins.map((b,i)=>`<button class="opt" data-b="${i}">${b}</button>`).join('')}</div>`}
+function bindCL(q){
+  const items=shuffle(q.items);let i=0,miss=[];
+  const draw=()=>{$('#scount').textContent=`${i+1} de ${items.length}`;$('#scard').textContent=items[i][0]};
+  draw();
+  let wait=false;
+  $$('[data-b]').forEach(b=>b.onclick=()=>{
+    if(S.locked||wait)return;
+    const right=+b.dataset.b===items[i][1];
+    wait=true;
+    b.classList.add(right?'ok':'bad');
+    if(right)beep([[700,.07]]);else{sndBad();miss.push(`${items[i][0]}: ${q.bins[items[i][1]].replace(/^\S+\s/,'').toLowerCase()}`)}
+    setTimeout(()=>{
+      b.classList.remove('ok','bad');wait=false;i++;
+      if(i<items.length)draw();
+      else{$('#scard').textContent='Pronto!';resolve(!miss.length,miss.join(' · '))}
+    },right?260:650);
+  });
+}
+/* marcar vários */
+function renderMU(q){
+  const op=shuffle([...q.yes,...q.no]);
+  return `<div class="opts" id="mu">${op.map(o=>`<button class="opt" data-v="${encodeURIComponent(o)}">${o}</button>`).join('')}</div><button class="cta check" id="chk" style="display:none">Conferir</button>`;
+}
+function bindMU(q){
+  const on=new Set();
+  $$('#mu .opt').forEach(b=>b.onclick=()=>{
+    if(S.locked)return;
+    const v=decodeURIComponent(b.dataset.v);
+    if(on.has(v)){on.delete(v);b.classList.remove('sel')}else{on.add(v);b.classList.add('sel')}
+    $('#chk').style.display=on.size?'block':'none';
+  });
+  $('#chk').onclick=()=>{
+    const ok=on.size===q.yes.length&&q.yes.every(v=>on.has(v));
+    $('#chk').style.display='none';
+    $$('#mu .opt').forEach(x=>{
+      const v=decodeURIComponent(x.dataset.v);x.disabled=true;x.classList.remove('sel');
+      if(q.yes.includes(v))x.classList.add('ok');else if(on.has(v))x.classList.add('bad');else x.classList.add('dim');
+    });
+    resolve(ok,q.yes.join(', '));
+  };
+}
+
+/* ===== FIM ===== */
+function finish(){
+  sndWin();
+  const cfg=S.cfg,wrong=[...S.wrong].map(topic);
+  let top;
+  if(S.exam){
+    const nota=(S.correct/S.goal*10).toFixed(1).replace('.',',');
+    const msg=S.correct>=18?'Pronto para a prova! 🌟':S.correct>=14?'Muito bom! Dá uma olhada nos temas abaixo.':'Boa! Agora é só treinar os temas abaixo.';
+    top=`<div class="end"><span class="big">🏁</span><h1>Prova final concluída</h1><div class="grade">${nota}</div><p>${S.correct} de ${S.goal} certas</p><p style="margin-top:6px;color:#fff;font-weight:700">${msg}</p></div>`;
+  }else{
+    const stars=S.errors<=1?3:S.errors<=3?2:1;
+    top=`<div class="end"><span class="big">🪐</span><h1>Você chegou a Netuno!</h1><div class="stars">${'⭐'.repeat(stars)}${'<span style="opacity:.2">⭐</span>'.repeat(3-stars)}</div><p>${S.errors?`Corrigiu ${S.errors===1?'o erro':'os '+S.errors+' erros'} e completou a viagem.`:'Viagem perfeita, sem nenhum erro!'}${S.best>=3?` Melhor sequência: ${S.best}.`:''}</p></div>`;
+  }
+  const rev=wrong.length?`<div class="box"><h3>Vale revisar</h3><ul>${wrong.map(t=>`<li>${t.ic} ${t.nm}</li>`).join('')}</ul></div>`:'';
+  const left=missed().length;
+  app.innerHTML=`${top}${rev}
+    ${S.exam&&left?`<button class="cta red" id="er">🎯 Treinar meus erros (${left})</button>`:''}
+    <button class="cta" id="again">🚀 ${S.exam?'Fazer outra prova':'Outra viagem'}</button>
+    <button class="cta soft" id="hm">🏠 Ver meu mapa</button>`;
+  window.scrollTo(0,0);
+  $('#again').onclick=()=>startMission(cfg.mode==='errs'&&!missed().length?{mode:'quick'}:cfg);
+  $('#hm').onclick=home;
+  const er=$('#er');if(er)er.onclick=()=>startMission({mode:'errs'});
+}
+
+/* ===== COLA RÁPIDA ===== */
+function cola(l){
+  const C={
+  1:`<div class="note"><h3>Luz</h3><b>Luminoso</b>: tem luz própria (estrelas, como o Sol).<br><b>Iluminado</b>: recebe luz (planetas e luas).</div>
+     <div class="note"><h3>Ordem a partir do Sol</h3>Mercúrio, Vênus, Terra, Marte, Júpiter, Saturno, Urano, Netuno.</div>
+     <div class="note"><h3>Ordem de tamanho (menor → maior)</h3>Mercúrio, Marte, Vênus, Terra, Netuno, Urano, Saturno, Júpiter.</div>
+     <div class="note"><h3>Movimentos</h3><b>Rotação</b>: em torno de si → dia e noite (24 horas).<br><b>Translação</b>: ao redor do Sol → ano (365 dias).<br><b>Órbita</b>: o caminho. <b>Geoide</b>: formato da Terra.</div>
+     <div class="note"><h3>Tipos</h3><b>Rochosos</b>: os 4 primeiros, têm solo.<br><b>Gasosos</b>: os 4 últimos, sem solo e com anéis.</div>
+     <div class="note"><h3>Cada planeta</h3><table class="pltable">
+      <tr><td>Mercúrio</td><td>menor, mais perto do Sol, ano de 88 dias</td></tr><tr><td>Vênus</td><td>mais quente (470 °C), gases seguram o calor</td></tr><tr><td>Terra</td><td>ar respirável e água líquida</td></tr><tr><td>Marte</td><td>vermelho (ferrugem), recebeu rovers</td></tr><tr><td>Júpiter</td><td>maior, mancha vermelha = tempestade</td></tr><tr><td>Saturno</td><td>anéis de gelo bem visíveis, mais luas</td></tr><tr><td>Urano</td><td>azul (metano), rotação “deitado”</td></tr><tr><td>Netuno</td><td>azul, mais distante, ano de 165 anos</td></tr></table></div>
+     <div class="note"><h3>Visíveis no céu</h3>Mercúrio, Vênus, Marte, Júpiter e Saturno.</div>
+     <div class="note"><h3>Exploração espacial</h3>O ser humano só pisou na <b>Terra</b> e na <b>Lua</b>. Usamos telescópios, satélites e sondas.<br><b>Exoplaneta</b>: orbita outra estrela.<br><b>Plutão</b>: planeta-anão desde 2006. É menor que a Lua, tem órbita muito diferente e não livre de outros objetos.</div>`,
+  2:`<div class="note"><h3>Resumo dos astros</h3><table class="pltable">
+      <tr><td>Estrela</td><td>único tipo que emite luz</td></tr><tr><td>Planeta</td><td>esférico, orbita uma estrela</td></tr><tr><td>Satélite</td><td>rochoso, orbita um planeta</td></tr><tr><td>Asteroide</td><td>rocha irregular, a maioria no cinturão</td></tr><tr><td>Cometa</td><td>gelo e poeira, cauda perto do Sol</td></tr><tr><td>Meteoro</td><td>asteroide pegando fogo na atmosfera</td></tr><tr><td>Meteorito</td><td>pedaço do meteoro que chega ao chão</td></tr></table></div>
+     <div class="note"><h3>Luas</h3><b>Saturno</b> tem mais luas (145 até 2024). <b>Mercúrio e Vênus</b> não têm.</div>
+     <div class="note"><h3>Asteroides</h3><b>Cinturão</b> entre Marte e Júpiter. Quando um astro cai em outro, forma uma <b>cratera</b>. Gasosos não têm crateras porque não têm solo.</div>
+     <div class="note"><h3>“Estrela cadente”</h3>Não é estrela: é um <b>meteoro</b>. Ele pega fogo pelo <b>atrito com o ar</b>.</div>
+     <div class="note"><h3>Bendegó</h3>Maior meteorito do Brasil: 5,36 toneladas, encontrado em 1784 na Bahia. Resistiu ao incêndio do Museu Nacional em 2018.</div>
+     <div class="note"><h3>Cometas</h3>O gelo derrete perto do Sol e forma a <b>cauda</b>. <b>Halley</b>: mais de 75 anos por volta, volta em 2061.</div>
+     <div class="note"><h3>Chuva de meteoros</h3>A Terra passa pelo <b>rastro de poeira de um cometa</b>. Por isso dá para prever.</div>`,
+  3:`<div class="note"><h3>Como vemos no Brasil</h3><div class="moons"><div>${moon('nova',52)}Nova</div><div>${moon('crescente',52)}Crescente</div><div>${moon('cheia',52)}Cheia</div><div>${moon('minguante',52)}Minguante</div></div></div>
+     <div class="note"><h3>Luz</h3>A Lua é <b>iluminada</b>: reflete a luz do Sol, como um espelho. O Sol sempre ilumina metade dela.</div>
+     <div class="note"><h3>Revolução lunar</h3>A volta da Lua em torno da Terra: cerca de <b>28 dias</b> (um mês).</div>
+     <div class="note"><h3>Por que há fases?</h3>Nem sempre vemos toda a face iluminada. <b>A Lua não muda de tamanho.</b></div>
+     <div class="note"><h3>Horários</h3><table class="pltable"><tr><td>Nova</td><td>de dia, mas não a vemos</td></tr><tr><td>Crescente</td><td>tarde e noite</td></tr><tr><td>Cheia</td><td>noite e madrugada</td></tr><tr><td>Minguante</td><td>madrugada e manhã</td></tr></table></div>
+     <div class="note"><h3>Semana e mês</h3>A cada <b>7 dias</b> a Lua muda de fase: por isso a semana tem 7 dias.<br>O tempo entre duas fases iguais é o <b>mês</b>.<br><b>Minguar</b> = diminuir.<br><b>Quarto</b> = vemos metade da parte iluminada, um quarto da Lua.</div>`
+  };
+  app.innerHTML=`<div class="top"><button class="iconbtn" id="quit" aria-label="Voltar ao início">✕</button><span class="ttl" style="font-size:17px;color:#fff">📋 Cola rápida</span></div>
+    <div class="tabs">${[1,2,3].map(i=>`<button class="tab ${i===l?'on':''}" data-l="${i}">Lição ${i}</button>`).join('')}</div>${C[l]}
+    <button class="cta" id="go" style="margin-top:6px">🚀 Treinar a Lição ${l}</button>`;
+  window.scrollTo(0,0);
+  $('#quit').onclick=home;
+  $$('.tab').forEach(t=>t.onclick=()=>cola(+t.dataset.l));
+  $('#go').onclick=()=>{
+    const ids=TOPICS.filter(t=>t.l===l).map(t=>t.id);
+    const queue=pick(Q.filter(q=>ids.includes(q.t)),8);
+    S={cfg:{mode:'quick'},title:'Lição '+l,queue,goal:queue.length,done:0,answered:0,correct:0,errors:0,combo:0,best:0,wrong:new Set(),cur:null,exam:false};
+    next();
+  };
+}
+
+home();
+</script>
+</body>
+</html>
