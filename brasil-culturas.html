@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#1F6B4A">
+<title>Brasil de Muitas Culturas</title>
+<style>
+/* Layout: mapa de missões (home) -> leitura obrigatória do texto -> minijogo em tela cheia -> resultado. */
+:root{--ink:#2B2118;--paper:#FFF8EC;--card:#fff;--line:#E7D9C2;--ok:#1F9D57;--bad:#D93B3F;--gold:#F2A900;
+  --nac:#2F7DE1;--sim:#E5484D;--mul:#8E44AD;--ind:#1F8A4C;--afr:#D9730D}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;overscroll-behavior:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;touch-action:manipulation}
+[hidden]{display:none!important}
+.screen{min-height:100vh;min-height:100dvh;max-width:560px;margin:0 auto;padding:14px 14px 28px}
+
+/* ---------- Home ---------- */
+.hero{border-radius:22px;padding:16px 16px 14px;color:#fff;background:linear-gradient(135deg,#1F8A4C,#12603A 55%,#0E4A6B);position:relative;overflow:hidden;box-shadow:0 6px 0 #0B3B27}
+.hero h1{margin:0;font-size:25px;font-weight:900;line-height:1.1}
+.hero p{margin:5px 0 0;font-size:14px;font-weight:600;opacity:.95}
+.hero .zig{position:absolute;left:0;right:0;bottom:0;height:9px;background:repeating-linear-gradient(135deg,#F2A900 0 9px,#D93B3F 9px 18px,#fff 18px 27px,#2B2118 27px 36px)}
+.hero .tot{margin-top:9px;display:inline-block;background:rgba(255,255,255,.18);border-radius:999px;padding:4px 12px;font-weight:800;font-size:13px;margin-bottom:8px}
+.how{font-size:13.5px;font-weight:700;color:#6B5A45;margin:12px 4px 10px;text-align:center}
+.mis{background:var(--card);border:2px solid var(--line);border-radius:20px;margin-bottom:12px;overflow:hidden;box-shadow:0 4px 0 var(--line)}
+.mis-h{display:flex;gap:11px;align-items:center;padding:11px 12px;color:#fff;background:var(--c)}
+.mis-h .ico{flex:none;width:50px;height:50px;border-radius:15px;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:28px}
+.mis-h h2{margin:0;font-size:17.5px;font-weight:900;line-height:1.15}
+.mis-h small{display:block;font-size:12.5px;font-weight:700;opacity:.95;margin-top:2px}
+.mis-h .st{margin-left:auto;flex:none;background:#fff;color:var(--c);font-size:11.5px;font-weight:900;border-radius:999px;padding:4px 9px;white-space:nowrap}
+.tx{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 12px;border-top:2px solid var(--line);min-height:58px}
+.tx:active{background:#FBF1DF}
+.tx .n{flex:none;width:34px;height:34px;border-radius:50%;background:var(--c);color:#fff;font-weight:900;display:grid;place-items:center}
+.tx b{display:block;font-size:15.5px;line-height:1.2}
+.tx span.s{font-size:12.5px;font-weight:700;color:#7A6853}
+.tx .go{margin-left:auto;flex:none;font-size:13px;font-weight:900;color:var(--c);white-space:nowrap}
+.tx .stars{letter-spacing:1px}.off{filter:grayscale(1);opacity:.3}
+.foot{display:flex;gap:10px;justify-content:center;margin-top:8px}
+.foot button{font-size:13px;font-weight:800;color:#7A6853;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:#fff}
+
+/* ---------- Leitura ---------- */
+#read{position:fixed;inset:0;z-index:30;background:var(--paper);overflow-y:auto}
+.rd{max-width:560px;margin:0 auto;padding:12px 14px 120px}
+.rd-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.rd-top .tag{background:var(--c);color:#fff;font-weight:900;font-size:12.5px;border-radius:999px;padding:5px 11px}
+.rd-top .x{margin-left:auto;width:44px;height:44px;border-radius:50%;background:#fff;border:2px solid var(--line);font-weight:900;font-size:17px}
+.rd-step{font-size:13px;font-weight:800;color:#7A6853;margin:0 2px 4px}
+.rd h2{margin:0 0 9px;font-size:23px;font-weight:900;line-height:1.15}
+.rd-card{background:#fff;border:2px solid var(--line);border-left:8px solid var(--c);border-radius:16px;padding:12px 14px;font-size:18.5px;line-height:1.5}
+.rd-card p{margin:0 0 9px}.rd-card p:last-child{margin-bottom:0}
+.rd-card b{color:var(--c)}
+.rd-card p.hl{background:#FFF1B8;border-radius:8px;box-shadow:0 0 0 5px #FFF1B8}
+.pairs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.pair{background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px;text-align:center;font-size:14px;font-weight:700}
+.pair svg{width:72px;height:48px;border-radius:5px;box-shadow:0 0 0 1.5px #0002;display:block;margin:0 auto 4px}
+.pair b{display:block;font-size:16.5px;color:var(--c)}
+.rd-act{display:flex;gap:8px;margin-top:10px}
+.rd-act button{flex:1;min-height:46px;border-radius:13px;border:2px solid var(--line);background:#fff;font-weight:800;font-size:14.5px}
+.rd-bar{position:fixed;left:0;right:0;bottom:0;padding:10px 14px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--paper) 26%)}
+.rd-bar .in{max-width:532px;margin:0 auto}
+.rd-msg{text-align:center;font-size:13.5px;font-weight:800;color:#7A6853;margin-bottom:6px}
+.cta{position:relative;overflow:hidden;width:100%;min-height:58px;border-radius:17px;background:var(--c,#1F8A4C);color:#fff;font-size:19px;font-weight:900;box-shadow:0 5px 0 rgba(0,0,0,.28)}
+.cta:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.28)}
+.cta:disabled{background:#B9AD9C;box-shadow:0 5px 0 #948979}
+.cta .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.35)}
+.cta span{position:relative}
+
+/* ---------- Jogo ---------- */
+#game{position:fixed;inset:0;z-index:10;background:#123;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;align-items:center;gap:6px;padding:8px 8px 0}
+.hud .b{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.94);font-weight:900;font-size:17px;box-shadow:0 3px 0 rgba(0,0,0,.25);flex:none}
+.hud .pill{background:rgba(255,255,255,.94);border-radius:999px;padding:7px 11px;font-weight:900;font-size:14px;box-shadow:0 3px 0 rgba(0,0,0,.25);white-space:nowrap}
+.hud .sp{flex:1}
+#qcard{position:absolute;left:8px;right:8px;top:58px;z-index:3;background:#fff;border-radius:16px;padding:9px 13px 10px;box-shadow:0 4px 0 rgba(0,0,0,.25);border:3px solid var(--c,#1F8A4C);max-width:540px;margin:0 auto}
+#qp{font-size:12px;font-weight:900;color:var(--c,#1F8A4C);text-transform:uppercase;letter-spacing:.04em}
+#qq{font-size:19px;font-weight:900;line-height:1.22;margin-top:1px}
+#toast{position:absolute;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:6;border-radius:16px;padding:12px 14px;font-size:17px;font-weight:800;text-align:center;color:#fff;box-shadow:0 5px 0 rgba(0,0,0,.25);max-width:520px;margin:0 auto;pointer-events:none}
+#toast.ok{background:var(--ok)}#toast.bad{background:var(--bad)}#toast.info{background:#2B2118}
+#ghint{position:absolute;left:50%;transform:translateX(-50%);top:46%;z-index:5;background:rgba(20,20,20,.82);color:#fff;font-size:14px;font-weight:800;border-radius:999px;padding:8px 14px;white-space:nowrap;pointer-events:none;max-width:94vw;overflow:hidden;text-overflow:ellipsis}
+
+/* Genius */
+#genius{position:absolute;inset:0;z-index:2;background:radial-gradient(circle at 50% 30%,#2A3566,#131A38 70%);display:flex;flex-direction:column;align-items:center;padding:58px 10px calc(10px + env(safe-area-inset-bottom));gap:1.2vh;overflow:hidden}
+.g-card{background:#fff;border-radius:16px;padding:8px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 0 rgba(0,0,0,.3);max-width:96vw}
+.g-card svg{height:min(13vh,92px);width:auto;aspect-ratio:3/2;border-radius:6px;box-shadow:0 0 0 2px #0002;flex:none}
+.g-card .big{font-size:min(9vh,60px);line-height:1}
+.g-card .nm{font-size:13px;font-weight:800;color:#7A6853}
+.g-card .ct{font-size:min(4.4vh,30px);font-weight:900;line-height:1.05}
+.g-q{color:#fff;font-size:min(2.9vh,18.5px);font-weight:800;text-align:center;line-height:1.2;padding:0 6px}
+.g-q b{color:#FFD766}
+.g-board{position:relative;width:min(90vw,46vh,400px);aspect-ratio:1;display:grid;grid-template-columns:1fr 1fr;gap:9px;flex:none}
+.gp{position:relative;color:#fff;font-weight:900;font-size:min(4.6vw,2.5vh,19px);line-height:1.1;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--k);box-shadow:inset 0 -7px 0 rgba(0,0,0,.25),inset 0 0 0 4px rgba(255,255,255,.14);transition:filter .1s,transform .1s;text-shadow:0 1px 0 rgba(0,0,0,.35);word-break:break-word;hyphens:auto}
+.gp:nth-child(1){border-radius:100% 14px 14px 14px;padding:24% 5% 6% 24%}
+.gp:nth-child(2){border-radius:14px 100% 14px 14px;padding:24% 24% 6% 5%}
+.gp:nth-child(3){border-radius:14px 14px 14px 100%;padding:6% 5% 24% 24%}
+.gp:nth-child(4){border-radius:14px 14px 100% 14px;padding:6% 24% 24% 5%}
+.gp.lit{filter:brightness(1.7) saturate(1.2);transform:scale(1.03)}
+.gp.dim{filter:brightness(.42) saturate(.6)}
+.gp.buzz{animation:buzz .35s}
+.g-board.mem .gp span{visibility:hidden}
+.g-board.lock{pointer-events:none}
+.g-knob{position:absolute;left:50%;top:50%;width:30%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:#131A38;border:5px solid #0A0E22;color:#fff;display:grid;place-items:center;font-weight:900;font-size:min(6vw,3.2vh,26px);pointer-events:none;box-shadow:0 0 0 4px rgba(255,255,255,.08)}
+.g-st{color:#fff;font-weight:800;font-size:min(2.7vh,17px);text-align:center;min-height:1.3em}
+@keyframes buzz{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+/* ---------- Resultado / confirmar ---------- */
+#result{text-align:center}
+.res-stars{font-size:54px;margin-top:10px}
+#result h1{margin:2px 0;font-size:27px;font-weight:900}
+.res-num{font-weight:800;color:#6B5A45}
+.res-box{background:#fff;border:2px solid var(--line);border-radius:16px;padding:11px 13px;margin:12px 0;text-align:left;font-size:15.5px;line-height:1.4}
+.res-box h3{margin:0 0 5px;font-size:15px;font-weight:900}
+.res-box div{padding:5px 0;border-top:1px dashed var(--line)}.res-box div b{color:var(--ok)}
+.res-btns{display:flex;flex-direction:column;gap:10px}
+.btn2{min-height:52px;border-radius:15px;background:#fff;border:2px solid var(--line);font-weight:900;font-size:16.5px;width:100%}
+#confirm{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.55);display:grid;place-items:center;padding:18px}
+#confirm .box{background:#fff;border-radius:20px;padding:18px;max-width:360px;width:100%;text-align:center}
+#confirm h3{margin:0 0 6px;font-size:20px}#confirm p{margin:0 0 14px;font-weight:600;color:#6B5A45}
+#confirm .row{display:flex;gap:10px}#confirm .row button{flex:1}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.confetti i{position:absolute;top:-12px;width:9px;height:14px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg)}}
+</style>
+</head>
+<body>
+
+<div id="home" class="screen"></div>
+
+<div id="read" hidden><div class="rd">
+  <div class="rd-top"><span class="tag" id="rdTag"></span><button class="x" id="rdX" aria-label="Fechar">✕</button></div>
+  <div class="rd-step" id="rdStep"></div>
+  <h2 id="rdTitle"></h2>
+  <div class="rd-card" id="rdText"></div>
+  <div id="rdPairs"></div>
+  <div class="rd-act"><button id="rdSay">🔊 Ouvir o texto</button></div>
+</div>
+<div class="rd-bar"><div class="in"><div class="rd-msg" id="rdMsg"></div><button class="cta" id="rdGo"><i class="fill"></i><span id="rdGoT"></span></button></div></div></div>
+
+<div id="game" hidden>
+  <canvas id="cv"></canvas>
+  <div id="genius" hidden>
+    <div class="g-card" id="gCard"></div>
+    <div class="g-q" id="gQ"></div>
+    <div class="g-board" id="gBoard"><button class="gp" style="--k:#1F9D57"><span></span></button><button class="gp" style="--k:#D93B3F"><span></span></button><button class="gp" style="--k:#E8A800"><span></span></button><button class="gp" style="--k:#2F7DE1"><span></span></button><div class="g-knob" id="gKnob"></div></div>
+    <div class="g-st" id="gSt"></div>
+  </div>
+  <div class="hud"><button class="b" id="quitBtn" aria-label="Sair">✕</button><span class="pill" id="hearts"></span><span class="sp"></span><span class="pill" id="prog"></span><span class="pill">⭐ <span id="score">0</span></span><button class="b" id="bookBtn" aria-label="Reler o texto">📖</button></div>
+  <div id="qcard" hidden><div id="qp"></div><div id="qq"></div></div>
+  <div id="ghint" hidden></div>
+  <div id="toast" hidden></div>
+</div>
+
+<div id="result" class="screen" hidden>
+  <div class="res-stars" id="resStars"></div>
+  <h1 id="resTitle"></h1>
+  <div class="res-num" id="resNum"></div>
+  <div class="res-box" id="resMist"></div>
+  <div class="res-btns"><button class="cta" id="resNext"><span></span></button><button class="btn2" id="resAgain">🔁 Jogar este texto de novo</button><button class="btn2" id="resMap">🗺️ Voltar ao mapa</button></div>
+</div>
+
+<div id="confirm" hidden><div class="box"><h3 id="cfTitle"></h3><p id="cfText"></p><div class="row"><button class="btn2" id="cfNo"></button><button class="cta" id="cfYes" style="min-height:52px;font-size:16.5px"><span></span></button></div></div></div>
+
+<script>
+'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+const plain=s=>String(s).replace(/\*\*/g,'');
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+/* =========================================================
+   BANDEIRAS (SVG simplificado, 60x40)
+   ========================================================= */
+function starPts(cx,cy,r){let p='';for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=i%2?r*.4:r;p+=(cx+Math.cos(a)*q).toFixed(1)+','+(cy+Math.sin(a)*q).toFixed(1)+' '}return p}
+const FL={
+ BR:{n:'Brasil',em:'no Brasil',g:'brasileira',s:'<rect width="60" height="40" fill="#1F9E4A"/><path d="M30 4 55 20 30 36 5 20Z" fill="#F7D417"/><circle cx="30" cy="20" r="9.5" fill="#2A4FA3"/><path d="M21 17.5q9-2.5 18 3.5l-.6 2.2q-8.4-6-17.6-3.4z" fill="#fff"/>'},
+ CA:{n:'Canadá',em:'no Canadá',g:'canadense',s:'<rect width="60" height="40" fill="#fff"/><rect width="15" height="40" fill="#D52B1E"/><rect x="45" width="15" height="40" fill="#D52B1E"/><path transform="translate(30.5 21) scale(.8) translate(-30.5 -21)" fill="#D52B1E" d="M30.5 6l3 6 4-2-1.5 9 5-4 1 3 5-1-2 5 3 2-9 6 1 4-8-1.5v4h-2v-4l-8 1.5 1-4-9-6 3-2-2-5 5 1 1-3 5 4-1.5-9 4 2z"/>'},
+ CN:{n:'China',em:'na China',g:'chinesa',s:'<rect width="60" height="40" fill="#DE2910"/><polygon fill="#FFDE00" points="'+starPts(11,11,6.5)+'"/><polygon fill="#FFDE00" points="'+starPts(21,4.5,2.2)+'"/><polygon fill="#FFDE00" points="'+starPts(25,9,2.2)+'"/><polygon fill="#FFDE00" points="'+starPts(25,15,2.2)+'"/><polygon fill="#FFDE00" points="'+starPts(21,19.5,2.2)+'"/>'},
+ JP:{n:'Japão',em:'no Japão',g:'japonesa',s:'<rect width="60" height="40" fill="#fff"/><circle cx="30" cy="20" r="11" fill="#BC002D"/>'},
+ PT:{n:'Portugal',em:'em Portugal',g:'portuguesa',s:'<rect width="60" height="40" fill="#DA291C"/><rect width="24" height="40" fill="#046A38"/><circle cx="24" cy="20" r="8" fill="#FFE900"/><path d="M19.5 15.5h9v6q0 4-4.5 5.5-4.5-1.500-4.500-5.500z" fill="#DA291C" stroke="#fff" stroke-width="1.4"/>'},
+ IT:{n:'Itália',em:'na Itália',g:'italiana',s:'<rect width="60" height="40" fill="#fff"/><rect width="20" height="40" fill="#009246"/><rect x="40" width="20" height="40" fill="#CE2B37"/>'},
+ DE:{n:'Alemanha',em:'na Alemanha',g:'alemã',s:'<rect width="60" height="40" fill="#FFCE00"/><rect width="60" height="26.7" fill="#DD0000"/><rect width="60" height="13.3" fill="#111"/>'},
+ ES:{n:'Espanha',em:'na Espanha',g:'espanhola',s:'<rect width="60" height="40" fill="#AA151B"/><rect y="10" width="60" height="20" fill="#F1BF00"/><rect x="14" y="14.500" width="7" height="9" rx="1.5" fill="#AA151B" stroke="#7A5A00" stroke-width="1"/>'},
+ LB:{n:'Líbano',em:'no Líbano',g:'libanesa',s:'<rect width="60" height="40" fill="#fff"/><rect width="60" height="10" fill="#ED1C24"/><rect y="30" width="60" height="10" fill="#ED1C24"/><path fill="#00A651" d="M30 11.500l6 6h-3l5 5h-4l5 4.500H21l5-4.500h-4l5-5h-3z"/><rect x="29" y="26" width="2" height="3" fill="#00A651"/>'},
+ AR:{n:'Argentina',em:'na Argentina',g:'argentina',s:'<rect width="60" height="40" fill="#fff"/><rect width="60" height="13.3" fill="#74ACDF"/><rect y="26.7" width="60" height="13.3" fill="#74ACDF"/><circle cx="30" cy="20" r="4.2" fill="#F6B40E" stroke="#C98A00" stroke-width=".8"/>'},
+ FR:{n:'França',em:'na França',g:'francesa',s:'<rect width="60" height="40" fill="#fff"/><rect width="20" height="40" fill="#0055A4"/><rect x="40" width="20" height="40" fill="#EF4135"/>'},
+ AO:{n:'Angola',em:'em Angola',g:'angolana',s:'<rect width="60" height="40" fill="#111"/><rect width="60" height="20" fill="#CE1126"/><path d="M36 13a9 9 0 1 1-10 13" fill="none" stroke="#F9D616" stroke-width="2.6" stroke-linecap="round"/><polygon fill="#F9D616" points="'+starPts(29,17,3.6)+'"/>'}
+};
+const flag=k=>`<svg viewBox="0 0 60 40" role="img" aria-label="Bandeira: ${FL[k].n}">${FL[k].s}</svg>`;
+const fq=(k,l)=>({flag:k,q:`Quem nasce **${FL[k].em}** tem nacionalidade…`,a:FL[k].g,w:shuffle(Object.keys(FL).filter(x=>x!==k&&FL[x].g!==FL[k].g)).map(x=>FL[x].g),l});
+const Q=(q,a,w,l)=>({q,a,w,l});
+
+/* =========================================================
+   CONTEÚDO: missões -> textos curtos -> perguntas sobre o texto
+   ========================================================= */
+const MIS=[
+{id:'nac',c:'var(--nac)',hex:'#2F7DE1',ico:'🌍',name:'A nacionalidade',game:'Genius das bandeiras',gid:'genius',texts:[
+ {id:'nac1',title:'De onde você é?',s:[
+  'Além do nome, a nossa identidade também tem a ver com o **lugar onde nascemos**. Isso é a **nacionalidade**.',
+  'Quem nasce no Brasil tem nacionalidade **brasileira**.',
+  'A **certidão de nascimento** é um dos documentos que comprovam a nacionalidade de uma pessoa.',
+  'Veja no quadro o país e a nacionalidade de quem nasce nele:'],
+  pairs:['BR','CA','CN','JP','PT','IT'],
+  qs:()=>[fq('BR',3),fq('CA',3),fq('CN',3),fq('JP',3),fq('PT',3),fq('IT',3),
+   Object.assign(Q('Que documento comprova a nacionalidade?','certidão de nascimento',['boletim da escola','carteira do clube','conta de luz'],2),{emo:'📄'}),
+   Object.assign(Q('A nacionalidade tem a ver com o lugar onde…','nascemos',['estudamos','passeamos','brincamos'],0),{emo:'👶'})]},
+ {id:'nac2',title:'Gente do mundo inteiro',s:[
+  'O Brasil foi formado por muitos povos: os **indígenas**, que vivem aqui há milhares de anos, os **portugueses**, os **africanos** e os **imigrantes**.',
+  '**Imigrantes** são pessoas que vieram de outros países para morar aqui, como alemães, espanhóis e libaneses.',
+  'Veja no quadro o país e a nacionalidade de quem nasce nele:'],
+  pairs:['DE','ES','LB','AR','FR','AO'],
+  qs:()=>[fq('DE',2),fq('ES',2),fq('LB',2),fq('AR',2),fq('FR',2),fq('AO',2),
+   Object.assign(Q('Quem vive no Brasil há milhares de anos?','os indígenas',['os alemães','os espanhóis','os libaneses'],0),{emo:'🪶'}),
+   Object.assign(Q('Imigrantes são pessoas que vieram de outros…','países',['bairros','planetas','séculos'],1),{emo:'🧳'})]}]},
+{id:'sim',c:'var(--sim)',hex:'#E5484D',ico:'🛹',name:'Símbolos e identidade',game:'Corrida de skate do Igor',gid:'runner',texts:[
+ {id:'sim1',title:'Os símbolos do Brasil',s:[
+  'A **bandeira** e o **hino nacional** são símbolos que representam e identificam um país.',
+  'Nas Olimpíadas e na Copa do Mundo, os atletas usam as cores da bandeira, e o **hino** é tocado antes dos jogos.',
+  'A bandeira brasileira foi criada em **1889**.',
+  'O **verde** lembra as matas, o **amarelo** lembra o ouro, o **azul** lembra o céu e o **branco** lembra a paz.',
+  'A **língua portuguesa** é falada em todo o Brasil, mas cada lugar tem o seu **sotaque**.'],
+  qs:()=>[Q('A bandeira brasileira foi criada em…','1889',['1500','1924','2016'],2),Q('O verde da bandeira lembra…','as matas',['o mar','a paz','o ouro'],3),
+   Q('O amarelo da bandeira lembra…','o ouro',['o sol','as matas','o céu'],3),Q('O azul da bandeira lembra…','o céu',['os rios','a paz','o ouro'],3),
+   Q('O branco da bandeira lembra…','a paz',['as nuvens','o céu','as matas'],3),Q('O que é tocado antes dos jogos da Copa?','o hino nacional',['um samba','o sino','uma buzina'],1),
+   Q('Dois símbolos de um país:','bandeira e hino',['rede e canoa','pizza e sushi'],0),Q('Língua falada em todo o Brasil:','portuguesa',['espanhola','inglesa','italiana'],4),
+   Q('O jeito de falar de cada lugar é o…','sotaque',['hino','lema','mito'],4)]},
+ {id:'sim2',title:'Quem sou eu?',s:[
+  '**Identidade** é tudo aquilo que caracteriza você como **indivíduo**: seus gostos e suas preferências.',
+  'Igor adora andar de skate. Suas roupas, os lugares aonde vai e até as palavras que usa mostram isso. Ele tem **identidade cultural de skatista**.',
+  'As identidades de uma pessoa podem ser muitas e **mudam** ao longo da vida.',
+  'Elas fazem a gente se sentir parte de um **grupo**.',
+  'Os brasileiros nascem no mesmo país, falam a mesma língua e compartilham a mesma **história** e a mesma **cultura**.',
+  '**Cultura** é o conjunto de tradições, costumes e conhecimentos de um povo.'],
+  qs:()=>[Q('Identidade é o que caracteriza você como…','indivíduo',['turista','atleta','aluno'],0),Q('Igor tem identidade cultural de…','skatista',['surfista','goleiro','músico'],1),
+   Q('Ao longo da vida, as identidades…','mudam',['somem','nunca mudam'],2),Q('A identidade faz a pessoa se sentir parte de um…','grupo',['jogo','prédio','mapa'],3),
+   Q('Os brasileiros compartilham a mesma…','história e cultura',['casa e rua','roupa e comida'],4),Q('Tradições, costumes e conhecimentos formam a…','cultura',['bandeira','certidão','colônia'],5),
+   Q('A identidade tem a ver com seus gostos e…','preferências',['notas','parentes','brinquedos'],0),Q('O que mostra a identidade do Igor?','roupas e palavras',['altura e peso','nota da prova'],1)]}]},
+{id:'mul',c:'var(--mul)',hex:'#8E44AD',ico:'🎉',name:'Brasil multicultural',game:'Balaio das culturas',gid:'catch',texts:[
+ {id:'mul1',title:'A mistura que formou o Brasil',s:[
+  'O Brasil é um país de **muitas culturas**.',
+  'Nossos costumes nasceram da mistura das tradições dos **indígenas**, que já viviam aqui, dos **portugueses**, que **colonizaram** o país, e dos **africanos**, trazidos **à força** para trabalhar como escravos.',
+  '**Colonizar** é transformar um lugar em colônia e explorá-lo como se fosse seu.',
+  'Essa mistura **nem sempre foi pacífica**: os portugueses exploraram o trabalho dos indígenas, e muitos indígenas morreram de **doenças** trazidas pelos colonizadores.',
+  'Até hoje existem injustiças e **desigualdade** por causa desse passado.'],
+  qs:()=>[Q('Quem já vivia aqui?','os indígenas',['os portugueses','os italianos','os japoneses'],1),Q('Quem colonizou o Brasil?','os portugueses',['os japoneses','os alemães','os indígenas'],1),
+   Q('Quem foi trazido à força?','os africanos',['os espanhóis','os libaneses','os italianos'],1),Q('Os africanos foram obrigados a trabalhar como…','escravos',['reis','turistas','professores'],1),
+   Q('Muitos indígenas morreram por causa de…','doenças',['frio','terremotos','enchentes'],3),Q('A mistura de culturas foi pacífica?','nem sempre',['sim, sempre','nunca houve briga'],3),
+   Q('Colonizar é transformar um lugar em…','colônia',['floresta','escola','museu'],2),Q('O Brasil é um país de muitas…','culturas',['neves','geleiras'],0),
+   Q('Esse passado deixou injustiças e…','desigualdade',['paz total','riqueza para todos'],4)]},
+ {id:'mul2',title:'Sabores e festas de muitos povos',s:[
+  'Os **imigrantes** também trouxeram seus costumes para o Brasil: alemães, libaneses, espanhóis e muitos outros.',
+  'Os **italianos** trouxeram a pizza, a lasanha e a palavra “tchau”.',
+  'Os **japoneses** trouxeram o hábito de comer peixe cru com molho de soja.',
+  'O **acarajé** veio com os africanos. A **tapioca**, feita de mandioca, é herança dos indígenas.',
+  'A mistura aparece também nas festas e danças, como o **boi-bumbá**, no Amazonas, e o **maculelê**, na Bahia.'],
+  qs:()=>[Q('Pizza e lasanha vieram com os…','italianos',['japoneses','indígenas','africanos'],1),Q('A palavra “tchau” veio dos…','italianos',['africanos','alemães','indígenas'],1),
+   Q('Peixe cru com molho de soja veio dos…','japoneses',['espanhóis','africanos','italianos'],2),Q('O acarajé veio com os…','africanos',['italianos','japoneses','alemães'],3),
+   Q('A tapioca é herança dos…','indígenas',['libaneses','italianos','japoneses'],3),Q('A tapioca é feita de…','mandioca',['trigo','arroz','milho'],3),
+   Q('Os imigrantes vieram de outros…','países',['bairros','planetas'],0),Q('O boi-bumbá é festa do…','Amazonas',['Paraná','Rio de Janeiro'],4),Q('O maculelê é dança da…','Bahia',['Amazônia','Argentina'],4)]}]},
+{id:'ind',c:'var(--ind)',hex:'#1F8A4C',ico:'🏹',name:'Cultura indígena',game:'Arco e flecha',gid:'bow',texts:[
+ {id:'ind1',title:'Heranças indígenas no dia a dia',s:[
+  'A cultura indígena está presente no nosso dia a dia.',
+  'Nomes como **Tainá**, **Cauê** e **Jandira** e palavras como **pipoca**, **jacaré**, **Ipanema** e **Maracanã** têm origem indígena.',
+  'O costume de dormir em **rede** também veio dos indígenas. Ele é comum no **Norte** e no **Nordeste**.',
+  'A **mandioca** já era plantada pelos povos nativos muito antes da chegada dos europeus.',
+  'Com ela se fazem a **tapioca**, o **beiju**, a **farinha** e bebidas.'],
+  qs:()=>[Q('Costume herdado dos indígenas: dormir em…','rede',['beliche','sofá','colchão'],2),Q('Onde a rede é mais comum?','Norte e Nordeste',['Sul e Sudeste','só no Sul'],2),
+   Q('Palavra de origem indígena:','pipoca',['tchau','caçula','pizza'],1),Q('Nome de origem indígena:','Tainá',['Enzo','Akira','Igor'],1),
+   Q('Outra palavra de origem indígena:','jacaré',['samba','lasanha','cafuné'],1),Q('Planta cultivada pelos povos nativos:','mandioca',['trigo','uva','café'],3),
+   Q('Alimento feito de mandioca:','beiju',['pizza','acarajé','sushi'],4),Q('A mandioca era plantada antes da chegada dos…','europeus',['indígenas','dinossauros'],3),
+   Q('Também tem origem indígena:','Maracanã',['moleque','miçanga'],1)]},
+ {id:'ind2',title:'Saberes, mitos e arte',s:[
+  'Quando os portugueses chegaram, os indígenas já sabiam muito sobre **agricultura**, **remédios naturais** e a **floresta**.',
+  'Até hoje se fazem **canoas** como eles faziam: de **um único tronco** de árvore.',
+  'Os **mitos** são histórias que explicam a origem do mundo, dos animais e das plantas. Eles passam **de geração em geração**.',
+  'A **arte indígena** está nos cestos, nas cerâmicas, nas redes e na **pintura corporal**, que pode indicar nascimento, luto ou guerra.',
+  'Ela **não é primitiva**: é bem elaborada e usa **formas geométricas**.'],
+  qs:()=>[Q('A canoa indígena é feita de um único…','tronco',['ferro','plástico','tijolo'],1),Q('Os mitos explicam a origem do…','mundo',['celular','futebol','dinheiro'],2),
+   Q('Os mitos passam de…','geração em geração',['loja em loja','jornal em jornal'],2),Q('A arte indígena usa formas…','geométricas',['digitais','secretas'],4),
+   Q('A arte indígena é…','bem elaborada',['primitiva','sem estilo'],4),Q('A pintura corporal pode indicar…','nascimento ou luto',['hora do lanche','só enfeite'],3),
+   Q('Os indígenas conheciam remédios…','naturais',['de farmácia','mágicos'],0),Q('Onde está a arte indígena?','cestos e cerâmicas',['carros','prédios'],3),
+   Q('Os indígenas sabiam muito sobre a…','floresta',['neve','internet'],0)]}]},
+{id:'afr',c:'var(--afr)',hex:'#D9730D',ico:'🥁',name:'Cultura afro-brasileira',game:'Roda de batuque',gid:'drums',texts:[
+ {id:'afr1',title:'Da África para o Brasil',s:[
+  'Milhares de africanos foram trazidos **à força** para trabalhar como escravos nas lavouras de **cana-de-açúcar** e, mais tarde, na **mineração** e no **café**.',
+  'Vieram sem nenhum pertence, mas trouxeram seus saberes, crenças, ritmos e histórias.',
+  'Depois da portuguesa, a cultura **africana** foi a que mais influenciou a cultura brasileira.',
+  'Vieram com eles alimentos como a banana, o coco, o quiabo, o inhame e o **azeite de dendê**, muito usado na cozinha **baiana**.',
+  'Palavras como **caçula**, **cafuné**, **moleque**, **miçanga** e **samba** também têm origem africana.'],
+  qs:()=>[Q('Como os africanos vieram para o Brasil?','à força',['a passeio','de férias'],0),Q('Primeiro, trabalharam nas lavouras de…','cana-de-açúcar',['soja','uva','trigo'],0),
+   Q('Mais tarde, na mineração e nas lavouras de…','café',['morango','arroz'],0),Q('Azeite muito usado na cozinha baiana:','dendê',['girassol','milho','soja'],3),
+   Q('Palavra de origem africana:','caçula',['pipoca','tchau','jacaré'],4),Q('Outra palavra de origem africana:','cafuné',['Ipanema','lasanha','Maracanã'],4),
+   Q('Alimento que veio com os africanos:','quiabo',['mandioca','sushi','pizza'],3),Q('Depois da portuguesa, a cultura que mais nos influenciou:','africana',['japonesa','alemã','italiana'],2),
+   Q('Eles trouxeram crenças, ritmos e…','histórias',['malas','moedas','navios'],1)]},
+ {id:'afr2',title:'Samba, Bonfim e capoeira',s:[
+  'O **samba** nasceu na **Bahia** e cresceu no **Rio de Janeiro**. Nos anos 1920, quem tocasse samba podia ser **preso**!',
+  'A **Lavagem do Bonfim** é uma festa que mistura **catolicismo** e **candomblé**.',
+  'A **capoeira** começou como uma **defesa**. Os golpes ficaram parecidos com uma **dança**, para treinar sem os **capatazes** desconfiarem.',
+  'Ela foi proibida por muito tempo, até **Mestre Bimba** apresentá-la ao presidente Getúlio Vargas.',
+  'Desde 2014, a capoeira é **Patrimônio Cultural da Humanidade**.'],
+  qs:()=>[Q('O samba nasceu na…','Bahia',['Amazônia','Argentina','Itália'],0),Q('O samba cresceu no…','Rio de Janeiro',['Paraná','Acre','Japão'],0),
+   Q('Nos anos 1920, quem tocava samba podia ser…','preso',['premiado','presidente'],0),Q('A Lavagem do Bonfim mistura catolicismo e…','candomblé',['futebol','capoeira'],1),
+   Q('A capoeira começou como uma…','defesa',['brincadeira','corrida'],2),Q('Os golpes ficaram parecidos com uma…','dança',['pintura','prova'],2),
+   Q('Parecia dança para enganar os…','capatazes',['turistas','juízes'],2),Q('Quem mostrou a capoeira ao presidente?','Mestre Bimba',['Rugendas','Igor'],3),
+   Q('Desde 2014, a capoeira é Patrimônio da…','Humanidade',['Bahia','escola'],4)]}]}
+];
+const TEXTS=[];MIS.forEach(m=>m.texts.forEach((t,i)=>{t.mis=m;t.n=i+1;t.items=t.qs().map((q,k)=>Object.assign(q,{id:t.id+'#'+k}));TEXTS.push(t)}));
+const TBY=Object.fromEntries(TEXTS.map(t=>[t.id,t]));
+
+/* =========================================================
+   PROGRESSO
+   ========================================================= */
+const KEY='brasilCulturas.v1';
+let S={q:{},t:{},mute:false};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.q)S=Object.assign(S,s)}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function record(it,ok){const p=S.q[it.id]||(S.q[it.id]={s:0,r:0,l:1});p.s++;if(ok)p.r++;p.l=ok?1:0;save()}
+const tinfo=t=>S.t[t.id]||{plays:0,best:0};
+function mstat(m){const b=m.texts.map(t=>tinfo(t));if(b.every(x=>x.best===3))return'Dominado ⭐';if(b.some(x=>x.plays))return'Jogando';return'Novo'}
+function nextText(after){const order=after?[...TEXTS.slice(TEXTS.indexOf(after)+1),...TEXTS.slice(0,TEXTS.indexOf(after))]:TEXTS;
+  return order.find(t=>!tinfo(t).plays)||order.find(t=>tinfo(t).best<3)||order[0]}
+
+/* =========================================================
+   SOM E VOZ
+   ========================================================= */
+let AC=null;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,d=.12,type='sine',vol=.15,delay=0,slide=0){
+  if(S.mute)return;const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+delay;
+  o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+slide),t+d);
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.02)}
+function sfx(n){({ok:()=>{tone(660,.1,'triangle',.16);tone(990,.16,'triangle',.16,.09)},bad:()=>tone(160,.3,'sawtooth',.1,0,-70),pop:()=>tone(520,.05,'square',.06),
+  coin:()=>tone(1200,.07,'triangle',.09),win:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.16,'triangle',.15,i*.11)),shoot:()=>tone(900,.18,'sine',.1,0,-600),
+  thud:()=>tone(120,.12,'square',.14,0,-50),drum:()=>tone(150,.18,'sine',.3,0,-90)}[n]||(()=>{}))()}
+function speak(t){if(!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(plain(t));u.lang='pt-BR';u.rate=.9;
+  const v=speechSynthesis.getVoices().find(v=>/pt[-_]BR/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+function hush(){try{speechSynthesis.cancel()}catch(e){}}
+const praise=()=>rnd(['Isso!','Muito bem!','Acertou!','Boa!','Mandou bem!','Show!']);
+
+/* =========================================================
+   TELAS: mapa
+   ========================================================= */
+function show(id){['home','result'].forEach(s=>$('#'+s).hidden=s!==id);$('#game').hidden=id!=='game';window.scrollTo(0,0)}
+const starsHTML=n=>[0,1,2].map(i=>`<span class="${i<n?'':'off'}">⭐</span>`).join('');
+function renderHome(){
+  const played=TEXTS.filter(t=>tinfo(t).plays).length,st=TEXTS.reduce((a,t)=>a+tinfo(t).best,0),sug=nextText();
+  $('#home').innerHTML=`<div class="hero"><h1>Brasil de Muitas Culturas</h1><p>História · Lições 12 e 13</p>
+    <span class="tot">📖 ${played} de ${TEXTS.length} textos jogados · ⭐ ${st} de ${TEXTS.length*3}</span><div class="zig"></div></div>
+   <div class="how">Leia o texto com atenção e depois jogue para responder!</div>`+
+   MIS.map(m=>`<div class="mis" style="--c:${m.c}"><div class="mis-h"><span class="ico">${m.ico}</span><div><h2>${m.name}</h2><small>🎮 ${m.game}</small></div><span class="st">${mstat(m)}</span></div>
+     ${m.texts.map(t=>{const i=tinfo(t);return `<button class="tx" data-t="${t.id}"><span class="n">${t.n}</span><span><b>${esc(t.title)}</b><span class="s">${i.plays?`<span class="stars">${starsHTML(i.best)}</span> · jogou ${i.plays}×`:'Ainda não jogou'}</span></span><span class="go">${t===sug?'👉 ':''}Ler e jogar ▶</span></button>`}).join('')}</div>`).join('')+
+   `<div class="foot"><button id="muteBtn">${S.mute?'🔇 Som desligado':'🔊 Som ligado'}</button><button id="resetBtn">🗑️ Zerar progresso</button></div>`;
+  $$('.tx').forEach(b=>b.onclick=()=>{ac();startText(b.dataset.t)});
+  $('#muteBtn').onclick=()=>{S.mute=!S.mute;save();renderHome()};
+  $('#resetBtn').onclick=()=>confirmBox('Zerar o progresso?','Isso apaga as estrelas e o que já foi jogado neste celular.','Cancelar','Zerar',()=>{S.q={};S.t={};save();renderHome()});
+  show('home');
+}
+
+/* =========================================================
+   LEITURA OBRIGATÓRIA (antes do jogo, para reler e quando erra muito)
+   ========================================================= */
+let rdTimer=0,rdCb=null;
+function openRead(tid,mode,cb,lines){
+  const t=TBY[tid],m=t.mis,el=$('#read');rdCb=cb;el.style.setProperty('--c',m.hex);
+  $('#rdTag').textContent=m.ico+' '+m.name;
+  $('#rdStep').textContent=mode==='start'?`Passo 1 de 2 · Leia o texto ${t.n}`:mode==='review'?'Vamos reler para continuar! Olhe as partes em amarelo.':'Releia e volte ao jogo';
+  $('#rdTitle').textContent=t.title;
+  $('#rdText').innerHTML=t.s.map((s,i)=>`<p class="${lines&&lines.has(i)?'hl':''}">${md(s)}</p>`).join('');
+  $('#rdPairs').innerHTML=t.pairs?`<div class="pairs">${t.pairs.map(k=>`<div class="pair">${flag(k)}${FL[k].n}<b>${FL[k].g}</b></div>`).join('')}</div>`:'';
+  $('#rdSay').onclick=()=>speak(t.s.join(' ')+(t.pairs?' '+t.pairs.map(k=>FL[k].n+': '+FL[k].g).join('. ')+'.':''));
+  $('#rdX').hidden=mode==='review';
+  $('#rdX').onclick=()=>{closeRead();if(mode==='start')renderHome();else if(rdCb){const c=rdCb;rdCb=null;c()}};
+  const words=t.s.join(' ').split(/\s+/).length+(t.pairs?18:0);
+  let secs=mode==='start'?Math.max(8,Math.min(20,words*.2)):mode==='review'?4:0;
+  if(mode==='start'&&tinfo(t).plays)secs=Math.max(5,secs/2);
+  if(window.__fast)secs=0;
+  const go=$('#rdGo'),fill=go.querySelector('.fill'),label=mode==='start'?'▶ Começar o jogo':'▶ Voltar ao jogo';
+  clearInterval(rdTimer);fill.style.transition='none';fill.style.width='0';
+  if(secs>0){go.disabled=true;let left=Math.ceil(secs);$('#rdGoT').textContent=`Lendo… ${left}`;$('#rdMsg').textContent='📖 Leia com atenção: as perguntas do jogo são sobre este texto!';
+    requestAnimationFrame(()=>{fill.style.transition=`width ${secs}s linear`;fill.style.width='100%'});
+    rdTimer=setInterval(()=>{left--;if(left<=0){clearInterval(rdTimer);go.disabled=false;fill.style.transition='none';fill.style.width='0';$('#rdGoT').textContent=label;$('#rdMsg').textContent='Pronto! Já leu tudo?'}else $('#rdGoT').textContent=`Lendo… ${left}`},1000);
+  }else{go.disabled=false;$('#rdGoT').textContent=label;$('#rdMsg').textContent=''}
+  go.onclick=()=>{if(go.disabled)return;closeRead();const c=rdCb;rdCb=null;if(c)c()};
+  el.hidden=false;el.scrollTop=0;
+}
+function closeRead(){clearInterval(rdTimer);hush();$('#read').hidden=true}
+function startText(tid){openRead(tid,'start',()=>begin(tid))}
+
+/* =========================================================
+   RODADA (igual para todos os jogos)
+   ========================================================= */
+let R=null;
+function begin(tid){
+  const t=TBY[tid],m=t.mis;
+  R={tid,t,m,idx:0,score:0,hearts:3,first:0,right:0,streak:0,wrong:[],pending:[],items:shuffle(t.items).map(i=>Object.assign({},i))};
+  $('#game').style.setProperty('--c',m.hex);show('game');
+  $('#qcard').hidden=true;$('#toast').hidden=true;$('#genius').hidden=true;$('#ghint').hidden=true;
+  const mod=R.mod={genius:Genius,runner:Runner,catch:Catch,bow:Bow,drums:Drums}[m.gid];
+  resize();hud();
+  if(mod.canvas){$('#cv').hidden=false;loopStart(mod)}else{$('#cv').hidden=true;loopStop()}
+  mod.start();if(mod.hint)showHint(mod.hint);
+}
+function hud(){if(!R)return;$('#hearts').textContent='❤️'.repeat(R.hearts)+'🤍'.repeat(3-R.hearts);
+  $('#prog').textContent=Math.min(R.idx+1,R.items.length)+' / '+R.items.length;$('#score').textContent=R.score}
+function optionsFor(it,n){return shuffle([it.a,...shuffle(it.w).slice(0,n-1)])}
+function judge(it,ok){
+  if(!it.retry){record(it,ok);R.first++;if(ok)R.right++}
+  if(ok){R.streak++;R.score+=10+Math.min(R.streak,5)*2;sfx('ok')}
+  else{R.streak=0;R.hearts=Math.max(0,R.hearts-1);R.pending.push(it);if(!it.retry){R.wrong.push(it);R.items.push(Object.assign({},it,{retry:true}))}sfx('bad');if(navigator.vibrate)try{navigator.vibrate(100)}catch(e){}}
+  hud();
+}
+function advance(next){
+  if(!R)return;R.idx++;
+  if(R.hearts<=0){paused=true;const lines=new Set(R.pending.map(i=>i.l));R.pending=[];
+    openRead(R.tid,'review',()=>{paused=false;last=performance.now();if(!R)return;R.hearts=3;hud();next()},lines)}
+  else next();
+}
+function showQ(it){$('#qcard').hidden=false;$('#qp').textContent=(it.retry?'🔁 De novo · ':'')+`Pergunta ${R.idx+1}`;$('#qq').innerHTML=md(it.q);hud()}
+let toastT=0;
+function toast(html,kind='ok',sec=1.2){const t=$('#toast');t.innerHTML=html;t.className=kind;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,sec*1000)}
+const wrongMsg=it=>`❌ A resposta certa é <b>${esc(it.a)}</b>`;
+let hintT=0;
+function showHint(t){const h=$('#ghint');h.textContent=t;h.hidden=false;clearTimeout(hintT);hintT=setTimeout(()=>h.hidden=true,4000)}
+function finish(){
+  if(!R)return;loopStop();if(R.mod.stop)R.mod.stop();
+  const acc=R.first?R.right/R.first:0,stars=acc>=.9?3:acc>=.65?2:1,t=R.t;
+  const ti=S.t[t.id]||(S.t[t.id]={plays:0,best:0});ti.plays++;ti.best=Math.max(ti.best,stars);save();
+  $('#result').style.setProperty('--c',R.m.hex);
+  $('#resStars').innerHTML=starsHTML(stars);$('#resTitle').textContent=['','Boa tentativa!','Muito bem!','Você arrasou!'][stars];
+  $('#resNum').textContent=`${R.right} de ${R.first} certas de primeira · ${R.score} pontos`;
+  const m=$('#resMist');
+  if(R.wrong.length){m.hidden=false;m.innerHTML='<h3>📌 Para lembrar:</h3>'+R.wrong.map(it=>`<div>${md(it.q)} <b>${esc(it.a)}</b></div>`).join('')}else m.hidden=true;
+  const nx=nextText(t),tid=t.id;
+  $('#resNext').style.setProperty('--c',nx.mis.hex);$('#resNext span').textContent=`${nx.mis.ico} Próximo: ${nx.title} ▶`;
+  $('#resNext').onclick=()=>startText(nx.id);$('#resAgain').onclick=()=>startText(tid);$('#resMap').onclick=()=>renderHome();
+  R=null;show('result');if(stars===3){sfx('win');confetti()}
+}
+function confetti(){const c=document.createElement('div');c.className='confetti';const cols=['#F2A900','#1F9D57','#E5484D','#2F7DE1','#8E44AD','#fff'];
+  for(let i=0;i<60;i++){const p=document.createElement('i');p.style.left=Math.random()*100+'%';p.style.background=rnd(cols);p.style.animationDelay=Math.random()*.6+'s';p.style.animationDuration=1.4+Math.random()+'s';c.appendChild(p)}
+  document.body.appendChild(c);setTimeout(()=>c.remove(),3200)}
+function confirmBox(title,text,no,yes,onYes,onNo){$('#cfTitle').textContent=title;$('#cfText').textContent=text;$('#cfNo').textContent=no;$('#cfYes span').textContent=yes;$('#confirm').hidden=false;
+  $('#cfNo').onclick=()=>{$('#confirm').hidden=true;if(onNo)onNo()};$('#cfYes').onclick=()=>{$('#confirm').hidden=true;onYes()}}
+$('#quitBtn').onclick=()=>{paused=true;confirmBox('Sair do jogo?','As respostas que você já deu ficam guardadas.','Continuar','Sair',()=>{loopStop();if(R&&R.mod.stop)R.mod.stop();R=null;paused=false;renderHome()},()=>{paused=false;last=performance.now()})};
+$('#bookBtn').onclick=()=>{if(!R)return;paused=true;openRead(R.tid,'peek',()=>{paused=false;last=performance.now()})};
+
+/* =========================================================
+   MOTOR DO CANVAS + desenhos compartilhados
+   ========================================================= */
+const cv=$('#cv'),ctx=cv.getContext('2d');let W=0,H=0,DPR=1;
+const FONT="'Segoe UI',system-ui,-apple-system,Roboto,sans-serif";
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=window.innerWidth;H=window.innerHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0)}
+window.addEventListener('resize',()=>{resize();if(R&&R.mod.onResize)R.mod.onResize()});
+let raf=0,last=0,active=null,paused=false,timers=[];
+function wait(s,fn){timers.push({t:s,fn})}
+function loopStart(mod){active=mod;paused=false;timers=[];last=performance.now();cancelAnimationFrame(raf);
+  const f=t=>{const dt=Math.min(.05,(t-last)/1000);last=t;
+    if(!paused&&active){for(const tm of timers.slice()){tm.t-=dt;if(tm.t<=0){timers.splice(timers.indexOf(tm),1);tm.fn()}}if(active&&active.update)active.update(dt)}
+    if(active&&active.draw)active.draw();raf=requestAnimationFrame(f)};raf=requestAnimationFrame(f)}
+function loopStop(){cancelAnimationFrame(raf);active=null;timers=[]}
+function rr(c,x,y,w,h,r){r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function circ(x,y,r){ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill()}
+function wrapLines(c,text,maxW){const ws=String(text).split(' '),ls=[];let cur='';for(const w of ws){const t=cur?cur+' '+w:w;if(!cur||c.measureText(t).width<=maxW)cur=t;else{ls.push(cur);cur=w}}if(cur)ls.push(cur);return ls}
+function fitText(c,text,maxW,maxH,start,min=11){for(let s=start;s>=min;s--){c.font=`900 ${s}px ${FONT}`;const ls=wrapLines(c,text,maxW);if(ls.every(l=>c.measureText(l).width<=maxW)&&ls.length*s*1.12<=maxH)return{s,ls}}
+  c.font=`900 ${min}px ${FONT}`;return{s:min,ls:wrapLines(c,text,maxW)}}
+function drawText(c,text,cx,cy,maxW,maxH,start,color){const f=fitText(c,text,maxW,maxH,start);c.fillStyle=color;c.textAlign='center';c.textBaseline='middle';
+  const lh=f.s*1.12;f.ls.forEach((l,i)=>c.fillText(l,cx,cy-(f.ls.length-1)*lh/2+i*lh+1))}
+const SC={n:['#FFFDF6','#2B2118'],ok:['#DDF5E4','#1F9D57'],bad:['#FDE3E3','#D93B3F']};
+function sign(c,x,y,w,h,text,st='n',fs=21){c.fillStyle='rgba(0,0,0,.22)';rr(c,x+2,y+5,w,h,13);c.fill();rr(c,x,y,w,h,13);c.fillStyle=SC[st][0];c.fill();c.lineWidth=3.5;c.strokeStyle=SC[st][1];c.stroke();
+  drawText(c,text,x+w/2,y+h/2,w-12,h-8,fs,'#2B2118')}
+function burst(arr,x,y,col,n=16){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=120+Math.random()*260;arr.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-120,life:.9,col:Array.isArray(col)?rnd(col):col,r:3+Math.random()*5})}}
+function updParts(arr,dt,g=600){for(const p of arr){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=g*dt;p.life-=dt}for(let i=arr.length-1;i>=0;i--)if(arr[i].life<=0)arr.splice(i,1)}
+function drawParts(arr){for(const p of arr){ctx.globalAlpha=Math.max(0,Math.min(1,p.life*1.4));ctx.fillStyle=p.col;circ(p.x,p.y,p.r)}ctx.globalAlpha=1}
+function qBottom(){const q=$('#qcard');return q.hidden?70:q.getBoundingClientRect().bottom}
+function tree(x,y,s){const c=ctx;c.fillStyle='rgba(0,0,0,.16)';c.beginPath();c.ellipse(x,y+s*.95,s*.8,s*.25,0,0,7);c.fill();c.fillStyle='#7A4B21';c.fillRect(x-s*.12,y,s*.24,s*.95);
+  c.fillStyle='#2E7D46';circ(x,y-s*.25,s*.7);c.fillStyle='#3F9A52';circ(x-s*.38,y,s*.48);circ(x+s*.38,y,s*.48);c.fillStyle='#62BF72';circ(x-s*.15,y-s*.45,s*.34)}
+function starShape(x,y,r,col){const c=ctx;c.fillStyle=col;c.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=i%2?r*.45:r;c.lineTo(x+Math.cos(a)*q,y+Math.sin(a)*q)}c.closePath();c.fill()}
+function zigzag(y,h,cols){const c=ctx,n=Math.ceil(W/h)+1;c.fillStyle=cols[0];c.fillRect(0,y,W,h);c.fillStyle=cols[1];for(let i=0;i<n;i++){c.beginPath();c.moveTo(i*h,y+h);c.lineTo(i*h+h/2,y);c.lineTo(i*h+h,y+h);c.fill()}}
+
+/* ---------- 🛹 CORRIDA DE SKATE (símbolos e identidade) ---------- */
+const Runner={canvas:true,hint:'Deslize ou toque ◀ ▶ para trocar de pista',
+  start(){this.lane=1;this.px=null;this.gate=null;this.coins=[];this.parts=[];this.speed=H*.17;this.off=0;this.coinT=.4;this.shake=0;this.t=0;this.lean=0;
+    this.deco=[];for(let i=0;i<9;i++)this.deco.push(this.mk(Math.random()*H));this.next()},
+  tw(){return Math.min(W*.8,460)},tl(){return(W-this.tw())/2},laneX(i){return this.tl()+this.tw()*(i+.5)/3},py(){return H*.8},gh(){return 72},
+  mk(y){return{y,side:Math.random()<.5?0:1,k:Math.random(),j:.3+Math.random()*.5}},
+  next(){if(!R)return;if(R.idx>=R.items.length)return finish();const it=this.it=R.items[R.idx];showQ(it);
+    let o=optionsFor(it,3).map(t=>({t,ok:t===it.a}));if(o.length<3)o.push({t:'',cone:true});o=shuffle(o);
+    wait(Math.min(2.4,.8+it.q.length/30),()=>{this.gate={y:qBottom()-this.gh(),opts:o,hit:false}})},
+  mv(d){const l=Math.max(0,Math.min(2,this.lane+d));if(l!==this.lane){this.lane=l;this.lean=d*.35;sfx('pop')}},
+  down(x){this.d=x},move(){},up(x){if(this.d==null)return;const dx=x-this.d;this.mv(Math.abs(dx)>28?(dx>0?1:-1):(x<W/2?-1:1));this.d=null},
+  key(k){if(k==='ArrowLeft')this.mv(-1);if(k==='ArrowRight')this.mv(1)},
+  update(dt){const sp=this.speed,py=this.py();this.t+=dt;this.off=(this.off+sp*dt)%60;this.lean*=Math.pow(.02,dt);
+    const tx=this.laneX(this.lane);if(this.px==null)this.px=tx;this.px+=(tx-this.px)*Math.min(1,dt*14);
+    for(const d of this.deco){d.y+=sp*dt;if(d.y>H+60)Object.assign(d,this.mk(-60-Math.random()*120))}
+    this.coinT-=dt;if(this.coinT<=0){this.coinT=.55;const g=this.gate;if(!g||g.hit||g.y>py-40)this.coins.push({lane:Math.floor(Math.random()*3),y:qBottom()})}
+    for(const c of this.coins){c.y+=sp*dt;if(!c.got&&Math.abs(c.y-py)<26&&c.lane===this.lane){c.got=true;R.score+=1;hud();sfx('coin')}}
+    this.coins=this.coins.filter(c=>c.y<H+30&&!c.got);
+    const g=this.gate;
+    if(g){g.y+=sp*dt;
+      if(!g.hit&&g.y+this.gh()>=py-24){g.hit=true;g.res=this.lane;const ch=g.opts[this.lane],ok=!!ch.ok;judge(this.it,ok);
+        if(ok){this.speed=Math.min(H*.27,this.speed*1.05);burst(this.parts,this.px,py-30,['#F2A900','#fff','#1F9D57'],22);toast('✅ '+praise(),'ok',.9)}
+        else{this.shake=.45;toast(wrongMsg(this.it),'bad',2.3)}
+        wait(ok?1:2.4,()=>advance(()=>this.next()))}
+      if(g.y>H+120)this.gate=null}
+    updParts(this.parts,dt);this.shake=Math.max(0,this.shake-dt)},
+  draw(){const c=ctx,tl=this.tl(),tw=this.tw(),py=this.py();c.save();if(this.shake>0)c.translate((Math.random()-.5)*12,0);
+    const gg=c.createLinearGradient(0,0,W,0);gg.addColorStop(0,'#58B368');gg.addColorStop(.5,'#6CC47A');gg.addColorStop(1,'#58B368');c.fillStyle=gg;c.fillRect(-20,0,W+40,H);
+    c.fillStyle='#D9D2C5';c.fillRect(tl-12,0,tw+24,H);c.fillStyle='#BDB5A6';for(let y=-60+this.off;y<H;y+=30){c.fillRect(tl-12,y,12,2);c.fillRect(tl+tw,y,12,2)}
+    const ag=c.createLinearGradient(tl,0,tl+tw,0);ag.addColorStop(0,'#3B404D');ag.addColorStop(.5,'#4A5060');ag.addColorStop(1,'#3B404D');c.fillStyle=ag;c.fillRect(tl,0,tw,H);
+    c.strokeStyle='rgba(255,255,255,.6)';c.lineWidth=4;c.setLineDash([28,32]);c.lineDashOffset=-this.off;
+    for(let i=1;i<3;i++){const x=tl+tw*i/3;c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke()}c.setLineDash([]);
+    if(tl>26)for(const d of this.deco){const x=d.side?tl+tw+12+(W-tl-tw-12)*d.j:(tl-12)*d.j;if(d.k<.7)tree(x,d.y,Math.min(22,tl*.32));else{c.fillStyle=d.k<.85?'#F7D417':'#FF8FB1';circ(x,d.y,4);c.fillStyle='#fff';circ(x,d.y,1.6)}}
+    for(const k of this.coins)starShape(this.laneX(k.lane),k.y,12,'#F2A900');
+    const g=this.gate;
+    if(g){const lw=tw/3,gh=this.gh();
+      g.opts.forEach((o,i)=>{const x=tl+lw*i+5,w=lw-10;
+        if(o.cone){const cx=x+w/2,cy=g.y+gh/2;c.fillStyle='#F08A24';c.beginPath();c.moveTo(cx,cy-24);c.lineTo(cx+17,cy+20);c.lineTo(cx-17,cy+20);c.fill();c.fillStyle='#fff';c.fillRect(cx-9,cy,18,6);c.fillStyle='#C86A10';c.fillRect(cx-22,cy+20,44,6);return}
+        sign(c,x,g.y,w,gh,o.t,g.hit?(o.ok?'ok':i===g.res?'bad':'n'):'n',21)})}
+    // skatista (Igor), visto de trás
+    const x=this.px||W/2,bob=Math.sin(this.t*9)*1.5;c.save();c.translate(x,py);c.rotate(this.lean);
+    c.fillStyle='rgba(0,0,0,.28)';c.beginPath();c.ellipse(0,38,26,8,0,0,7);c.fill();
+    c.fillStyle='#222';circ(-17,36,5);circ(17,36,5);rr(c,-26,26,52,9,5);c.fillStyle='#F2A900';c.fill();c.fillStyle='#D93B3F';c.fillRect(-8,26,16,9);
+    c.fillStyle='#27408B';rr(c,-11,4+bob,9,24,4);c.fill();rr(c,2,4+bob,9,24,4);c.fill();
+    c.strokeStyle='#F2C29B';c.lineWidth=6;c.lineCap='round';c.beginPath();c.moveTo(-11,-16+bob);c.lineTo(-24,-4+bob);c.moveTo(11,-16+bob);c.lineTo(24,-6+bob);c.stroke();
+    rr(c,-13,-24+bob,26,32,9);c.fillStyle='#E5484D';c.fill();c.fillStyle='#fff';c.fillRect(-13,-10+bob,26,4);
+    c.fillStyle='#F2C29B';circ(0,-33+bob,11);c.fillStyle='#2F7DE1';c.beginPath();c.arc(0,-35+bob,12.5,Math.PI,0);c.fill();c.fillRect(-12.5,-36+bob,25,3);c.fillStyle='#fff';c.fillRect(-2,-47+bob,4,10);
+    c.restore();drawParts(this.parts);c.restore()}
+};
+
+/* ---------- 🏹 ARCO E FLECHA (cultura indígena) ---------- */
+const Bow={canvas:true,hint:'Puxe a flecha para trás, mire e solte!',
+  start(){this.parts=[];this.t=0;this.next()},
+  anchor(){return{x:W/2,y:H*.82}},RR(){return Math.min(100,W*.24,H*.13)},
+  lay(){const n=this.tg.length,top=qBottom()+14,r=Math.max(24,Math.min(40,W/(n*2)-16,H*.055)),pw=Math.min(128,(W-12)/n-6);
+    this.top=top;this.tg.forEach((t,i)=>Object.assign(t,{x:W*(i+.5)/n,y:top+16+r,r,pw,ph:50}))},
+  next(){if(!R)return;if(R.idx>=R.items.length)return finish();const it=this.it=R.items[R.idx];showQ(it);
+    this.tg=optionsFor(it,3).map(t=>({t,ok:t===it.a,st:'n',wob:0,spin:0}));this.lay();this.stuck=[];this.reset();this.done=false},
+  reset(){const a=this.anchor();this.b={x:a.x,y:a.y,vx:0,vy:0,fly:false};this.drag=false},
+  onResize(){if(this.tg){this.lay();if(this.b&&!this.b.fly)this.reset()}},
+  G(){return H*1.2},
+  vel(){const a=this.anchor(),b=this.b,R0=this.RR(),need=a.y-this.top+30,vmax=Math.sqrt(2*this.G()*need)*1.1;return{vx:(a.x-b.x)/R0*vmax,vy:(a.y-b.y)/R0*vmax}},
+  down(x,y){const b=this.b;if(!b||b.fly||this.done)return;if(Math.hypot(x-b.x,y-b.y)<90||y>H*.6){this.drag=true;this.move(x,y)}},
+  move(x,y){if(!this.drag)return;const a=this.anchor(),R0=this.RR();let dx=x-a.x,dy=Math.max(4,y-a.y);const d=Math.hypot(dx,dy);if(d>R0){dx*=R0/d;dy*=R0/d}this.b.x=a.x+dx;this.b.y=a.y+dy},
+  up(){if(!this.drag)return;this.drag=false;const a=this.anchor(),b=this.b;if(Math.hypot(b.x-a.x,b.y-a.y)<16){this.reset();return}const v=this.vel();b.vx=v.vx;b.vy=v.vy;b.fly=true;sfx('shoot')},
+  update(dt){this.t+=dt;const b=this.b;
+    if(b&&b.fly){b.vy+=this.G()*dt;b.x+=b.vx*dt;b.y+=b.vy*dt;const an=Math.atan2(b.vy,b.vx),tx=b.x+Math.cos(an)*30,ty=b.y+Math.sin(an)*30;
+      if(!this.done)for(const t of this.tg){const inC=Math.hypot(tx-t.x,ty-t.y)<t.r+6,inP=Math.abs(tx-t.x)<t.pw/2&&ty>t.y+t.r&&ty<t.y+t.r+t.ph+6;
+        if(inC||inP){this.done=true;this.stuck.push({x:b.x,y:b.y,an});this.b=null;this.hit(t);break}}
+      if(this.b&&b.fly&&(b.y>H+60||b.x<-60||b.x>W+60||(b.y<-200))){toast('🏹 Quase! Tente de novo','info',1);this.reset()}}
+    for(const t of this.tg||[]){t.wob=Math.max(0,t.wob-dt);t.spin=Math.max(0,t.spin-dt)}updParts(this.parts,dt,700)},
+  hit(t){const ok=t.ok;judge(this.it,ok);sfx('thud');
+    if(ok){t.st='ok';t.spin=.6;burst(this.parts,t.x,t.y,['#F2A900','#1F9D57','#D93B3F','#fff'],26);toast('🎯 '+praise(),'ok',1)}
+    else{t.st='bad';t.wob=.6;this.tg.forEach(o=>{if(o.ok)o.st='ok'});toast(wrongMsg(this.it),'bad',2.3)}
+    wait(ok?1.1:2.4,()=>advance(()=>this.next()))},
+  arrow(c,len){c.strokeStyle='#8B5A2B';c.lineWidth=4;c.lineCap='round';c.beginPath();c.moveTo(0,0);c.lineTo(len,0);c.stroke();
+    c.fillStyle='#4A4A4A';c.beginPath();c.moveTo(len+12,0);c.lineTo(len-2,-6);c.lineTo(len-2,6);c.fill();
+    [['#D93B3F',-1],['#F2A900',1]].forEach(([col,s])=>{c.fillStyle=col;c.beginPath();c.moveTo(0,0);c.lineTo(-4,s*8);c.lineTo(12,s*8);c.lineTo(16,0);c.fill()})},
+  draw(){const c=ctx,a=this.anchor(),gy=H*.9;
+    const sk=c.createLinearGradient(0,0,0,H);sk.addColorStop(0,'#7FD3F2');sk.addColorStop(.6,'#D8F3E0');sk.addColorStop(1,'#FCEFC0');c.fillStyle=sk;c.fillRect(0,0,W,H);
+    c.fillStyle='rgba(255,243,176,.4)';circ(W*.84,H*.46,40);c.fillStyle='#FFF3B0';circ(W*.84,H*.46,26);
+    c.fillStyle='#9AD3A0';c.beginPath();c.moveTo(0,H*.62);c.quadraticCurveTo(W*.25,H*.5,W*.5,H*.6);c.quadraticCurveTo(W*.78,H*.68,W,H*.56);c.lineTo(W,H);c.lineTo(0,H);c.fill();
+    c.fillStyle='#4FA765';for(let i=0;i<9;i++)circ(W*i/8,H*.66+Math.sin(i*2.3)*8,W*.09);c.fillStyle='#3A8C52';c.fillRect(0,H*.68,W,H);
+    const rv=c.createLinearGradient(0,H*.7,0,H*.8);rv.addColorStop(0,'#5CC2E8');rv.addColorStop(1,'#3A9BD0');c.fillStyle=rv;c.fillRect(0,H*.7,W,H*.085);
+    c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=2;for(let i=0;i<5;i++){const x=((i*97+this.t*18)%(W+60))-30,y=H*.72+i%3*H*.02;c.beginPath();c.moveTo(x,y);c.quadraticCurveTo(x+9,y-4,x+18,y);c.stroke()}
+    // canoa de um tronco só
+    const cx=W*.2+Math.sin(this.t*.6)*8,cy=H*.745;c.fillStyle='#7A4B21';c.beginPath();c.moveTo(cx-30,cy-4);c.quadraticCurveTo(cx,cy+12,cx+30,cy-4);c.quadraticCurveTo(cx,cy+2,cx-30,cy-4);c.fill();
+    c.fillStyle='#6DB36A';c.fillRect(0,H*.785,W,H);zigzag(H-18,18,['#2B2118','#F2A900']);zigzag(H-27,9,['#D93B3F','#FFFDF6']);
+    // galho com os alvos
+    c.strokeStyle='#6B4423';c.lineWidth=11;c.lineCap='round';c.beginPath();c.moveTo(-10,this.top-2);c.quadraticCurveTo(W/2,this.top+10,W+10,this.top-4);c.stroke();
+    c.fillStyle='#3F9A52';for(let i=0;i<7;i++){const x=W*(i+.3)/7;c.beginPath();c.ellipse(x,this.top-7,13,6,(i%2?-.5:.5),0,7);c.fill()}
+    for(const t of this.tg||[]){const wob=t.wob?Math.sin(t.wob*40)*6:0;c.save();c.translate(t.x+wob,0);
+      c.strokeStyle='#C8A96A';c.lineWidth=3;c.beginPath();c.moveTo(0,this.top+4);c.lineTo(0,t.y-t.r);c.stroke();
+      c.save();c.translate(0,t.y);c.rotate(t.spin*14);const cols=['#2B2118','#F3DFA6','#D93B3F','#F3DFA6'];cols.forEach((col,i)=>{c.fillStyle=col;circ(0,0,t.r*(1-i*.22))});
+      c.fillStyle='#2B2118';for(let i=0;i<10;i++){const an=i*Math.PI/5;c.beginPath();c.moveTo(Math.cos(an)*t.r*.76,Math.sin(an)*t.r*.76);c.lineTo(Math.cos(an+.2)*t.r*.56,Math.sin(an+.2)*t.r*.56);c.lineTo(Math.cos(an-.2)*t.r*.56,Math.sin(an-.2)*t.r*.56);c.fill()}
+      c.fillStyle='#2B2118';circ(0,0,t.r*.12);c.restore();
+      sign(c,-t.pw/2,t.y+t.r+3,t.pw,t.ph,t.t,t.st,20);c.restore()}
+    for(const s of this.stuck||[]){c.save();c.translate(s.x,s.y);c.rotate(s.an);c.translate(-30,0);this.arrow(c,48);c.restore()}
+    // arco
+    const b=this.b,pull=b&&!b.fly?Math.hypot(b.x-a.x,b.y-a.y):0,ang=b&&!b.fly&&pull>3?Math.atan2(a.y-b.y,a.x-b.x):-Math.PI/2,L=Math.min(66,H*.1);
+    if(b&&this.drag){const v=this.vel();let x=a.x,y=a.y,vx=v.vx,vy=v.vy;c.fillStyle='rgba(43,33,24,.5)';for(let i=0;i<20;i++){const dt=.045;vy+=this.G()*dt;x+=vx*dt;y+=vy*dt;if(i%2===0)circ(x,y,4-i*.1)}}
+    c.save();c.translate(a.x,a.y);c.rotate(ang);
+    c.strokeStyle='#F5EBD0';c.lineWidth=2.5;c.beginPath();c.moveTo(0,-L);c.lineTo(-pull,0);c.lineTo(0,L);c.stroke();
+    c.strokeStyle='#7A4B21';c.lineWidth=9;c.lineCap='round';c.beginPath();c.moveTo(0,-L);c.quadraticCurveTo(38-pull*.12,0,0,L);c.stroke();
+    c.strokeStyle='#D93B3F';c.lineWidth=9;c.beginPath();c.moveTo(18-pull*.06,-9);c.lineTo(18-pull*.06,9);c.stroke();
+    c.strokeStyle='#F2A900';c.lineWidth=4;[-L*.62,L*.62].forEach(y=>{c.beginPath();c.moveTo(11,y-4);c.lineTo(15,y+4);c.stroke()});
+    if(b&&!b.fly){c.translate(-pull,0);this.arrow(c,L*1.25)}c.restore();
+    if(b&&b.fly){c.save();c.translate(b.x,b.y);c.rotate(Math.atan2(b.vy,b.vx));c.translate(-30,0);this.arrow(c,L*1.25);c.restore()}
+    drawParts(this.parts)}
+};
+
+/* ---------- 🎉 BALAIO DAS CULTURAS (Brasil multicultural) ---------- */
+const Catch={canvas:true,hint:'Arraste o balaio e pegue a resposta certa!',
+  start(){this.sx=W/2;this.tx=W/2;this.bubs=[];this.fr=[];this.parts=[];this.speed=H*.14;this.flash=0;this.t=0;
+    this.stars=Array.from({length:50},()=>({x:Math.random(),y:Math.random()*.6,s:.4+Math.random()}));this.next()},
+  sy(){return H*.85},
+  next(){if(!R)return;if(R.idx>=R.items.length)return finish();const it=this.it=R.items[R.idx];showQ(it);this.opts=optionsFor(it,3);this.queue=[];this.bubs=[];this.live=true;this.spT=.6;this.frT=2},
+  spawn(){if(!this.queue.length)this.queue=shuffle(this.opts);const t=this.queue.pop();ctx.font=`900 19px ${FONT}`;
+    const w=Math.min(W*.6,Math.max(74,ctx.measureText(t).width+34)),h=50;let x=w/2+8+Math.random()*(W-w-16);
+    const lb=this.bubs[this.bubs.length-1];if(lb&&Math.abs(lb.x-x)<(w+lb.w)/2+10)x=lb.x<W/2?W-w/2-8:w/2+8;
+    this.bubs.push({t,x,y:qBottom()-h,w,h,ok:t===this.it.a,col:rnd(['#E5484D','#F2A900','#2F7DE1','#1F9D57','#8E44AD'])})},
+  down(x){this.pd=true;this.tx=x},move(x){if(this.pd)this.tx=x},up(){this.pd=false},
+  key(k){if(k==='ArrowLeft')this.tx=Math.max(30,this.tx-70);if(k==='ArrowRight')this.tx=Math.min(W-30,this.tx+70)},
+  update(dt){this.t+=dt;this.sx+=(this.tx-this.sx)*Math.min(1,dt*12);const sy=this.sy();
+    if(this.live){this.spT-=dt;if(this.spT<=0&&this.bubs.length<4){this.spawn();this.spT=1.25}
+      this.frT-=dt;if(this.frT<=0){this.frT=2.4+Math.random()*1.5;this.fr.push({x:24+Math.random()*(W-48),y:qBottom()-10,e:rnd(['🍌','🥥','🌽','🍍']),v:H*(.2+Math.random()*.08)})}}
+    for(const b of this.bubs){b.y+=this.speed*dt;
+      if(this.live&&Math.abs(b.y-(sy-14))<b.h/2+14&&Math.abs(b.x-this.sx)<b.w/2+30){this.live=false;const ok=b.ok;judge(this.it,ok);
+        if(ok){burst(this.parts,b.x,b.y,['#F2A900','#7CF2B0','#fff','#FF8FB1'],24);toast('🧺 '+praise(),'ok',.9);this.speed=Math.min(H*.22,this.speed*1.04)}
+        else{this.flash=.4;toast(wrongMsg(this.it),'bad',2.3)}
+        this.bubs=[];wait(ok?.9:2.4,()=>advance(()=>this.next()));break}}
+    this.bubs=this.bubs.filter(b=>b.y<H+60);
+    for(const f of this.fr){f.y+=f.v*dt;if(!f.got&&Math.hypot(f.x-this.sx,f.y-(sy-10))<38){f.got=true;R.score+=2;hud();sfx('coin');burst(this.parts,f.x,f.y,'#F2A900',8)}}
+    this.fr=this.fr.filter(f=>f.y<H+40&&!f.got);updParts(this.parts,dt,300);this.flash=Math.max(0,this.flash-dt)},
+  draw(){const c=ctx,g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1B1F4B');g.addColorStop(.7,'#4B2A7B');g.addColorStop(1,'#A2466B');c.fillStyle=g;c.fillRect(0,0,W,H);
+    c.fillStyle='#fff';for(const s of this.stars){c.globalAlpha=.35+.4*Math.abs(Math.sin(this.t*s.s+s.x*9));circ(s.x*W,s.y*H,s.s*1.4)}c.globalAlpha=1;
+    // bandeirinhas
+    const cols=['#E5484D','#F2A900','#2F7DE1','#1F9D57','#fff','#FF8FB1'];
+    [[.3,26],[.42,18]].forEach(([fy,sag],r)=>{const y0=H*fy,n=Math.max(7,Math.round(W/46));c.strokeStyle='rgba(255,255,255,.6)';c.lineWidth=1.5;c.beginPath();
+      for(let i=0;i<=n;i++){const x=W*i/n,y=y0+Math.sin(i/n*Math.PI)*sag;i?c.lineTo(x,y):c.moveTo(x,y)}c.stroke();
+      for(let i=0;i<n;i++){const x=W*(i+.5)/n,y=y0+Math.sin((i+.5)/n*Math.PI)*sag;c.fillStyle=cols[(i+r*2)%cols.length];c.globalAlpha=.9;c.beginPath();c.moveTo(x-10,y);c.lineTo(x+10,y);c.lineTo(x,y+20);c.fill()}c.globalAlpha=1});
+    c.fillStyle='#5A3520';c.fillRect(0,H*.93,W,H*.07);c.fillStyle='#7A4B2A';for(let x=0;x<W;x+=34)c.fillRect(x,H*.93,30,6);
+    c.font=`30px ${FONT}`;c.textAlign='center';c.textBaseline='middle';for(const f of this.fr)c.fillText(f.e,f.x,f.y);
+    for(const b of this.bubs){c.strokeStyle='rgba(255,255,255,.5)';c.lineWidth=2;c.beginPath();c.moveTo(b.x,b.y-b.h/2);c.lineTo(b.x,b.y-b.h/2-12);c.stroke();
+      c.fillStyle='rgba(0,0,0,.25)';rr(c,b.x-b.w/2+2,b.y-b.h/2+5,b.w,b.h,b.h/2);c.fill();rr(c,b.x-b.w/2,b.y-b.h/2,b.w,b.h,b.h/2);c.fillStyle='#FFFDF6';c.fill();c.lineWidth=4;c.strokeStyle=b.col;c.stroke();
+      drawText(c,b.t,b.x,b.y,b.w-20,b.h-6,19,'#2B2118')}
+    // balaio
+    const x=this.sx,y=this.sy();c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.ellipse(x,y+26,44,8,0,0,7);c.fill();
+    c.strokeStyle='#8B5A2B';c.lineWidth=5;c.beginPath();c.arc(x,y-14,34,Math.PI*1.08,Math.PI*1.92);c.stroke();
+    c.save();c.beginPath();c.moveTo(x-46,y-16);c.lineTo(x+46,y-16);c.lineTo(x+32,y+26);c.lineTo(x-32,y+26);c.closePath();c.fillStyle='#E6C177';c.fill();c.clip();
+    c.strokeStyle='#2B2118';c.lineWidth=4;for(let r=0;r<2;r++){c.beginPath();for(let i=-5;i<=5;i++){const px=x+i*10,py=y-6+r*16+(i%2?8:0);i===-5?c.moveTo(px,py):c.lineTo(px,py)}c.stroke()}
+    c.strokeStyle='#D93B3F';c.lineWidth=3;c.beginPath();c.moveTo(x-46,y+18);c.lineTo(x+46,y+18);c.stroke();c.restore();
+    c.fillStyle='#8B5A2B';rr(c,x-49,y-21,98,9,4);c.fill();
+    drawParts(this.parts);if(this.flash>0){c.fillStyle=`rgba(229,72,77,${this.flash*.6})`;c.fillRect(0,0,W,H)}}
+};
+
+/* ---------- 🥁 RODA DE BATUQUE (cultura afro-brasileira) ---------- */
+const Drums={canvas:true,hint:'Toque no atabaque da resposta certa!',
+  start(){this.parts=[];this.t=0;this.beat=0;this.bt=0;this.groove=0;this.kick=0;this.houses=Array.from({length:8},(_,i)=>({c:['#F7C8D0','#BFE3F5','#FBE2A0','#C9EBC3','#E7C9F2','#FFD1A6'][i%6],h:.75+((i*37)%10)/40}));this.next()},
+  next(){if(!R)return;if(R.idx>=R.items.length)return finish();const it=this.it=R.items[R.idx];showQ(it);
+    this.o=optionsFor(it,3).map(t=>({t,ok:t===it.a,st:'n',sq:0,sh:0}));this.live=false;this.time=this.T=9;wait(.35,()=>{this.live=true})},
+  lay(){const n=this.o.length,dh=Math.min(130,H*.21),dw=Math.min(96,W/n-22);return{n,dh,dw,dy:H-dh-16,sy:H-dh-16-74,cw:W/n}},
+  down(x,y){const L=this.lay();if(y>L.sy-8)this.tap(Math.max(0,Math.min(L.n-1,Math.floor(x/L.cw))))},move(){},up(){},
+  tap(i){if(!this.live||!R)return;this.live=false;const o=this.o[i],ok=o.ok,L=this.lay();sfx('drum');o.sq=.3;judge(this.it,ok);
+    if(ok){o.st='ok';this.groove=Math.min(3,this.groove+1);this.kick=.9;burst(this.parts,L.cw*(i+.5),L.dy,['#F2A900','#fff','#D93B3F','#1F9D57'],24);
+      if(this.time>0){R.score+=5;hud();toast('🎵 '+praise()+' No ritmo! +5','ok',1)}else toast('✅ '+praise(),'ok',1)}
+    else{o.st='bad';o.sh=.5;this.groove=0;this.o.forEach(x=>{if(x.ok)x.st='ok'});toast(wrongMsg(this.it),'bad',2.3)}
+    wait(ok?1.1:2.4,()=>advance(()=>this.next()))},
+  update(dt){this.t+=dt;if(this.live)this.time=Math.max(0,this.time-dt);this.kick=Math.max(0,this.kick-dt);
+    this.bt+=dt;if(this.bt>=.3){this.bt-=.3;const b=this.beat++%8;
+      if(b===0||b===3||b===6)tone(95,.12,'sine',.16,0,-40);if(this.groove>=1&&(b===2||b===5||b===7))tone(1400,.03,'square',.03);
+      if(this.groove>=2&&(b===0||b===4))tone(b?330:294,.14,'triangle',.07);if(this.groove>=3&&b%2===1)tone(700,.04,'triangle',.05)}
+    for(const o of this.o||[]){o.sq=Math.max(0,o.sq-dt);o.sh=Math.max(0,o.sh-dt)}updParts(this.parts,dt,500)},
+  fig(c,x,y,s,ph,flip,kick){c.save();c.translate(x,y);c.scale(flip*s,s);const sw=Math.sin(this.t*5+ph),lean=sw*.18;c.rotate(lean);
+    c.lineCap='round';c.strokeStyle='#FFFDF6';c.lineWidth=9;
+    c.beginPath();c.moveTo(0,0);c.lineTo(-10-sw*8,34);c.stroke();c.beginPath();c.moveTo(0,0);if(kick>0){const k=Math.sin(Math.min(1,kick/.9)*Math.PI);c.lineTo(30*k+8,34-46*k)}else c.lineTo(12+sw*8,34);c.stroke();
+    c.lineWidth=11;c.beginPath();c.moveTo(0,0);c.lineTo(0,-30);c.stroke();c.strokeStyle='#F2A900';c.lineWidth=4;c.beginPath();c.moveTo(-6,-2);c.lineTo(6,-2);c.stroke();
+    c.strokeStyle='#7A4A2B';c.lineWidth=6;c.beginPath();c.moveTo(0,-26);c.lineTo(18,-14+sw*8);c.moveTo(0,-26);c.lineTo(-16,-18-sw*8);c.stroke();
+    c.fillStyle='#7A4A2B';circ(0,-41,9);c.restore()},
+  draw(){const c=ctx,L=this.lay(),qb=qBottom(),pulse=1-this.bt/.3;
+    const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#FFC978');g.addColorStop(.55,'#FF9E7A');g.addColorStop(1,'#E0705A');c.fillStyle=g;c.fillRect(0,0,W,H);
+    c.fillStyle='rgba(255,244,200,.8)';circ(W*.78,qb+30,30);
+    const hy=Math.max(qb+56,H*.4),hb=L.sy-26,hw=W/this.houses.length*1.25;
+    this.houses.forEach((h,i)=>{const x=i*hw*.8-10,hh=(hb-hy)*h.h+30,y=hb-hh;c.fillStyle=h.c;c.fillRect(x,y,hw,hh);c.fillStyle='rgba(0,0,0,.12)';c.fillRect(x+hw-5,y,5,hh);c.fillStyle='#A94B2D';c.fillRect(x-2,y-7,hw+4,8);
+      c.fillStyle='#4E6A8E';for(let k=0;k<2;k++)if(hh>52){rr(c,x+hw*(.2+k*.4),y+12,hw*.2,22,6);c.fill()}c.fillStyle='#6B4423';rr(c,x+hw*.38,hb-26,hw*.24,26,5);c.fill()});
+    c.fillStyle='#B58B5E';c.fillRect(0,hb,W,H);c.fillStyle='rgba(0,0,0,.1)';for(let y=hb+8;y<H;y+=16)for(let x=(y%32?0:12);x<W;x+=24){c.beginPath();c.ellipse(x,y,8,4,0,0,7);c.fill()}
+    if(hb-qb>70){const s=Math.min(1,(hb-qb)/170),fy=hb-38*s;this.fig(c,W/2-34*s,fy,s,0,1,this.kick);this.fig(c,W/2+34*s,fy,s,2,-1,0)}
+    // barra do ritmo
+    const bw=Math.min(W-40,320),bx=(W-bw)/2,by=L.sy-18;rr(c,bx,by,bw,9,5);c.fillStyle='rgba(0,0,0,.25)';c.fill();if(this.time>0){rr(c,bx,by,bw*this.time/this.T,9,5);c.fillStyle='#FFE066';c.fill()}
+    this.o.forEach((o,i)=>{const cx=L.cw*(i+.5)+(o.sh?Math.sin(o.sh*40)*6:0),sq=o.sq/.3,dw=L.dw,dh=L.dh*(1-sq*.07),dy=H-16-dh;
+      sign(c,cx-(L.cw-10)/2,L.sy,L.cw-10,58,o.t,o.st,20);
+      c.fillStyle='rgba(0,0,0,.28)';c.beginPath();c.ellipse(cx,H-14,dw*.42,8,0,0,7);c.fill();
+      const wg=c.createLinearGradient(cx-dw/2,0,cx+dw/2,0);wg.addColorStop(0,'#7A4319');wg.addColorStop(.45,'#C27A3A');wg.addColorStop(1,'#6B3A15');
+      c.fillStyle=wg;c.beginPath();c.moveTo(cx-dw/2,dy+8);c.lineTo(cx+dw/2,dy+8);c.lineTo(cx+dw*.3,H-16);c.lineTo(cx-dw*.3,H-16);c.closePath();c.fill();
+      c.strokeStyle='#F3E3C3';c.lineWidth=2;for(let k=-2;k<=2;k++){c.beginPath();c.moveTo(cx+k*dw*.2,dy+12);c.lineTo(cx+(k+.5)*dw*.14,dy+dh*.5);c.stroke()}
+      c.fillStyle='#D93B3F';c.fillRect(cx-dw*.4,dy+dh*.5,dw*.8,7);c.fillStyle='#F2A900';c.fillRect(cx-dw*.39,dy+dh*.5+7,dw*.78,5);c.fillStyle='#1F9D57';c.fillRect(cx-dw*.38,dy+dh*.5+12,dw*.76,5);
+      c.fillStyle='#F3E3C3';c.beginPath();c.ellipse(cx,dy+8,dw/2,11+sq*3,0,0,7);c.fill();c.strokeStyle='#5A3210';c.lineWidth=3;c.stroke();
+      if(this.live){c.strokeStyle=`rgba(255,255,255,${pulse*.7})`;c.lineWidth=3;c.beginPath();c.ellipse(cx,dy+8,dw/2+6+(1-pulse)*8,14+(1-pulse)*4,0,0,7);c.stroke()}});
+    drawParts(this.parts)}
+};
+
+/* entrada do canvas */
+let pdn=false;
+cv.addEventListener('pointerdown',e=>{ac();const m=R&&R.mod;if(!m||!m.canvas||paused)return;pdn=true;m.down(e.clientX,e.clientY);try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+cv.addEventListener('pointermove',e=>{const m=R&&R.mod;if(!m||!m.canvas||paused||!pdn)return;m.move(e.clientX,e.clientY)});
+const pup=e=>{const m=R&&R.mod;pdn=false;if(!m||!m.canvas||paused)return;m.up(e.clientX,e.clientY)};
+cv.addEventListener('pointerup',pup);cv.addEventListener('pointercancel',pup);
+window.addEventListener('keydown',e=>{const m=R&&R.mod;if(m&&m.key&&!paused)m.key(e.key)});
+
+/* ---------- 🟢🔴🟡🔵 GENIUS DAS BANDEIRAS (nacionalidade) ---------- */
+const GT=[415,310,252,209];
+const Genius={
+  start(){$('#genius').hidden=false;this.tok=0;this.seq=[];this.n=0;this.pads=$$('#gBoard .gp');this.pads.forEach((p,i)=>p.onclick=()=>this.tap(i));this.next()},
+  stop(){this.tok++;$('#genius').hidden=true},
+  later(ms,fn){const tok=this.tok;setTimeout(()=>{if(tok===this.tok&&R)fn()},ms)},
+  light(i,ms=280){const p=this.pads[i];p.classList.add('lit');tone(GT[i],ms/1000,'triangle',.16);setTimeout(()=>p.classList.remove('lit'),ms)},
+  next(){if(!R)return;if(R.idx>=R.items.length)return finish();this.tok++;const it=this.it=R.items[R.idx];hud();this.mode='q';
+    $('#gCard').innerHTML=it.flag?`${flag(it.flag)}<div><div class="nm">${it.retry?'🔁 De novo · ':''}País</div><div class="ct">${FL[it.flag].n}</div></div>`:`<span class="big">${it.emo||'❓'}</span><div><div class="nm">${it.retry?'🔁 De novo · ':''}Pergunta do texto</div></div>`;
+    $('#gQ').innerHTML=md(it.q);this.opts=optionsFor(it,4);
+    const b=$('#gBoard');b.classList.remove('mem','lock');this.pads.forEach((p,i)=>{p.classList.remove('dim','buzz');p.querySelector('span').textContent=this.opts[i]});
+    $('#gKnob').textContent=`${R.idx+1}/${R.items.length}`;$('#gSt').textContent='Toque na cor da resposta certa!'},
+  tap(i){ac();if(this.mode==='mem')return this.memTap(i);if(this.mode!=='q')return;this.mode='wait';const it=this.it,ok=this.opts[i]===it.a,ci=this.opts.indexOf(it.a);
+    $('#gBoard').classList.add('lock');judge(it,ok);this.n++;
+    if(ok){this.light(i,420);if(!it.retry)this.seq.push(i);$('#gSt').textContent='✅ '+praise();$('#gKnob').textContent='⭐'}
+    else{const p=this.pads[i];p.classList.remove('buzz');void p.offsetWidth;p.classList.add('buzz');this.pads.forEach((q,k)=>{if(k!==ci)q.classList.add('dim')});
+      this.later(450,()=>this.light(ci,900));$('#gSt').innerHTML=it.flag?`❌ ${FL[it.flag].n} → <b>${esc(it.a)}</b>`:`❌ Resposta certa: <b>${esc(it.a)}</b>`;$('#gKnob').textContent='👀'}
+    this.later(ok?950:2600,()=>{if(this.n%3===0&&this.seq.length>=3)this.memory();else advance(()=>this.next())})},
+  memory(){this.mode='show';const s=this.ms=this.seq.slice(-Math.min(5,this.seq.length)),b=$('#gBoard');b.classList.add('mem','lock');this.pads.forEach(p=>p.classList.remove('dim'));
+    $('#gCard').innerHTML='<span class="big">🧠</span><div><div class="nm">Desafio Genius</div><div class="ct">Repita as cores!</div></div>';$('#gQ').innerHTML='Vale <b>bônus</b>! Preste atenção na ordem.';
+    $('#gSt').textContent='👀 Observe…';$('#gKnob').textContent='🧠';
+    s.forEach((p,i)=>this.later(800+i*650,()=>this.light(p,430)));
+    this.later(800+s.length*650+150,()=>{this.mode='mem';this.k=0;b.classList.remove('lock');$('#gSt').textContent='Sua vez! Repita as cores.'})},
+  memTap(i){if(i===this.ms[this.k]){this.light(i);this.k++;$('#gKnob').textContent=this.k+'/'+this.ms.length;
+      if(this.k===this.ms.length){this.mode='wait';R.score+=15;hud();sfx('win');$('#gSt').textContent='🧠 Memória de campeão! +15';this.later(1200,()=>advance2(()=>this.next()))}}
+    else{this.mode='wait';const p=this.pads[i];p.classList.remove('buzz');void p.offsetWidth;p.classList.add('buzz');tone(110,.3,'sawtooth',.1);$('#gSt').textContent='Quase! 😉 Vamos continuar.';this.later(1200,()=>advance2(()=>this.next()))}}
+};
+/* depois do desafio de memória a pergunta já foi contada: só segue em frente */
+function advance2(next){advance(next)}
+
+/* ---------- início ---------- */
+document.addEventListener('pointerdown',()=>ac(),{once:true});
+resize();renderHome();
+</script>
+</body>
+</html>
